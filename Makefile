@@ -8,3 +8,7 @@ main: main.c
 .PHONY: clean
 clean:
 	del /s *.o
+
+cleanall:
+	del /s *.o
+	del *.exe
