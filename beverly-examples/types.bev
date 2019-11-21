@@ -1,0 +1,19 @@
+// enteros i8, i16, i32, i64 (default i32).
+let n:i32 = 5 // forma explicita.
+n := 5 // inferencia de tipos (implicita).
+
+// booleanos
+let b:bool = true // forma explicita.
+b := true // inferencia de tipos (implicita).
+
+// characters
+let c:char = 'a' // forma explicita.
+c := 'a' // inferencia de tipos (implicita).
+
+// flotantes f32, f64 (default f32).
+let f:float = 5.1 // forma explicita.
+f := 5.1 // inferencia de tipos (implicita).
+
+// cadena de caracteres (ascii or unicode todavia no se XD).
+let text:string = "Hola, mundo!" // forma explicita.
+text := "Hola, mundo!" // inferencia de tipos (implicita).
