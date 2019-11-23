@@ -4,10 +4,10 @@
 
 int main(void) {
 
-    char c = 'h';
-    const char *str = &c;
-    
-    printf("c: %s\n", str);
+    char *str0 = "hello sds";
+    char *str1 = "hello";
+
+    printf("equal: %d\n", str0 == str1);
 
     return 0;
 }

@@ -13,8 +13,11 @@ typedef struct Lexer {
 
 Lexer new_lexer(const char *input);
 
-void read_lexer(Lexer *lexer);
+void free_lexer(Lexer *lexer);
+
+void read_char_lexer(Lexer *lexer);
 
 Token next_token_lexer(Lexer *lexer);
+
 
 #endif //LEXER_H
