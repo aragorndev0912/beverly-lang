@@ -1,10 +1,13 @@
 #include <stdio.h>
-#include "includes/object.h"
+#include <string.h>
+#include <stdlib.h>
 
 int main(void) {
 
-    Object obj = init_object(5);
-    printf("id: %d", obj._id);
+    char c = 'h';
+    const char *str = &c;
+    
+    printf("c: %s\n", str);
 
     return 0;
 }
