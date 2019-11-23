@@ -1,7 +1,7 @@
 NAME=beverly
 CC=gcc
 CFLAGS=-Wall -g
-CVERSION=c99
+CVERSION=c11
 
 main: main.o token.o lexer.o
 	$(CC) $(CFLAGS) -o $(NAME) main.o lexer.o token.o -std=$(CVERSION)

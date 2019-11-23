@@ -3,13 +3,13 @@
 #include <string.h>
 #include <stdlib.h>
 
-static const char *read_identifier(Lexer *lexer);
+static char *read_identifier(Lexer *lexer);
 static bool is_letter(char ch);
-static const char *get_slice_str(Lexer *lexer, int begin);
+static char *get_slice_str(Lexer *lexer, int begin);
 static void skip_space(Lexer *lexer);
-static const char *read_number(Lexer *lexer);
+static char *read_number(Lexer *lexer);
 static bool is_digit(char ch);
-static const char *to_str(const Lexer *lexer, size_t n);
+static char *to_str(const Lexer *lexer, size_t n);
 
 Lexer new_lexer(const char *input) {
     Lexer lexer = {0};
@@ -89,7 +89,7 @@ Token next_token_lexer(Lexer *lexer) {
     return token;
 }
 
-const char *read_identifier(Lexer *lexer) {
+static char *read_identifier(Lexer *lexer) {
     int begin = lexer->_position;
     while (is_letter(lexer->_ch))
         read_char_lexer(lexer);
@@ -101,7 +101,7 @@ static bool is_letter(char ch) {
     return (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || (ch == '_'); 
 }
 
-static const char *get_slice_str(Lexer *lexer, int begin) {
+static char *get_slice_str(Lexer *lexer, int begin) {
     int end = lexer->_position;
     int diff = end - begin;
     char *str = (char *) malloc(sizeof(char) * diff+1);
@@ -118,7 +118,7 @@ static void skip_space(Lexer *lexer) {
         read_char_lexer(lexer);
 }
 
-static const char *read_number(Lexer *lexer) {
+static char *read_number(Lexer *lexer) {
     int begin = lexer->_position;
     while (is_digit(lexer->_ch))
         read_char_lexer(lexer);
@@ -130,7 +130,7 @@ static bool is_digit(char ch) {
     return ch >= '0' && ch <= '9';  
 }
 
-static const char *to_str(const Lexer *lexer, size_t n) {
+static char *to_str(const Lexer *lexer, size_t n) {
     char *str = (char *) malloc(sizeof(char) * n);
     str[0] = lexer->_ch;
     str[1] = '\0';

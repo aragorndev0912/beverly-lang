@@ -1,45 +1,45 @@
 #ifndef BEV_TOKEN_H
 #define BEV_TOKEN_H
 
-const char *BEV_ILLEGAL = "ILLEGAL";
-const char *BEV_EOF = "EOF";
+extern char *BEV_ILLEGAL;
+extern char *BEV_EOF;
 
 // Identificadores y  literales.
-const char *BEV_IDENT = "IDENT"; // foo, x, y, a, ...
-const char *BEV_INT = "INT"; // 1, 55, ...
+extern char *BEV_IDENT; // foo, x, y, a, ...
+extern char *BEV_INT; // 1, 55, ...
 
 // Operadores
-const char *BEV_ASSIGN = "=";
-const char *BEV_PLUS = "+";
+extern char *BEV_ASSIGN;
+extern char *BEV_PLUS;
 
 // Delimitadores.
-const char *BEV_COMMA = ",";
-const char *BEV_SEMICOLON = ";";
+extern char *BEV_COMMA;
+extern char *BEV_SEMICOLON;
 
-const char *BEV_LPAREN = "(";
-const char *BEV_RPAREN = ")";
-const char *BEV_LBRACE = "{";
-const char *BEV_RBRACE = "}";
+extern char *BEV_LPAREN;
+extern char *BEV_RPAREN;
+extern char *BEV_LBRACE;
+extern char *BEV_RBRACE;
 
 // Palabras claves.
-const char *BEV_FUNCTION = "FUNCTION";
-const char *BEV_LET = "LET";
+extern char *BEV_FUNCTION;
+extern char *BEV_LET;
 
-typedef const char *TokenType;
+typedef char *TokenType;
 
 typedef struct Token {
     TokenType _type;
-    const char *_literal;
+    char *_literal;
 
 } Token;
 
-Token new_token(TokenType type, const char *literal);
+Token new_token(TokenType type, char *literal);
 
 void free_token(Token *token);
 
 void set_type_token(Token *token, TokenType type);
 
-void set_literal_token(Token *token, const char *literal);
+void set_literal_token(Token *token, char *literal);
 
 TokenType look_up_ident_token(const Token *token);
 

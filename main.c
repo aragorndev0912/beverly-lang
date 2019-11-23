@@ -4,7 +4,11 @@
 int main(void) {
 
     Lexer lexer = new_lexer("let x = 5;");
-    read_char_lexer(&lexer);
+    
+    Token token = next_token_lexer(&lexer);
+
+    free_token(&token);
+    free_lexer(&lexer); // libera la memoria.
 
     return 0;
 }
