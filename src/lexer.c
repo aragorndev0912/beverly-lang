@@ -1,13 +1,15 @@
 #include "./lexer.h"
-#include <string.h>
 #include "./bool.h"
+#include <string.h>
+#include <stdlib.h>
 
 static const char *read_identifier(Lexer *lexer);
 static bool is_letter(char ch);
 static const char *get_slice_str(Lexer *lexer, int begin);
 static void skip_space(Lexer *lexer);
-static const *read_number(Lexer *lexer);
+static const char *read_number(Lexer *lexer);
 static bool is_digit(char ch);
+static const char *to_str(const Lexer *lexer, size_t n);
 
 Lexer new_lexer(const char *input) {
     Lexer lexer = {0};
@@ -37,36 +39,36 @@ Token next_token_lexer(Lexer *lexer) {
 
     switch (lexer->_ch) {
         case '=':
-            token = new_token(ASSIGN, lexer->_ch);
+            token = new_token(BEV_ASSIGN, to_str(lexer, 2));
             break;
 
         case ';':
-            token = new_token(SEMICOLON, lexer->_ch);
+            token = new_token(BEV_SEMICOLON, to_str(lexer, 2));
             break;
 
         case '(':
-            token = new_token(LPAREN, lexer->_ch);
+            token = new_token(BEV_LPAREN, to_str(lexer, 2));
             break;
 
         case ')':
-            token = new_token(RPAREN, lexer->_ch);
+            token = new_token(BEV_RPAREN, to_str(lexer, 2));
             break;
         
         case '+':
-            token = new_token(PLUS, lexer->_ch);
+            token = new_token(BEV_PLUS, to_str(lexer, 2));
             break;
         
         case '{':
-            token = new_token(LBRACE, lexer->_ch);
+            token = new_token(BEV_LBRACE, to_str(lexer, 2));
             break;
 
         case '}':
-            token = new_token(RBRACE, lexer->_ch);
+            token = new_token(BEV_RBRACE, to_str(lexer, 2));
             break;
 
         case 0:
             set_literal_token(&token, 0);
-            set_type_token(&token, EOF);
+            set_type_token(&token, BEV_EOF);
         
         default:
             if (is_letter(lexer->_ch)) {
@@ -76,14 +78,14 @@ Token next_token_lexer(Lexer *lexer) {
             }
             else if (is_digit(lexer->_ch)) {
                 set_literal_token(&token, read_number(lexer));
-                set_type_token(&token, INT);
+                set_type_token(&token, BEV_INT);
                 return token;
             }
             else
-                token = new_token(ILLEGAL, lexer->_ch);
+                token = new_token(BEV_ILLEGAL, to_str(lexer, 2));
     }
 
-    read_lexer(lexer);
+    read_char_lexer(lexer);
     return token;
 }
 
@@ -96,7 +98,7 @@ const char *read_identifier(Lexer *lexer) {
 }
 
 static bool is_letter(char ch) {
-    return ch >= 'a' && ch <= 'z' || ch >= 'A' && ch <= 'Z' || ch == '_'; 
+    return (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || (ch == '_'); 
 }
 
 static const char *get_slice_str(Lexer *lexer, int begin) {
@@ -106,7 +108,7 @@ static const char *get_slice_str(Lexer *lexer, int begin) {
 
     int index = 0;
     for (int k=begin; k < end; k++)
-        str[0] = lexer->_input[k];
+        str[index++] = lexer->_input[k];
 
     return str;
 }
@@ -116,7 +118,7 @@ static void skip_space(Lexer *lexer) {
         read_char_lexer(lexer);
 }
 
-static const *read_number(Lexer *lexer) {
+static const char *read_number(Lexer *lexer) {
     int begin = lexer->_position;
     while (is_digit(lexer->_ch))
         read_char_lexer(lexer);
@@ -126,4 +128,12 @@ static const *read_number(Lexer *lexer) {
 
 static bool is_digit(char ch) {
     return ch >= '0' && ch <= '9';  
+}
+
+static const char *to_str(const Lexer *lexer, size_t n) {
+    char *str = (char *) malloc(sizeof(char) * n);
+    str[0] = lexer->_ch;
+    str[1] = '\0';
+
+    return str;
 }

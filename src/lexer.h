@@ -1,5 +1,5 @@
-#ifndef LEXER_H
-#define LEXER_H
+#ifndef BEV_LEXER_H
+#define BEV_LEXER_H
 
 #include "./token.h"
 
@@ -20,4 +20,4 @@ void read_char_lexer(Lexer *lexer);
 Token next_token_lexer(Lexer *lexer);
 
 
-#endif //LEXER_H
+#endif //BEV_LEXER_H

@@ -1,13 +1,10 @@
 #include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
+#include "./src/lexer.h"
 
 int main(void) {
 
-    char *str0 = "hello sds";
-    char *str1 = "hello";
-
-    printf("equal: %d\n", str0 == str1);
+    Lexer lexer = new_lexer("let x = 5;");
+    read_char_lexer(&lexer);
 
     return 0;
 }
