@@ -1,38 +1,9 @@
 #include "repl.h"
 #include "bool.h"
 #include <stdio.h>
+#include <stdlib.h>
 
-// char * getline(void) {
-//     char * line = malloc(100), * linep = line;
-//     size_t lenmax = 100, len = lenmax;
-//     int c;
-
-//     if(line == NULL)
-//         return NULL;
-
-//     for(;;) {
-//         c = fgetc(stdin);
-//         if(c == EOF)
-//             break;
-
-//         if(--len == 0) {
-//             len = lenmax;
-//             char * linen = realloc(linep, lenmax *= 2);
-
-//             if(linen == NULL) {
-//                 free(linep);
-//                 return NULL;
-//             }
-//             line = linen + (line - linep);
-//             linep = linen;
-//         }
-
-//         if((*line++ = c) == '\n')
-//             break;
-//     }
-//     *line = '\0';
-//     return linep;
-// }
+static char *get_line(const char *prompt);
 
 Repl new_repl(const char *prompt) {
     Repl repl = {0};
@@ -42,14 +13,51 @@ Repl new_repl(const char *prompt) {
 }
 
 void start_repl(Repl *repl) {
-    char data[1024];
+    char *line = NULL;
     while (true) {
-        printf("%s", repl->_prompt);
-        scanf("%s", data);
-        printf("data: %s\n",data);
+        line = get_line(repl->_prompt);
+        printf("%s\n", line);
+        
+        
+        free(line);
+        line = NULL;
     }
+    
 }
 
 void free_repl(Repl *repl) {
     // Falta implementacion.
+}
+
+char *get_line(const char *prompt) {
+    int diff = 4;
+    int index = 0;
+    char ch = 0;
+    size_t max = diff;
+
+    char *line = (char *) malloc(sizeof(char) * max);
+    printf("%s ", prompt);
+    while (true) {
+        ch = fgetc(stdin);
+        if (ch == EOF) break;
+
+        if (index >= max) {
+            max += diff;
+            char *aux_line = (char *) realloc(line, max);
+            if (aux_line == NULL) {
+                free(line);
+                line = NULL;
+                return NULL;
+            }
+
+            line = aux_line;
+        }
+
+        line[index] = ch;
+        if (line[index] == '\n') break;
+        index += 1;
+    }
+
+    line[index] = '\0';
+    return line;
 }
