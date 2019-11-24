@@ -2,9 +2,11 @@
 #define BEV_LEXER_H
 
 #include "./token.h"
+#include <stddef.h>
 
 typedef struct Lexer {
     const char *_input;
+    size_t _len_input;
     int _position;
     int _read_position;
     char _ch;

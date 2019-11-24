@@ -12,10 +12,12 @@ static void skip_space(Lexer *lexer);
 static char *read_number(Lexer *lexer);
 static bool is_digit(char ch);
 static char *to_str(const Lexer *lexer, size_t n);
+static char peek_char(const Lexer *lexer);
 
 Lexer new_lexer(const char *input) {
     Lexer lexer = {0};
     lexer._input = input;
+    lexer._len_input = strlen(lexer._input);
     read_char_lexer(&lexer);
 
     return lexer;
@@ -26,7 +28,7 @@ void free_lexer(Lexer *lexer) {
 }
 
 void read_char_lexer(Lexer *lexer) {
-    if (lexer->_read_position >= strlen(lexer->_input)) 
+    if (lexer->_read_position >= lexer->_len_input) 
         lexer->_ch = 0;
     else 
         lexer->_ch = lexer->_input[lexer->_read_position];
@@ -41,7 +43,29 @@ Token next_token_lexer(Lexer *lexer) {
 
     switch (lexer->_ch) {
         case '=':
-            token = new_token(BEV_ASSIGN, to_str(lexer, 2));
+            if (peek_char(lexer) == '=') {
+                char *ch = (char *) malloc(sizeof(char) * 3);
+                ch[0] = lexer->_ch;
+                read_char_lexer(lexer);
+                ch[1] = lexer->_ch;
+                ch[2] = '\0';
+                token = new_token(BEV_EQUAL, ch);
+            }
+            else 
+                token = new_token(BEV_ASSIGN, to_str(lexer, 2));
+            break;
+        
+        case '!':
+            if (peek_char(lexer) == '=') {
+                char *ch = (char *) malloc(sizeof(char) * 3);
+                ch[0] = lexer->_ch;
+                read_char_lexer(lexer);
+                ch[1] = lexer->_ch;
+                ch[2] = '\0';
+                token = new_token(BEV_NOT_EQUAL, ch);
+            }
+            else
+                token = new_token(BEV_BANG, to_str(lexer, 2));
             break;
 
         case ';':
@@ -100,12 +124,9 @@ Token next_token_lexer(Lexer *lexer) {
             if (is_letter(lexer->_ch)) {
                 set_literal_token(&token, read_identifier(lexer));
                 set_type_token(&token, look_up_ident_token(&token));
-                // token = new_token(look_up_ident_token(&token), read_identifier(lexer));
                 return token;
             }
             else if (is_digit(lexer->_ch)) {
-                // set_literal_token(&token, read_number(lexer));
-                // set_type_token(&token, BEV_INT);
                 token = new_token(BEV_INT, read_number(lexer));
                 return token;
             }
@@ -168,4 +189,11 @@ static char *to_str(const Lexer *lexer, size_t n) {
     str[1] = '\0';
 
     return str;
+}
+
+static char peek_char(const Lexer *lexer) {
+    if (lexer->_read_position >= lexer->_len_input)
+        return 0;
+    else
+        return lexer->_input[lexer->_read_position];
 }

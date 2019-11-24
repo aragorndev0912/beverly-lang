@@ -15,9 +15,12 @@ extern char *BEV_MINUS;
 extern char *BEV_NOT;
 extern char *BEV_MULT;
 extern char *BEV_DIV;
+extern char *BEV_BANG;
 
 extern char *BEV_LT;
 extern char *BEV_GT;
+extern char *BEV_EQUAL;
+extern char *BEV_NOT_EQUAL;
 
 // Delimitadores.
 extern char *BEV_COMMA;

@@ -16,9 +16,13 @@ char *BEV_MINUS = "-";
 char *BEV_NOT = "not";
 char *BEV_MULT = "*";
 char *BEV_DIV = "/";
+char *BEV_BANG = "!";
 
 char *BEV_LT = "<";
 char *BEV_GT = ">";
+char *BEV_EQUAL = "==";
+char *BEV_NOT_EQUAL = "!=";
+
 // Delimitadores.
 char *BEV_COMMA = ",";
 char *BEV_SEMICOLON = ";";
