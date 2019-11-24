@@ -4,8 +4,8 @@ CFLAGS=-Wall -g
 CVERSION=c11
 LEXER_TEST=lexer
 
-main: main.o repl.o
-	$(CC) $(CFLAGS) -o $(NAME) main.o repl.o -std=$(CVERSION)
+main: main.o repl.o token.o lexer.o 
+	$(CC) $(CFLAGS) -o $(NAME) main.o repl.o token.o lexer.o  -std=$(CVERSION)
 
 main.o: main.c src/repl.h
 	$(CC) $(CFLAGS) -c main.c -std=$(CVERSION)
@@ -16,8 +16,8 @@ lexer.o: src/lexer.c src/lexer.h src/bool.h src/token.h
 token.o: src/token.c src/token.h
 	$(CC) $(CFLAGS) -c src/token.c -std=$(CVERSION)
 
-repl.o: src/repl.c src/repl.h src/bool.h token.o lexer.o 
-	$(CC) $(CFLAGS) -c src/repl.c token.o lexer.o
+repl.o: src/repl.c src/repl.h src/bool.h 
+	$(CC) $(CFLAGS) -c src/repl.c 
 
 #************************************************************************
 #************************************************************************

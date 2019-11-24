@@ -14,13 +14,29 @@ Repl new_repl(const char *prompt) {
 
 void start_repl(Repl *repl) {
     char *line = NULL;
+    Lexer lexer = {0};
+    Token token = {0};
+
     while (true) {
         line = get_line(repl->_prompt);
-        printf("%s\n", line);
+        // printf("%s\n", line);
+        lexer = new_lexer(line);
+
+        token = next_token_lexer(&lexer);
+        while (token._type != NULL && token._type != BEV_EOF) {
+            printf("type: %s literal: %s\n", token._type, token._literal);    
+
+            free_token(&token);
+            token = next_token_lexer(&lexer);
+        }
         
-        
+        if (token._type == BEV_EOF)
+            free_token(&token);
+
         free(line);
         line = NULL;
+
+        free_lexer(&lexer);
     }
     
 }
@@ -36,7 +52,7 @@ char *get_line(const char *prompt) {
     size_t max = diff;
 
     char *line = (char *) malloc(sizeof(char) * max);
-    printf("%s ", prompt);
+    printf("\n%s ", prompt);
     while (true) {
         ch = fgetc(stdin);
         if (ch == EOF) break;
