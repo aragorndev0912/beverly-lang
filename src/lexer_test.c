@@ -50,9 +50,14 @@ void test_1(void) {
     let result = add(five, ten);\n\
     not-/*5; \n\
     5 < 10 > 5; \n\
+    if (5 < 10) {\n\
+        return true;\n\
+    } else {\n\
+        return false;\n\
+    }\n\
     ";
 
-    const char *tests[49][2] = {
+    const char *tests[66][2] = {
         {BEV_LET, "let"}, 
         {BEV_IDENT, "five"}, 
         {BEV_ASSIGN, "="}, 
@@ -101,6 +106,23 @@ void test_1(void) {
         {BEV_GT, ">"}, 
         {BEV_INT, "5"}, 
         {BEV_SEMICOLON, ";"}, 
+        {BEV_IF, "if"}, 
+        {BEV_LPAREN, "("}, 
+        {BEV_INT, "5"}, 
+        {BEV_LT, "<"}, 
+        {BEV_INT, "10"}, 
+        {BEV_RPAREN, ")"}, 
+        {BEV_LBRACE, "{"}, 
+        {BEV_RETURN, "return"}, 
+        {BEV_TRUE, "true"}, 
+        {BEV_SEMICOLON, ";"}, 
+        {BEV_RBRACE, "}"}, 
+        {BEV_ELSE, "else"}, 
+        {BEV_LBRACE, "{"}, 
+        {BEV_RETURN, "return"}, 
+        {BEV_FALSE, "false"}, 
+        {BEV_SEMICOLON, ";"}, 
+        {BEV_RBRACE, "}"}, 
         {BEV_EOF, ""} 
     };
 

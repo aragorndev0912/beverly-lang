@@ -31,6 +31,11 @@ extern char *BEV_RBRACE;
 // Palabras claves.
 extern char *BEV_FUNCTION;
 extern char *BEV_LET;
+extern char *BEV_TRUE;
+extern char *BEV_FALSE;
+extern char *BEV_IF;
+extern char *BEV_ELSE;
+extern char *BEV_RETURN;
 
 typedef char *TokenType;
 

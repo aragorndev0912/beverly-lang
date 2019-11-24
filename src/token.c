@@ -31,6 +31,11 @@ char *BEV_RBRACE = "}";
 // Palabras claves.
 char *BEV_FUNCTION = "FUNCTION";
 char *BEV_LET = "LET";
+char *BEV_TRUE = "TRUE";
+char *BEV_FALSE = "FALSE";
+char *BEV_IF = "IF";
+char *BEV_ELSE = "ELSE";
+char *BEV_RETURN = "RETURN";
 
 Token new_token(TokenType type, char *literal) {
     Token token = {0};
@@ -59,5 +64,10 @@ TokenType look_up_ident_token(const Token *token) {
     if (strcmp(token->_literal, "fn") == 0) return BEV_FUNCTION;
     else if (strcmp(token->_literal, "let") == 0) return BEV_LET;
     else if (strcmp(token->_literal, "not") == 0) return BEV_NOT;
+    else if (strcmp(token->_literal, "true") == 0) return BEV_TRUE;
+    else if (strcmp(token->_literal, "false") == 0) return BEV_FALSE;
+    else if (strcmp(token->_literal, "if") == 0) return BEV_IF;
+    else if (strcmp(token->_literal, "else") == 0) return BEV_ELSE;
+    else if (strcmp(token->_literal, "return") == 0) return BEV_RETURN;
     else return BEV_IDENT;
 }
