@@ -1,7 +1,7 @@
 #ifndef BEV_LEXER_H
 #define BEV_LEXER_H
 
-#include "./token.h"
+#include "token.h"
 #include <stddef.h>
 
 typedef struct Lexer {
