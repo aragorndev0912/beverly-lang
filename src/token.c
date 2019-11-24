@@ -1,7 +1,6 @@
 #include "./token.h"
 #include <string.h>
 #include <stdlib.h>
-#include <stdio.h>
 
 char *BEV_ILLEGAL = "ILLEGAL";
 char *BEV_EOF = "EOF";
@@ -27,62 +26,16 @@ char *BEV_RBRACE = "}";
 char *BEV_FUNCTION = "FUNCTION";
 char *BEV_LET = "LET";
 
-
-typedef struct __ArrayLiteral {
-    char *_literal;
-    struct __ArrayLiteral *next;
-
-} __ArrayLiteral;
-
-static void add_arrayliteral(__ArrayLiteral **array, char * literal) {
-    printf("add: %s\n", literal);
-    if (array == NULL) {
-        (*array) = (__ArrayLiteral *) malloc(sizeof(__ArrayLiteral));
-        (*array)->_literal = literal;
-        (*array)->next = NULL;
-    }
-    else {
-        __ArrayLiteral *aux = (*array);
-        while (aux->next != NULL)
-            aux->next = aux->next;
-
-        aux->next = (__ArrayLiteral *) malloc(sizeof(__ArrayLiteral));
-        aux->next->_literal = literal;
-        aux->next->next = NULL;
-    }
-}
-
-static void del_arrayliteral(__ArrayLiteral **array) {
-    __ArrayLiteral *aux = NULL;
-    while ((*array) != NULL) {
-        aux = (*array); 
-        (*array) = (*array)->next;
-        printf("DEL literal: %s\n", aux->_literal);
-        free(aux->_literal);
-        aux->_literal = NULL;
-        free(aux);
-        aux = NULL;
-    }
-}
-
-static __ArrayLiteral *array_literal = NULL;
-
 Token new_token(TokenType type, char *literal) {
     Token token = {0};
     token._type = type;
     token._literal = literal;
-    printf("literal: %s\n", literal);
-    // Agregar a un array para liberar la memoria reservada.
-    add_arrayliteral(&array_literal, token._literal);
 
     return token;
 }
 
 void free_token(Token *token) {
-    // del_arrayliteral(&array_literal);
-    printf("DEL: %s\n", token->_literal);
-    if (token->_literal != NULL) {
-        printf("DEL: %s\n", token->_literal);
+    if (token->_literal != NULL && token->_type != BEV_EOF) {
         free(token->_literal);
         token->_literal = NULL;
     }

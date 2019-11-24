@@ -3,6 +3,8 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include <stdio.h>
+
 static char *read_identifier(Lexer *lexer);
 static bool is_letter(char ch);
 static char *get_slice_str(Lexer *lexer, int begin);
@@ -45,6 +47,10 @@ Token next_token_lexer(Lexer *lexer) {
         case ';':
             token = new_token(BEV_SEMICOLON, to_str(lexer, 2));
             break;
+        
+        case ',':
+            token = new_token(BEV_COMMA, to_str(lexer, 2));
+            break;
 
         case '(':
             token = new_token(BEV_LPAREN, to_str(lexer, 2));
@@ -67,8 +73,10 @@ Token next_token_lexer(Lexer *lexer) {
             break;
 
         case 0:
-            set_literal_token(&token, 0);
-            set_type_token(&token, BEV_EOF);
+            // set_literal_token(&token, 0);
+            // set_type_token(&token, BEV_EOF);
+            token = new_token(BEV_EOF, 0);
+            break;
         
         default:
             if (is_letter(lexer->_ch)) {
@@ -85,7 +93,9 @@ Token next_token_lexer(Lexer *lexer) {
                 token = new_token(BEV_ILLEGAL, to_str(lexer, 2));
     }
 
-    read_char_lexer(lexer);
+    if (token._type != BEV_EOF)
+        read_char_lexer(lexer);
+    
     return token;
 }
 

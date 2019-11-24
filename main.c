@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include "./src/lexer.h"
+#include <stdlib.h>
+#include <errno.h>
 
 int main(void) {
 
