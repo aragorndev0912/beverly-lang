@@ -64,6 +64,26 @@ Token next_token_lexer(Lexer *lexer) {
             token = new_token(BEV_PLUS, to_str(lexer, 2));
             break;
         
+        case '-':
+            token = new_token(BEV_MINUS, to_str(lexer, 2));
+            break;
+        
+        case '*':
+            token = new_token(BEV_MULT, to_str(lexer, 2));
+            break;
+        
+        case '<':
+            token = new_token(BEV_LT, to_str(lexer, 2));
+            break;
+        
+        case '>':
+            token = new_token(BEV_GT, to_str(lexer, 2));
+            break;
+        
+        case '/':
+            token = new_token(BEV_DIV, to_str(lexer, 2));
+            break;
+        
         case '{':
             token = new_token(BEV_LBRACE, to_str(lexer, 2));
             break;
@@ -73,8 +93,6 @@ Token next_token_lexer(Lexer *lexer) {
             break;
 
         case 0:
-            // set_literal_token(&token, 0);
-            // set_type_token(&token, BEV_EOF);
             token = new_token(BEV_EOF, 0);
             break;
         
@@ -82,11 +100,13 @@ Token next_token_lexer(Lexer *lexer) {
             if (is_letter(lexer->_ch)) {
                 set_literal_token(&token, read_identifier(lexer));
                 set_type_token(&token, look_up_ident_token(&token));
+                // token = new_token(look_up_ident_token(&token), read_identifier(lexer));
                 return token;
             }
             else if (is_digit(lexer->_ch)) {
-                set_literal_token(&token, read_number(lexer));
-                set_type_token(&token, BEV_INT);
+                // set_literal_token(&token, read_number(lexer));
+                // set_type_token(&token, BEV_INT);
+                token = new_token(BEV_INT, read_number(lexer));
                 return token;
             }
             else

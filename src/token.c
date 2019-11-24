@@ -12,7 +12,13 @@ char *BEV_INT = "INT"; // 1, 55, ...
 // Operadores
 char *BEV_ASSIGN = "=";
 char *BEV_PLUS = "+";
+char *BEV_MINUS = "-";
+char *BEV_NOT = "not";
+char *BEV_MULT = "*";
+char *BEV_DIV = "/";
 
+char *BEV_LT = "<";
+char *BEV_GT = ">";
 // Delimitadores.
 char *BEV_COMMA = ",";
 char *BEV_SEMICOLON = ";";
@@ -52,5 +58,6 @@ void set_literal_token(Token *token, char *literal) {
 TokenType look_up_ident_token(const Token *token) {
     if (strcmp(token->_literal, "fn") == 0) return BEV_FUNCTION;
     else if (strcmp(token->_literal, "let") == 0) return BEV_LET;
+    else if (strcmp(token->_literal, "not") == 0) return BEV_NOT;
     else return BEV_IDENT;
 }

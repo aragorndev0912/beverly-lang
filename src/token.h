@@ -11,6 +11,13 @@ extern char *BEV_INT; // 1, 55, ...
 // Operadores
 extern char *BEV_ASSIGN;
 extern char *BEV_PLUS;
+extern char *BEV_MINUS;
+extern char *BEV_NOT;
+extern char *BEV_MULT;
+extern char *BEV_DIV;
+
+extern char *BEV_LT;
+extern char *BEV_GT;
 
 // Delimitadores.
 extern char *BEV_COMMA;

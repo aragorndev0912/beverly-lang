@@ -48,10 +48,11 @@ void test_1(void) {
     };\n\
     \n\
     let result = add(five, ten);\n\
+    not-/*5; \n\
+    5 < 10 > 5; \n\
     ";
-    // printf("%s\n", input);
 
-    const char *tests[37][2] = {
+    const char *tests[49][2] = {
         {BEV_LET, "let"}, 
         {BEV_IDENT, "five"}, 
         {BEV_ASSIGN, "="}, 
@@ -88,12 +89,24 @@ void test_1(void) {
         {BEV_IDENT, "ten"}, 
         {BEV_RPAREN, ")"}, 
         {BEV_SEMICOLON, ";"}, 
+        {BEV_NOT, "not"}, 
+        {BEV_MINUS, "-"}, 
+        {BEV_DIV, "/"}, 
+        {BEV_MULT, "*"}, 
+        {BEV_INT, "5"}, 
+        {BEV_SEMICOLON, ";"}, 
+        {BEV_INT, "5"}, 
+        {BEV_LT, "<"}, 
+        {BEV_INT, "10"}, 
+        {BEV_GT, ">"}, 
+        {BEV_INT, "5"}, 
+        {BEV_SEMICOLON, ";"}, 
         {BEV_EOF, ""} 
     };
 
     Lexer lexer = new_lexer(input);
-
     Token token = next_token_lexer(&lexer);
+    
     int index = 0;
     while (token._type != NULL && token._type != BEV_EOF) {
         assert(strcmp(tests[index][0], token._type) == 0);
