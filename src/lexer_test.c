@@ -154,7 +154,6 @@ void test_1(void) {
         free_token(&token);
 
     printf("Lexer test(1) has been complited.\n");
-
 }
 
 int main(void) {
