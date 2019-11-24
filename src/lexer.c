@@ -120,6 +120,8 @@ static char *get_slice_str(Lexer *lexer, int begin) {
     for (int k=begin; k < end; k++)
         str[index++] = lexer->_input[k];
 
+    str[diff] = '\0';
+
     return str;
 }
 
