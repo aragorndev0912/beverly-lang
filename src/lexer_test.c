@@ -57,9 +57,11 @@ void test_1(void) {
     }\n\
     10 == 15; \n\
     true != false;\n\
+    let _x:int = 18; \n\
+    let _y := 789; \n\
     ";
 
-    const char *tests[75][2] = {
+    const char *tests[87][2] = {
         {BEV_LET, "let"}, 
         {BEV_IDENT, "five"}, 
         {BEV_ASSIGN, "="}, 
@@ -133,6 +135,18 @@ void test_1(void) {
         {BEV_TRUE, "true"}, 
         {BEV_NOT_EQUAL, "!="}, 
         {BEV_FALSE, "false"}, 
+        {BEV_SEMICOLON, ";"}, 
+        {BEV_LET, "let"}, 
+        {BEV_IDENT, "_x"}, 
+        {BEV_DOUBLE_DOT, ":"}, 
+        {BEV_IDENT, "int"}, 
+        {BEV_ASSIGN, "="},
+        {BEV_INT, "18"}, 
+        {BEV_SEMICOLON, ";"}, 
+        {BEV_LET, "let"}, 
+        {BEV_IDENT, "_y"}, 
+        {BEV_ALLOCATE, ":="}, 
+        {BEV_INT, "789"}, 
         {BEV_SEMICOLON, ";"}, 
         {BEV_EOF, ""} 
     };

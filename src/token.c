@@ -22,6 +22,8 @@ char *BEV_LT = "<";
 char *BEV_GT = ">";
 char *BEV_EQUAL = "==";
 char *BEV_NOT_EQUAL = "!=";
+char *BEV_DOUBLE_DOT = ":";
+char *BEV_ALLOCATE = ":=";
 
 // Delimitadores.
 char *BEV_COMMA = ",";

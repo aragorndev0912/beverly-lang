@@ -67,6 +67,21 @@ Token next_token_lexer(Lexer *lexer) {
             else
                 token = new_token(BEV_BANG, to_str(lexer, 2));
             break;
+        
+        case ':':
+            if (peek_char(lexer) == '=') {
+                // allocate.
+                char *ch = (char *) malloc(sizeof(char) * 3);
+                ch[0] = lexer->_ch;
+                read_char_lexer(lexer);
+                ch[1] = lexer->_ch;
+                ch[2] = '\0';
+                token = new_token(BEV_ALLOCATE, ch);
+            }
+            else {
+                token = new_token(BEV_DOUBLE_DOT, to_str(lexer, 2));
+            }
+            break;
 
         case ';':
             token = new_token(BEV_SEMICOLON, to_str(lexer, 2));
