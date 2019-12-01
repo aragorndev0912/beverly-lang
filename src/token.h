@@ -1,5 +1,5 @@
-#ifndef BEV_TOKEN_H
-#define BEV_TOKEN_H
+#ifndef _BEV_TOKEN_H
+#define _BEV_TOKEN_H
 
 extern char *BEV_ILLEGAL;
 extern char *BEV_EOF;
@@ -60,4 +60,4 @@ void set_literal_token(Token *token, char *literal);
 
 TokenType look_up_ident_token(const Token *token);
 
-#endif //BEV_TOKEN_H
+#endif //_BEV_TOKEN_H

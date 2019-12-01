@@ -1,11 +1,10 @@
-#ifndef BEV_REPL
-#define BEV_REPL
+#ifndef _BEV_REPL
+#define _BEV_REPL
 
 #include "token.h"
 #include "lexer.h"
 
-typedef struct Repl
-{
+typedef struct Repl {
     const char *_prompt;
 
 } Repl;
@@ -17,4 +16,4 @@ void start_repl(Repl *repl);
 
 void free_repl(Repl *repl);
 
-#endif //BEV_REPL
+#endif //_BEV_REPL

@@ -1,5 +1,5 @@
-#ifndef BEV_BOOL_H
-#define BEV_BOOL_H
+#ifndef _BEV_BOOL_H
+#define _BEV_BOOL_H
 
 #ifndef __cplusplus
 typedef enum bool {
@@ -8,4 +8,4 @@ typedef enum bool {
 } bool;
 #endif //__cplusplus
 
-#endif //BEV_BOOL_H
+#endif //_BEV_BOOL_H
