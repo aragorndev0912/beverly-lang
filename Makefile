@@ -1,28 +1,35 @@
-NAME=beverly
-CC=gcc
-CFLAGS=-Wall -g
-CVERSION=c11
-LEXER_TEST=lexer
+NAME := beverly
+CC := gcc
+CFLAGS := -Wall -g -pedantic
+CVERSION := c11
+LEXER_TEST := lexer
 
-main: main.o repl.o token.o lexer.o 
-	$(CC) $(CFLAGS) -o $(NAME) main.o repl.o token.o lexer.o  -std=$(CVERSION)
+main: dist obj obj/main.o obj/repl.o obj/token.o obj/lexer.o 
+	$(CC) $(CFLAGS) -o dist/$(NAME) obj/main.o obj/repl.o obj/token.o obj/lexer.o  -std=$(CVERSION)
 
-main.o: main.c src/repl.h
-	$(CC) $(CFLAGS) -c main.c -std=$(CVERSION)
+obj/main.o: main.c src/repl.h
+	$(CC) $(CFLAGS) -c main.c -o obj/main.o -std=$(CVERSION)
 
-lexer.o: src/lexer.c src/lexer.h src/bool.h src/token.h
-	$(CC) $(CFLAGS) -c src/lexer.c -std=$(CVERSION)
+obj/lexer.o: src/lexer.c src/lexer.h src/bool.h src/token.h
+	$(CC) $(CFLAGS) -c src/lexer.c -o obj/lexer.o -std=$(CVERSION)
 
-token.o: src/token.c src/token.h
-	$(CC) $(CFLAGS) -c src/token.c -std=$(CVERSION)
+obj/token.o: src/token.c src/token.h
+	$(CC) $(CFLAGS) -c src/token.c -o obj/token.o -std=$(CVERSION)
 
-repl.o: src/repl.c src/repl.h src/bool.h 
-	$(CC) $(CFLAGS) -c src/repl.c 
+obj/repl.o: src/repl.c src/repl.h src/bool.h 
+	$(CC) $(CFLAGS) -c src/repl.c -o obj/repl.o -std=$(CVERSION)
 
 #************************************************************************
 #************************************************************************
 #************************************************************************
+dist:
+	mkdir dist
 
+obj:
+	mkdir obj
+#************************************************************************
+#************************************************************************
+#************************************************************************
 lexer_test: lexer_test.o token.o lexer.o
 	$(CC) $(CFLAGS) -o $(LEXER_TEST) lexer_test.o token.o lexer.o -std=$(CVERSION)
 
@@ -35,3 +42,5 @@ clean:
 all:
 	del /s *.o
 	del *.exe
+	rmdir /s dist
+	rmdir /s obj
