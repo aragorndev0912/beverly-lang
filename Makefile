@@ -1,23 +1,29 @@
 NAME := beverly
 CC := gcc
-CFLAGS := -Wall -g -pedantic
-CVERSION := c11
-LEXER_TEST := lexer
+CFLAGS := -Wall -pedantic -std=c99
+LEXER_TEST := lexer_test
+DEBUG := 1
+
+ifdef DEBUG
+	CFLAGS += -g
+else
+	CFLAGS += -O3
+endif
 
 main: dist obj obj/main.o obj/repl.o obj/token.o obj/lexer.o 
-	$(CC) $(CFLAGS) -o dist/$(NAME) obj/main.o obj/repl.o obj/token.o obj/lexer.o  -std=$(CVERSION)
+	$(CC) -o dist/$(NAME) obj/main.o obj/repl.o obj/token.o obj/lexer.o $(CFLAGS)
 
 obj/main.o: main.c src/repl.h
-	$(CC) $(CFLAGS) -c main.c -o obj/main.o -std=$(CVERSION)
+	$(CC) -c main.c -o obj/main.o $(CFLAGS)
 
 obj/lexer.o: src/lexer.c src/lexer.h src/bool.h src/token.h
-	$(CC) $(CFLAGS) -c src/lexer.c -o obj/lexer.o -std=$(CVERSION)
+	$(CC) -c src/lexer.c -o obj/lexer.o $(CFLAGS)  
 
 obj/token.o: src/token.c src/token.h
-	$(CC) $(CFLAGS) -c src/token.c -o obj/token.o -std=$(CVERSION)
+	$(CC) -c src/token.c -o obj/token.o $(CFLAGS) 
 
 obj/repl.o: src/repl.c src/repl.h src/bool.h 
-	$(CC) $(CFLAGS) -c src/repl.c -o obj/repl.o -std=$(CVERSION)
+	$(CC) -c src/repl.c -o obj/repl.o $(CFLAGS)  
 
 #************************************************************************
 #************************************************************************
@@ -30,17 +36,17 @@ obj:
 #************************************************************************
 #************************************************************************
 #************************************************************************
-lexer_test: lexer_test.o token.o lexer.o
-	$(CC) $(CFLAGS) -o $(LEXER_TEST) lexer_test.o token.o lexer.o -std=$(CVERSION)
+lexer_test: obj obj/lexer_test.o obj/token.o obj/lexer.o
+	$(CC) -o $(LEXER_TEST) obj/lexer_test.o obj/token.o obj/lexer.o $(CFLAGS)
 
-lexer_test.o: src/lexer_test.c
-	$(CC) $(CFLAGS) -c src/lexer_test.c -std=$(CVERSION)
+obj/lexer_test.o: src/lexer_test.c
+	$(CC) -c src/lexer_test.c -o obj/lexer_test.o $(CFLAGS)
 
-.PHONY:clean all
+.PHONY:clean cleanall
 clean:
 	del /s *.o
-all:
+cleanall:
 	del /s *.o
 	del *.exe
-	rmdir /s dist
 	rmdir /s obj
+	rmdir /s dist
