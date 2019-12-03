@@ -4,7 +4,7 @@
 // Struct Node.
 //----------------------------------------------------------------------------------
 const char *token_literal_node(const Node *const node) {
-    return node->literal;
+    return node->_literal;
 }
 
 void free_node(Node *node) {
@@ -41,7 +41,7 @@ void node_expression_identifier(Identifier *identifier) {
 }
 
 const char *token_literal_identifier(Identifier *identifier) {
-    return identifier->token._literal;
+    return identifier->_token._literal;
 }
 
 void free_identifier(Identifier *identifier) {
@@ -52,8 +52,8 @@ void free_identifier(Identifier *identifier) {
 // Struct Program.
 //----------------------------------------------------------------------------------
 const char *token_literal_program(Program *program) {
-    if (program->len > 0)
-        return token_literal_node(&(program->statements[0].node));
+    if (program->_len > 0)
+        return token_literal_node(&(program->_statements[0]._node));
     
     return "";
 }
@@ -70,7 +70,7 @@ void node_statement_letStatement(LetStatement *let_statement) {
 }
 
 const char *token_literal_letStatement(LetStatement *let_statement) {
-    return let_statement->token._literal;
+    return let_statement->_token._literal;
 }
 
 void free_letStatement(LetStatement *let_statement) {

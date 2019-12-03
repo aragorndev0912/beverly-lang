@@ -9,7 +9,7 @@
 //----------------------------------------------------------------------------------
 // Struct type Node.
 typedef struct Node {
-    const char *literal;
+    const char *_literal;
 
 } Node;
 
@@ -23,7 +23,7 @@ void free_node(Node *node);
 //----------------------------------------------------------------------------------
 // Struct type Statement.
 typedef struct Statement {
-    Node node;
+    Node _node;
 
 } Statement;
 
@@ -36,7 +36,7 @@ void free_statement(Statement *statement);
 // Expression declarations.
 //----------------------------------------------------------------------------------
 typedef struct Expression {
-    Node node;
+    Node _node;
 
 } Expression;
 
@@ -49,9 +49,9 @@ void free_expression(Expression *expression);
 // Expression Program.
 //----------------------------------------------------------------------------------
 typedef struct Program {
-    Statement *statements;
-    size_t len;
-    size_t cap;
+    Statement *_statements;
+    size_t _len;
+    size_t _cap;
 
 } Program;
 
@@ -64,8 +64,8 @@ void free_program(Program *program);
 // Expression Identifier.
 //----------------------------------------------------------------------------------
 typedef struct Identifier {
-    Token token;
-    char *value;
+    Token _token;
+    char *_value;
 
 } Identifier;
 
@@ -80,9 +80,9 @@ void free_identifier(Identifier *identifier);
 // Expression LetStatement.
 //----------------------------------------------------------------------------------
 typedef struct LetStatement {
-    Token token;
-    Identifier name;
-    Expression value;
+    Token _token;
+    Identifier _name;
+    Expression _value;
 
 } LetStatement;
 
