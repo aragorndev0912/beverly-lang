@@ -1,4 +1,5 @@
 #include "ast.h"
+#include <stdlib.h>
 
 //----------------------------------------------------------------------------------
 // Struct Node.
@@ -14,12 +15,16 @@ void free_node(Node *node) {
 //----------------------------------------------------------------------------------
 // Struct Statement.
 //----------------------------------------------------------------------------------
-void node_statement(const Statement *const statement) {
-    // Falta implementar.
+Statement new_stmt(void *ptr, TypeStmt type) {
+    Statement stmt = {._ptr=ptr, ._type=type};
+    return stmt;
 }
 
-void free_statement(Statement *statement) {
-    // Falta implementar.
+void free_stmt(Statement *stmt) {
+    if (stmt->_ptr != NULL) {
+        free(stmt->_ptr);
+        stmt->_ptr = NULL;
+    }
 }
 
 //----------------------------------------------------------------------------------
@@ -51,15 +56,21 @@ void free_identifier(Identifier *identifier) {
 //----------------------------------------------------------------------------------
 // Struct Program.
 //----------------------------------------------------------------------------------
+Program new_program(size_t cap) {
+    Program program = {._len=0, ._cap=cap};
+    program._statements = (Statement *) malloc(sizeof(Statement) * cap);
+
+    return program;
+}
+
 const char *token_literal_program(Program *program) {
-    if (program->_len > 0)
-        return token_literal_node(&(program->_statements[0]._node));
-    
-    return "";
+    // Falta implementar.
+    return NULL;
 }
 
 void free_program(Program *program) {
-    // Falta implementar.
+    for (int k=0; k < program->_len; k++) 
+        free_stmt(&program->_statements[k]);
 }
 
 //----------------------------------------------------------------------------------

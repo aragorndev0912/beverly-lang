@@ -21,16 +21,20 @@ void free_node(Node *node);
 //----------------------------------------------------------------------------------
 // Statement declarations.
 //----------------------------------------------------------------------------------
-// Struct type Statement.
+typedef enum TypeStmt {
+    LET = 0,
+
+} TypeStmt;
+
 typedef struct Statement {
-    Node _node;
+    void *_ptr;
+    TypeStmt _type;
 
 } Statement;
 
-void node_statement(const Statement *const statement);
+Statement new_stmt(void *ptr, TypeStmt type);
 
-void free_statement(Statement *statement);
-
+void free_stmt(Statement *stmt);
 
 //----------------------------------------------------------------------------------
 // Expression declarations.
@@ -54,6 +58,8 @@ typedef struct Program {
     size_t _cap;
 
 } Program;
+
+Program new_program(size_t cap);
 
 const char *token_literal_program(Program *program);
 
