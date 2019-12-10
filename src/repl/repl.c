@@ -1,5 +1,5 @@
 #include "repl.h"
-#include "bool.h"
+#include "../lib/bool.h"
 #include <stdio.h>
 #include <stdlib.h>
 

@@ -1,4 +1,4 @@
-#include "src/repl.h"
+#include "src/repl/repl.h"
 
 int main(void) {
     Repl repl = new_repl(">> ");

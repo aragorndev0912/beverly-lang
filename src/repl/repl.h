@@ -1,8 +1,8 @@
 #ifndef _BEV_REPL
 #define _BEV_REPL
 
-#include "token.h"
-#include "lexer.h"
+#include "../token/token.h"
+#include "../lexer/lexer.h"
 
 typedef struct Repl {
     const char *_prompt;

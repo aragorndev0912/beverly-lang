@@ -1,9 +1,9 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include "ast.h"
-#include "lexer.h"
-#include "parser.h"
+#include "../ast/ast.h"
+#include "../lexer/lexer.h"
+#include "../parser/parser.h"
 
 static void __test_letStatement(void) {
     const char *input = 

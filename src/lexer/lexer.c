@@ -1,5 +1,5 @@
-#include "lexer.h"
-#include "bool.h"
+#include "../lexer/lexer.h"
+#include "../lib/bool.h"
 #include <string.h>
 #include <stdlib.h>
 

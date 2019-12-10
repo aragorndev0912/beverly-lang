@@ -2,7 +2,7 @@
 #define _AST_H
 
 #include <stddef.h>
-#include "token.h"
+#include "../token/token.h"
 
 //----------------------------------------------------------------------------------
 // Node definitions.
