@@ -14,8 +14,8 @@ static void __test_letStatement(void) {
     Lexer lexer = new_lexer(input);
     Parser parser = new_parser(&lexer);
 
-    Program *program = program_parser(&parser); 
-    if (program == NULL) {
+    Program program = program_parser(&parser); 
+    if (program._statements == NULL) {
         free_lexer(&lexer);
         printf("Error, program is NULL");
         return;
