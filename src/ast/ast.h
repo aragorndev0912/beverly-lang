@@ -61,7 +61,7 @@ typedef struct Program {
 
 Program new_program(size_t cap);
 
-const char *token_literal_program(Program *program);
+void add_stmt_program(Program *const program, void *ptr, TypeStmt type);
 
 void free_program(Program *program);
 

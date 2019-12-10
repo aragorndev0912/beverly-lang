@@ -16,6 +16,6 @@ Parser new_parser(Lexer *lexer);
 
 void next_token_parser(Parser *parser);
 
-Program *program_parser(Parser *parser);
+Program program_parser(Parser *parser);
 
 #endif //_PARSER_H

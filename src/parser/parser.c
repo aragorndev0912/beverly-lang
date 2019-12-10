@@ -16,6 +16,9 @@ void next_token_parser(Parser *parser) {
     parser->_peek_token = next_token_lexer(&(*parser->_lexer));
 }
 
-Program *program_parser(Parser *parser) {
-    return NULL;
+Program program_parser(Parser *parser) {
+    Program program = new_program(10);
+
+
+    return program;
 }

@@ -56,16 +56,31 @@ void free_identifier(Identifier *identifier) {
 //----------------------------------------------------------------------------------
 // Struct Program.
 //----------------------------------------------------------------------------------
+
+static const size_t STMT_CAP = 10;
+
 Program new_program(size_t cap) {
-    Program program = {._len=0, ._cap=cap};
-    program._statements = (Statement *) malloc(sizeof(Statement) * cap);
+    Program program = {._len=0, ._cap=cap, ._statements=NULL};
 
     return program;
 }
 
-const char *token_literal_program(Program *program) {
-    // Falta implementar.
-    return NULL;
+void add_stmt_program(Program *const program, void *ptr, TypeStmt type) {
+    if (program->_statements == NULL) {
+        program->_statements = (Statement *) malloc(sizeof(Statement) * program->_cap);
+    }
+    else if ((program->_len) >= program->_cap) {
+        program->_cap += STMT_CAP;
+        Statement *stmt_aux = (Statement *) realloc(program->_statements, sizeof(Statement) * program->_cap);
+        if (stmt_aux) {
+            // Falta implementar limpiza (OJO).
+        }
+        program->_statements = stmt_aux;
+    }
+
+    program->_statements[program->_len]._ptr = ptr;
+    program->_statements[program->_len]._type = type;
+    program->_len += 1;
 }
 
 void free_program(Program *program) {
