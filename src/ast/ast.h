@@ -22,7 +22,8 @@ void free_node(Node *node);
 // Statement declarations.
 //----------------------------------------------------------------------------------
 typedef enum TypeStmt {
-    LET = 0,
+    FAILURE = 0,
+    LET,
 
 } TypeStmt;
 
@@ -75,12 +76,7 @@ typedef struct Identifier {
 
 } Identifier;
 
-void node_expression_identifier(Identifier *identifier);
-
-const char *token_literal_identifier(Identifier *identifier);
-
-void free_identifier(Identifier *identifier);
-
+Identifier new_identifier(const Token token, const char *value);
 
 //----------------------------------------------------------------------------------
 // Expression LetStatement.

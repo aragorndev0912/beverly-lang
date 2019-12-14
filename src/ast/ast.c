@@ -1,5 +1,6 @@
 #include "ast.h"
 #include <stdlib.h>
+#include <string.h>
 
 //----------------------------------------------------------------------------------
 // Struct Node.
@@ -41,16 +42,14 @@ void free_expression(Expression *expression) {
 //----------------------------------------------------------------------------------
 // Struct Identifier.
 //----------------------------------------------------------------------------------
-void node_expression_identifier(Identifier *identifier) {
-    // Falta implementar.
-}
+Identifier new_identifier(const Token *const token, const char *value) {
+    Identifier ident = (Identifier) {0};
+    
+    ident._token = new_token(token->_type, token->_literal);
+    
+    ident._value = 
 
-const char *token_literal_identifier(Identifier *identifier) {
-    return identifier->_token._literal;
-}
-
-void free_identifier(Identifier *identifier) {
-    // Falta implementar.
+    return ident;
 }
 
 //----------------------------------------------------------------------------------
@@ -85,6 +84,8 @@ void add_stmt_program(Program *const program, void *ptr, TypeStmt type) {
 void free_program(Program *program) {
     for (int k=0; k < program->_len; k++) 
         free_stmt(&program->_statements[k]);
+    
+    program->_statements = NULL;
 }
 
 //----------------------------------------------------------------------------------

@@ -22,6 +22,6 @@ Program program_parser(Parser *parser);
 
 Statement stmt_parser(Parser *parser);
 
-Statement letstmt_parser(Parser *parser);
+Statement let_stmt_parser(Parser *parser);
 
 #endif //_PARSER_H

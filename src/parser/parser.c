@@ -7,7 +7,7 @@
 //----------------------------------------------------------------------------------
 static bool is_current_token(const Parser *const parser, const Token *const token);
 static bool is_peek_token(const Parser *const parser, const Token *const token);
-static bool expect_tone(Parser *parser, const Token *const token);
+static bool expect_token(Parser *parser, const Token *const token);
 
 //----------------------------------------------------------------------------------
 // Declaracion de funciones estaticas.
@@ -16,8 +16,8 @@ Parser new_parser(Lexer *lexer) {
     Parser parser = {0};
     parser._lexer = lexer;
     // Inicializar token sin definicion
-    parser._current_token = (Token) {._type=BEV_UNDEFINED, ._literal=""};
-    parser._peek_token = (Token) {._type=BEV_UNDEFINED, ._literal=""};
+    parser._current_token = (Token) {._type=BEV_UNDEFINED, ._literal=NULL};
+    parser._peek_token = (Token) {._type=BEV_UNDEFINED, ._literal=NULL};
 
     next_token_parser(&parser);
     next_token_parser(&parser);
@@ -47,11 +47,18 @@ Program program_parser(Parser *parser) {
     Statement stmt = {0};
     while (parser->_current_token._type != BEV_EOF) {
         stmt = stmt_parser(parser);
-        if (stmt._ptr != NULL)
-            add_stmt_program(&program, stmt._ptr, stmt._type);
 
+        // Ocurrio algun error en la construccion del AST.
+        if(stmt._type == FAILURE) {
+            free_program(&program);
+            break;
+        }
+        else {
+            if (stmt._ptr != NULL)
+                add_stmt_program(&program, stmt._ptr, stmt._type);
 
-        next_token_parser(parser);
+            next_token_parser(parser);
+        }
     }   
 
     return program;
@@ -60,15 +67,27 @@ Program program_parser(Parser *parser) {
 Statement stmt_parser(Parser *parser) {
     Statement stmt = {0};
 
-    if (parser->_current_token._type == BEV_LET) {
-        // Falta implementar.
-    }
+    if (parser->_current_token._type == BEV_LET) 
+        return let_stmt_parser(parser);
 
     return stmt;
 }
 
-Statement letstmt_parser(Parser *parser) {
-    // Falta implementar.
+Statement let_stmt_parser(Parser *parser) {
+    Statement stmt = (Statement) {0};
+    LetStatement let_stmt = (LetStatement) {0};
+    
+    // Inicializo el token de la declaracion.
+    let_stmt._token = new_token(parser->_current_token._type, parser->_current_token._literal);
+
+    // Si el proximo token es diferente a un BEV_IDENT
+    // genero un error (FAILURE).
+    if (!expect_token(parser, BEV_IDENT)) 
+        return (Statement) {._ptr=NULL, ._type=FAILURE};
+
+    let_stmt._name = 
+
+    return stmt;
 }
 
 //----------------------------------------------------------------------------------
@@ -82,7 +101,7 @@ static bool is_peek_token(const Parser *const parser, const Token *const token) 
     return (parser->_peek_token._type == token->_type);
 }
 
-static bool expect_tone(Parser *parser, const Token *const token) {
+static bool expect_token(Parser *parser, const Token *const token) {
     if (is_peek_token(parser, token)) {
         next_token_parser(parser);
         return true;

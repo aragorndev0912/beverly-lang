@@ -44,10 +44,12 @@ char *BEV_IF = "IF";
 char *BEV_ELSE = "ELSE";
 char *BEV_RETURN = "RETURN";
 
+static char *copy_string(const char *string, size_t len);
+
 Token new_token(TokenType type, char *literal) {
     Token token = {0};
     token._type = type;
-    token._literal = literal;
+    token._literal = copy_string(literal, strlen(literal));
 
     return token;
 }
@@ -77,4 +79,11 @@ TokenType look_up_ident_token(const Token *token) {
     else if (strcmp(token->_literal, "else") == 0) return BEV_ELSE;
     else if (strcmp(token->_literal, "return") == 0) return BEV_RETURN;
     else return BEV_IDENT;
+}
+
+static char *copy_string(const char *string, size_t len) {
+    char *_string = (char *) malloc(sizeof(char) * len + 1);
+    strcpy(_string, string);
+
+    return _string;
 }
