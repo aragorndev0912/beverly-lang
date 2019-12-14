@@ -44,7 +44,7 @@ Token next_token_lexer(Lexer *lexer) {
     switch (lexer->_ch) {
         case '=':
             if (peek_char(lexer) == '=') {
-                char ch [3]= (char *) malloc(sizeof(char) * 3);
+                char *ch = (char *) malloc(sizeof(char) * 3);
                 ch[0] = lexer->_ch;
                 read_char_lexer(lexer);
                 ch[1] = lexer->_ch;

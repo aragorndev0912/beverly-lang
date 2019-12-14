@@ -1,4 +1,5 @@
 #include "ast.h"
+#include "../lib/lib.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -45,11 +46,18 @@ void free_expression(Expression *expression) {
 Identifier new_identifier(const Token *const token, const char *value) {
     Identifier ident = (Identifier) {0};
     
-    ident._token = new_token(token->_type, token->_literal);
-    
-    ident._value = 
+    ident._token = new_token(token->_type, copy_string(token->_literal));
+    ident._value = copy_string(value);
 
     return ident;
+}
+
+void free_identifier(Identifier *ident) {
+    if (ident != NULL) {
+        free_token(&ident->_token);
+        free(ident->_value);
+        ident->_value = NULL;
+    }
 }
 
 //----------------------------------------------------------------------------------
@@ -91,10 +99,3 @@ void free_program(Program *program) {
 //----------------------------------------------------------------------------------
 // Struct LetStatement.
 //----------------------------------------------------------------------------------
-Statement new_letstmt(const Token *const token) {
-    Token ntoken = new_token(token->_type, token->_literal);
-    LetStatement let_stmt = (LetStatement) {._token=ntoken};
-
-    // Falta implementar.
-
-}

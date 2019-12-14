@@ -10,8 +10,8 @@ else
 	CCFLAGS += -O3
 endif
 
-main: dist obj obj/main.o obj/repl.o obj/token.o obj/lexer.o 
-	$(C) -o dist/$(NAME) obj/main.o obj/repl.o obj/token.o obj/lexer.o $(CCFLAGS)
+main: dist obj obj/main.o obj/repl.o obj/token.o obj/lexer.o obj/lib.o
+	$(C) -o dist/$(NAME) obj/main.o obj/repl.o obj/token.o obj/lexer.o obj/lib.o $(CCFLAGS)
 
 obj/main.o: main.c src/repl/repl.h
 	$(C) -c main.c -o obj/main.o $(CCFLAGS)
@@ -25,11 +25,14 @@ obj/token.o: src/token/token.c src/token/token.h
 obj/repl.o: src/repl/repl.c src/repl/repl.h src/lib/bool.h 
 	$(C) -c src/repl/repl.c -o obj/repl.o $(CCFLAGS)  
 
-obj/ast.o: src/ast/ast.c src/ast/ast.h src/token/token.h
+obj/ast.o: src/ast/ast.c src/ast/ast.h src/token/token.h src/lib/lib.h
 	$(C) -c src/ast/ast.c -o obj/ast.o $(CCFLAGS)
 
-obj/parser.o: src/parser/parser.c src/parser/parser.h src/lexer/lexer.h src/token/token.h
+obj/parser.o: src/parser/parser.c src/parser/parser.h src/lexer/lexer.h src/token/token.h src/lib/lib.h
 	$(C) -c src/parser/parser.c -o obj/parser.o $(CCFLAGS)
+
+obj/lib.o: src/lib/lib.c src/lib/lib.h
+	$(C) -c src/lib/lib.c -o obj/lib.o $(CCFLAGS)
 
 #------------------------------------------------------------------------
 # Create folder dist and obj.
@@ -43,8 +46,8 @@ obj:
 #------------------------------------------------------------------------
 # Test Lexer.
 #------------------------------------------------------------------------
-lexer_test: obj obj/lexer_test.o obj/token.o obj/lexer.o
-	$(C) -o $(LEXER_TEST) obj/lexer_test.o obj/token.o obj/lexer.o $(CCFLAGS)
+lexer_test: obj obj/lexer_test.o obj/token.o obj/lexer.o obj/lib.o
+	$(C) -o $(LEXER_TEST) obj/lexer_test.o obj/token.o obj/lexer.o obj/lib.o $(CCFLAGS)
 
 obj/lexer_test.o: src/lexer/lexer_test.c
 	$(C) -c src/lexer/lexer_test.c -o obj/lexer_test.o $(CCFLAGS)
@@ -52,8 +55,8 @@ obj/lexer_test.o: src/lexer/lexer_test.c
 #------------------------------------------------------------------------
 # Test Parser.
 #------------------------------------------------------------------------
-parser_test: obj obj/parser_test.o obj/parser.o obj/lexer.o obj/ast.o obj/token.o
-	$(C) -o parser_test obj/parser_test.o obj/parser.o obj/lexer.o obj/ast.o obj/token.o $(CCFLAGS)
+parser_test: obj obj/parser_test.o obj/parser.o obj/lexer.o obj/ast.o obj/token.o obj/lib.o
+	$(C) -o parser_test obj/parser_test.o obj/parser.o obj/lexer.o obj/ast.o obj/token.o obj/lib.o $(CCFLAGS)
 
 obj/parser_test.o: src/parser/parser_test.c 
 	$(C) -c src/parser/parser_test.c -o obj/parser_test.o $(CCFLAGS)
