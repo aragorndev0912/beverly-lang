@@ -60,8 +60,7 @@ void free_identifier(Identifier *identifier) {
 static const size_t STMT_CAP = 10;
 
 Program new_program(size_t cap) {
-    Program program = {._len=0, ._cap=cap, ._statements=NULL};
-
+    Program program = (Program) {._len=0, ._cap=cap, ._statements=NULL};
     return program;
 }
 
@@ -72,7 +71,7 @@ void add_stmt_program(Program *const program, void *ptr, TypeStmt type) {
     else if ((program->_len) >= program->_cap) {
         program->_cap += STMT_CAP;
         Statement *stmt_aux = (Statement *) realloc(program->_statements, sizeof(Statement) * program->_cap);
-        if (stmt_aux) {
+        if (stmt_aux == NULL) {
             // Falta implementar limpiza (OJO).
         }
         program->_statements = stmt_aux;
@@ -91,14 +90,10 @@ void free_program(Program *program) {
 //----------------------------------------------------------------------------------
 // Struct LetStatement.
 //----------------------------------------------------------------------------------
-void node_statement_letStatement(LetStatement *let_statement) {
-    // Falta implementar.
-}
+Statement new_letstmt(const Token *const token) {
+    Token ntoken = new_token(token->_type, token->_literal);
+    LetStatement let_stmt = (LetStatement) {._token=ntoken};
 
-const char *token_literal_letStatement(LetStatement *let_statement) {
-    return let_statement->_token._literal;
-}
-
-void free_letStatement(LetStatement *let_statement) {
     // Falta implementar.
+
 }

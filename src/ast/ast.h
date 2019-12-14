@@ -92,10 +92,6 @@ typedef struct LetStatement {
 
 } LetStatement;
 
-void node_statement_letStatement(LetStatement *let_statement);
-
-const char *token_literal_letStatement(LetStatement *let_statement);
-
-void free_letStatement(LetStatement *let_statement);
+Statement new_letstmt(const Token *const token);
 
 #endif //_AST_H

@@ -1,6 +1,7 @@
 #ifndef _BEV_TOKEN_H
 #define _BEV_TOKEN_H
 
+extern char *BEV_UNDEFINED;
 extern char *BEV_ILLEGAL;
 extern char *BEV_EOF;
 

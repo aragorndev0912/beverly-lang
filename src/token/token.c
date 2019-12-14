@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 
+char *BEV_UNDFINED = "UNDEFINED";
 char *BEV_ILLEGAL = "ILLEGAL";
 char *BEV_EOF = "EOF";
 
