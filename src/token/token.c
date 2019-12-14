@@ -53,7 +53,7 @@ Token new_token(TokenType type, char *literal) {
 }
 
 void free_token(Token *token) {
-    if (token->_literal != NULL && token->_type != BEV_EOF) {
+    if (token != NULL && token->_literal != NULL && (token->_type != BEV_EOF || token->_type != BEV_UNDEFINED)) {
         free(token->_literal);
         token->_literal = NULL;
     }

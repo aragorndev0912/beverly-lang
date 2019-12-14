@@ -3,6 +3,7 @@
 #include "../lib/lib.h"
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 
 //----------------------------------------------------------------------------------
 // Declaracion de funciones estaticas.
@@ -29,9 +30,11 @@ Parser new_parser(Lexer *lexer) {
 
 void free_parser(Parser *parser) {
     if (parser != NULL && parser->_lexer != NULL) {
-        free_lexer(parser->_lexer);
+        // free_lexer(parser->_lexer);
         parser->_lexer = NULL;
+        printf("PARSER DELETED.\n");
     }
+    
 }
 
 void next_token_parser(Parser *parser) {
@@ -46,13 +49,11 @@ Program program_parser(Parser *parser) {
     Program program = new_program(10);
     program._statements = NULL;
 
-    Statement stmt = {0};
+    Statement stmt = (Statement) {0};
     while (parser->_current_token._type != BEV_EOF) {
         stmt = stmt_parser(parser);
-
         // Ocurrio algun error en la construccion del AST.
         if(stmt._type == TYPE_FAILURE) {
-            free_program(&program);
             break;
         }
         else {
@@ -63,12 +64,14 @@ Program program_parser(Parser *parser) {
         }
     }   
 
+    free_token(&parser->_current_token);
+    free_token(&parser->_peek_token);
+
     return program;
 }
 
 Statement stmt_parser(Parser *parser) {
-    Statement stmt = {0};
-
+    Statement stmt = (Statement) {0};
     if (parser->_current_token._type == BEV_LET) 
         return let_stmt_parser(parser);
 
@@ -78,6 +81,10 @@ Statement stmt_parser(Parser *parser) {
 Statement let_stmt_parser(Parser *parser) {
     Statement stmt = (Statement) {0};
     stmt._type = TYPE_LET;
+
+    // Reservo memoria para una estructura de tipo LetStatement.
+    stmt._ptr = (LetStatement *) malloc(sizeof(LetStatement));
+
     ((LetStatement *)stmt._ptr)->_token = new_token(parser->_current_token._type, copy_string(parser->_current_token._literal));
 
     // Si el proximo token es diferente a un BEV_IDENT
@@ -91,14 +98,9 @@ Statement let_stmt_parser(Parser *parser) {
     // Inicializo el identificador.
     ((LetStatement *)stmt._ptr)->_name = new_identifier(&parser->_current_token, parser->_current_token._literal);
 
-    // Si el token actual es diferente a un "punto y coma"
-    // genero un error (FAILURE).
-    if (!is_current_token(parser, BEV_SEMICOLON)) {
-        // Elimina la memoria reservada del token.
-        free_token(&((LetStatement *)stmt._ptr)->_token);
-        // Elimina la memoria reservada de un identificador.
-        free_identifier(&((LetStatement *)stmt._ptr)->_name);
-        return (Statement) {._ptr=NULL, ._type=TYPE_FAILURE};
+    // Por ahora no se examina las expresiones.
+    while (!is_current_token(parser, BEV_SEMICOLON)) {
+        next_token_parser(parser);
     }
 
     return stmt;
