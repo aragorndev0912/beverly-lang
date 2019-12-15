@@ -6,6 +6,12 @@
 #include <stdio.h>
 
 //----------------------------------------------------------------------------------
+// Declaracion de constantes.
+//----------------------------------------------------------------------------------
+
+static const size_t PARSER_ERROR_SIZE = 10;
+
+//----------------------------------------------------------------------------------
 // Declaracion de funciones estaticas.
 //----------------------------------------------------------------------------------
 static bool is_current_token(const Parser *const parser, const char *token);
@@ -13,7 +19,51 @@ static bool is_peek_token(const Parser *const parser, const char *token);
 static bool expect_token(Parser *parser, const char *token);
 
 //----------------------------------------------------------------------------------
-// Declaracion de funciones estaticas.
+// Implementacion de funciones ParserError.
+//----------------------------------------------------------------------------------
+ParserError new_parsererror(void) {
+    ParserError p_error;
+    p_error._errors = NULL;
+    p_error._len = 0;
+    p_error._cap = 0;
+
+    return p_error;
+}
+
+void free_parsererror(ParserError *p_error) {
+    if (p_error->_errors != NULL) {
+        for (int k=0; k < p_error->_len; k++) {
+            free(p_error->_errors[k]);
+            p_error->_errors[k] = NULL;
+        }
+
+        free(p_error->_errors);
+        p_error->_errors = NULL;
+    }
+}
+
+void add_parsererror(ParserError *p_error, const char *error) {
+    if (p_error->_errors == NULL) {
+        p_error->_errors = (char **) malloc(sizeof(char *) * p_error->_len);
+        p_error->_errors[p_error->_len++] = copy_string(error);
+    }
+    else {
+        if (p_error->_len >= p_error->_cap) {
+            p_error->_cap += PARSER_ERROR_SIZE; 
+            char **_tmp = (char **) realloc(p_error->_errors, p_error->_cap);
+            if (_tmp == NULL) {
+                // Falta implementacion.
+            }
+            p_error->_errors = _tmp;
+            _tmp = NULL;
+        }
+
+        p_error->_errors[p_error->_len++] = copy_string(error);
+    }
+}
+
+//----------------------------------------------------------------------------------
+// Implementacion de funciones Parser.
 //----------------------------------------------------------------------------------
 Parser new_parser(Lexer *lexer) {
     Parser parser = {0};
@@ -25,16 +75,25 @@ Parser new_parser(Lexer *lexer) {
     next_token_parser(&parser);
     next_token_parser(&parser);
 
+    parser.error = new_parsererror();
+
     return parser;
 }
 
 void free_parser(Parser *parser) {
-    if (parser != NULL && parser->_lexer != NULL) {
-        // free_lexer(parser->_lexer);
-        parser->_lexer = NULL;
-        printf("PARSER DELETED.\n");
+    if (parser != NULL) {
+        if (parser->_lexer != NULL) {
+            // free_lexer(parser->_lexer);
+            parser->_lexer = NULL;
+        }
+
+        if (parser->error._errors != NULL) {
+            for (int k=0; k < parser->error._len; k++) {
+                free(parser->error._errors[k]);
+                parser->error._errors[k] = NULL;
+            }
+        }   
     }
-    
 }
 
 void next_token_parser(Parser *parser) {
@@ -106,6 +165,13 @@ Statement let_stmt_parser(Parser *parser) {
     return stmt;
 }
 
+void peek_error_parser(Parser *parser, const char *token) {
+    char msg[200];
+    sprintf(msg, "expected next token to be %s, got '%s' instead\n", token, parser->_peek_token._literal);
+
+    add_parsererror(&parser->error, msg);
+}
+
 //----------------------------------------------------------------------------------
 // Implementacion de funciones estaticas.
 //----------------------------------------------------------------------------------
@@ -123,5 +189,6 @@ static bool expect_token(Parser *parser, const char *token) {
         return true;
     }
 
+    peek_error_parser(parser, token);
     return false;
 }

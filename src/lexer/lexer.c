@@ -25,7 +25,6 @@ Lexer new_lexer(const char *input) {
 
 void free_lexer(Lexer *lexer) {
     // Falta implementacion.
-    printf("LEXER DELETED.\n");
 }
 
 void read_char_lexer(Lexer *lexer) {

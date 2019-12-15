@@ -95,7 +95,6 @@ void free_program(Program *program) {
         free_stmt(&program->_statements[k]);
     
     program->_statements = NULL;
-    printf("PROGRAM DELETED.\n");
 }
 
 //----------------------------------------------------------------------------------

@@ -11,6 +11,8 @@ static void delete_data(Program *program, Lexer *lexer, Parser *parser);
 
 static bool let_statement(const LetStatement *const let_stmt, const char *name);
 
+static bool checkParserErrors(const Parser *const parser);
+
 static bool __test_letStatement(void) {
     const char *input = 
     "let x = 5;\n\
@@ -21,6 +23,10 @@ static bool __test_letStatement(void) {
     Parser parser = new_parser(&lexer);
     
     Program program = program_parser(&parser);
+    if (checkParserErrors(&parser)) {
+        delete_data(&program, &lexer, &parser);
+        return false;
+    }
 
     if (program._statements == NULL) {
         delete_data(&program, &lexer, &parser);
@@ -85,4 +91,15 @@ static bool let_statement(const LetStatement *const let_stmt, const char *name) 
     }
 
     return true;
+}
+
+static bool checkParserErrors(const Parser *const parser) {
+    if (parser->error._errors == NULL) 
+        return false;
+
+    printf("parser has %d errors.\n", parser->error._len);
+    for (int k=0; k < parser->error._len; k++) 
+        printf(parser->error._errors[k]);
+
+    return true;   
 }
