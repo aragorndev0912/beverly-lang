@@ -18,6 +18,10 @@ static bool is_current_token(const Parser *const parser, const char *token);
 static bool is_peek_token(const Parser *const parser, const char *token);
 static bool expect_token(Parser *parser, const char *token);
 
+
+static Statement letStmt_parser(Parser *parser);
+static Statement returnStmt_parser(Parser *parser);
+
 //----------------------------------------------------------------------------------
 // Implementacion de funciones ParserError.
 //----------------------------------------------------------------------------------
@@ -44,7 +48,8 @@ void free_parsererror(ParserError *p_error) {
 
 void add_parsererror(ParserError *p_error, const char *error) {
     if (p_error->_errors == NULL) {
-        p_error->_errors = (char **) malloc(sizeof(char *) * p_error->_len);
+        p_error->_cap = PARSER_ERROR_SIZE;
+        p_error->_errors = (char **) malloc(sizeof(char *) * p_error->_cap);
         p_error->_errors[p_error->_len++] = copy_string(error);
     }
     else {
@@ -105,22 +110,17 @@ void next_token_parser(Parser *parser) {
 }
 
 Program program_parser(Parser *parser) {
-    Program program = new_program(10);
+    Program program = new_program();
     program._statements = NULL;
 
     Statement stmt = (Statement) {0};
     while (parser->_current_token._type != BEV_EOF) {
         stmt = stmt_parser(parser);
         // Ocurrio algun error en la construccion del AST.
-        if(stmt._type == TYPE_FAILURE) {
-            break;
-        }
-        else {
-            if (stmt._ptr != NULL)
-                add_stmt_program(&program, stmt._ptr, stmt._type);
+        if (stmt._ptr != NULL)
+            add_stmt_program(&program, stmt._ptr, stmt._type);
 
-            next_token_parser(parser);
-        }
+        next_token_parser(parser);
     }   
 
     free_token(&parser->_current_token);
@@ -130,14 +130,38 @@ Program program_parser(Parser *parser) {
 }
 
 Statement stmt_parser(Parser *parser) {
-    Statement stmt = (Statement) {0};
+    Statement stmt = (Statement) {._ptr=NULL, ._type=TYPE_FAILURE};
     if (parser->_current_token._type == BEV_LET) 
-        return let_stmt_parser(parser);
+        return letStmt_parser(parser);
+    else if (parser->_current_token._type == BEV_RETURN)
+        return  returnStmt_parser(parser);
 
     return stmt;
 }
 
-Statement let_stmt_parser(Parser *parser) {
+static Statement returnStmt_parser(Parser *parser) {
+    Statement stmt = (Statement) {0};
+
+    stmt._ptr = (ReturnStatement *) malloc(sizeof(ReturnStatement));
+    ((ReturnStatement *)stmt._ptr)->_token = new_token(
+        parser->_current_token._type, 
+        copy_string(parser->_current_token._literal)
+    );
+    stmt._type = TYPE_RETURN;
+
+    // Inicializo la Expresion con valores nulos.
+    ((ReturnStatement *)stmt._ptr)->_value = (Expression) {0};
+
+    next_token_parser(parser);
+
+    while (!is_current_token(parser, BEV_SEMICOLON)) {
+        next_token_parser(parser);
+    }
+
+    return stmt;
+}
+
+static Statement letStmt_parser(Parser *parser) {
     Statement stmt = (Statement) {0};
     stmt._type = TYPE_LET;
 

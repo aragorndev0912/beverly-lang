@@ -30,8 +30,6 @@ Program program_parser(Parser *parser);
 
 Statement stmt_parser(Parser *parser);
 
-Statement let_stmt_parser(Parser *parser);
-
 void peek_error_parser(Parser *parser, const char *token);
 
 //----------------------------------------------------------------------------------

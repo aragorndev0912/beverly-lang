@@ -5,6 +5,11 @@
 #include <stdio.h>
 
 //----------------------------------------------------------------------------------
+// Constantes.
+//----------------------------------------------------------------------------------
+static const size_t STMT_CAP = 10;
+
+//----------------------------------------------------------------------------------
 // Struct Node.
 //----------------------------------------------------------------------------------
 const char *token_literal_node(const Node *const node) {
@@ -65,15 +70,14 @@ void free_identifier(Identifier *ident) {
 // Struct Program.
 //----------------------------------------------------------------------------------
 
-static const size_t STMT_CAP = 10;
-
-Program new_program(size_t cap) {
-    Program program = (Program) {._len=0, ._cap=cap, ._statements=NULL};
+Program new_program(void) {
+    Program program = (Program) {._len=0, ._cap=0, ._statements=NULL};
     return program;
 }
 
 void add_stmt_program(Program *const program, void *ptr, TypeStmt type) {
     if (program->_statements == NULL) {
+        program->_cap = STMT_CAP;
         program->_statements = (Statement *) malloc(sizeof(Statement) * program->_cap);
     }
     else if ((program->_len) >= program->_cap) {
@@ -91,7 +95,7 @@ void add_stmt_program(Program *const program, void *ptr, TypeStmt type) {
 }
 
 void free_program(Program *program) {
-    for (int k=0; k < program->_len; k++) 
+    for (int k=0; k < program->_len; k++)  
         free_stmt(&program->_statements[k]);
     
     program->_statements = NULL;

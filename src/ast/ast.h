@@ -24,6 +24,7 @@ void free_node(Node *node);
 typedef enum TypeStmt {
     TYPE_FAILURE = 0,
     TYPE_LET,
+    TYPE_RETURN,
 
 } TypeStmt;
 
@@ -60,7 +61,7 @@ typedef struct Program {
 
 } Program;
 
-Program new_program(size_t cap);
+Program new_program(void);
 
 void add_stmt_program(Program *const program, void *ptr, TypeStmt type);
 
@@ -89,5 +90,15 @@ typedef struct LetStatement {
     Expression _value;
 
 } LetStatement;
+
+//----------------------------------------------------------------------------------
+// Return Statement.
+//----------------------------------------------------------------------------------
+
+typedef struct ReturnStatement {
+    Token _token;
+    Expression _value;
+
+} ReturnStatement;
 
 #endif //_AST_H

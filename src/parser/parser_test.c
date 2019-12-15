@@ -7,11 +7,81 @@
 #include "../parser/parser.h"
 #include "../lib/bool.h"
 
+//----------------------------------------------------------------------------------
+// Firmas de funciones estaticas.
+//----------------------------------------------------------------------------------
 static void delete_data(Program *program, Lexer *lexer, Parser *parser);
 
 static bool let_statement(const LetStatement *const let_stmt, const char *name);
 
 static bool checkParserErrors(const Parser *const parser);
+
+static bool __test_letStatement(void);
+
+static bool _test_returnStatement(void);
+
+//----------------------------------------------------------------------------------
+// Funcion main.
+//----------------------------------------------------------------------------------
+int main(void) {
+    assert(__test_letStatement());
+    printf("__test_letStatement (COMPLETED).\n");
+
+    assert(_test_returnStatement());
+    printf("_test_returnStatement (COMPLETED).\n");
+
+    return 0;
+}
+
+//----------------------------------------------------------------------------------
+// Implementacion de funciones estaticas.
+//----------------------------------------------------------------------------------
+
+static bool _test_returnStatement(void) {
+    const char *input = 
+    "return 5;\n\
+    return 10;\n\
+    return 956345;";
+
+    Lexer lexer = new_lexer(input);
+    Parser parser = new_parser(&lexer);
+
+    Program program = program_parser(&parser);
+    if (checkParserErrors(&parser)) {
+        delete_data(&program, &lexer, &parser);
+        return false;
+    }
+
+    if (program._statements == NULL) {
+        delete_data(&program, &lexer, &parser);
+        printf("Error, program is NULL\n");
+        return false;
+    }
+
+    if (program._len != 3) {
+        delete_data(&program, &lexer, &parser);
+        printf("Error, program._len has been 3 statements. got=%d.\n", program._len);
+        return false;
+    }
+
+    for (int k=0; k < 3; k++) {
+        if (program._statements[k]._type != TYPE_RETURN) {
+            printf("Error, statement with index '%d' is not LET type.\n", k);
+            delete_data(&program, &lexer, &parser);
+            return false;
+        }
+
+        if (strcmp(((ReturnStatement *)program._statements[k]._ptr)->_token._literal, "return") != 0) {
+            printf("returnStatemt._literal not 'return', got='%s'", ((ReturnStatement *)program._statements[k]._ptr)->_token._literal);
+            delete_data(&program, &lexer, &parser);
+            return false;
+        }
+    }
+
+
+    delete_data(&program, &lexer, &parser);
+    return true;
+}
 
 static bool __test_letStatement(void) {
     const char *input = 
@@ -52,6 +122,7 @@ static bool __test_letStatement(void) {
             }
         }
         else {
+            printf("Error, statement with index '%d' is not LET type.\n", k);
             delete_data(&program, &lexer, &parser);
             return false;
         }
@@ -59,13 +130,6 @@ static bool __test_letStatement(void) {
 
     delete_data(&program, &lexer, &parser);
     return true;
-}
-
-int main(void) {
-    assert(__test_letStatement());
-    printf("__test_letStatement (COMPLETED).\n");
-
-    return 0;
 }
 
 static void delete_data(Program *program, Lexer *lexer, Parser *parser) {
