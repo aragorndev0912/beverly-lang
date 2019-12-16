@@ -9,16 +9,10 @@
 //----------------------------------------------------------------------------------
 static const size_t STMT_CAP = 10;
 
+
 //----------------------------------------------------------------------------------
 // Struct Node.
 //----------------------------------------------------------------------------------
-const char *token_literal_node(const Node *const node) {
-    return node->_literal;
-}
-
-void free_node(Node *node) {
-    // Falta implementar.
-}
 
 //----------------------------------------------------------------------------------
 // Struct Statement.
@@ -35,41 +29,14 @@ void free_stmt(Statement *stmt) {
     }
 }
 
+
 //----------------------------------------------------------------------------------
 // Struct Expression.
 //----------------------------------------------------------------------------------
-void node_expression(const Expression *const expression) {
-    // Falta implementar.
-}
-
-void free_expression(Expression *expression) {
-    // Falta implementar.
-}
-
-//----------------------------------------------------------------------------------
-// Struct Identifier.
-//----------------------------------------------------------------------------------
-Identifier new_identifier(const Token *const token, const char *value) {
-    Identifier ident = (Identifier) {0};
-    
-    ident._token = new_token(token->_type, copy_string(token->_literal));
-    ident._value = copy_string(value);
-
-    return ident;
-}
-
-void free_identifier(Identifier *ident) {
-    if (ident != NULL) {
-        free_token(&ident->_token);
-        free(ident->_value);
-        ident->_value = NULL;
-    }
-}
 
 //----------------------------------------------------------------------------------
 // Struct Program.
 //----------------------------------------------------------------------------------
-
 Program new_program(void) {
     Program program = (Program) {._len=0, ._cap=0, ._statements=NULL};
     return program;
@@ -104,6 +71,62 @@ void free_program(Program *program) {
     program->_statements = NULL;
 }
 
+const char *string_program(Program *program) {
+    // Falta implementar.
+    return NULL;
+}
+
+
+//----------------------------------------------------------------------------------
+// Struct Identifier.
+//----------------------------------------------------------------------------------
+Identifier new_identifier(const Token *const token, const char *value) {
+    Identifier ident = (Identifier) {0};
+    
+    ident._token = new_token(token->_type, copy_string(token->_literal));
+    ident._value = copy_string(value);
+
+    return ident;
+}
+
+void free_identifier(Identifier *ident) {
+    if (ident != NULL) {
+        free_token(&ident->_token);
+
+        // Libero la memoria reservada de la veriable _value.
+        if (ident->_value != NULL) {
+            free(ident->_value);
+            ident->_value = NULL;
+        }
+    }
+}
+
+const char *string_identifier(const Identifier *const ident) {
+    return ident->_value;
+}
+
 //----------------------------------------------------------------------------------
 // Struct LetStatement.
 //----------------------------------------------------------------------------------
+const char *string_letStmt(LetStatement *let_stmt) {
+    // Falta implementar.
+    return NULL;
+}
+
+
+//----------------------------------------------------------------------------------
+// Struct ReturnStatement.
+//----------------------------------------------------------------------------------
+const char *string_returnStmt(ReturnStatement *return_stmt) {
+    // Falta implementar.
+    return NULL;
+}
+
+
+//----------------------------------------------------------------------------------
+// Struct ExpressionStatement.
+//----------------------------------------------------------------------------------
+const char *string_exprStmt(ExprStatement *expr_stmt) {
+    // Falta implementar cuando expression != NULL.
+    return NULL;
+}

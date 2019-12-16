@@ -5,9 +5,8 @@
 #include "../token/token.h"
 
 //----------------------------------------------------------------------------------
-// Node definitions.
+// struct Node.
 //----------------------------------------------------------------------------------
-// Struct type Node.
 typedef struct Node {
     const char *_literal;
 
@@ -19,7 +18,7 @@ void free_node(Node *node);
 
 
 //----------------------------------------------------------------------------------
-// Statement declarations.
+// struct Statement.
 //----------------------------------------------------------------------------------
 typedef enum TypeStmt {
     TYPE_FAILURE = 0,
@@ -38,21 +37,17 @@ Statement new_stmt(void *ptr, TypeStmt type);
 
 void free_stmt(Statement *stmt);
 
+
 //----------------------------------------------------------------------------------
-// Expression declarations.
+// struct Expression.
 //----------------------------------------------------------------------------------
 typedef struct Expression {
     Node _node;
 
 } Expression;
 
-void node_expression(const Expression *const expression);
-
-void free_expression(Expression *expression);
-
-
 //----------------------------------------------------------------------------------
-// Expression Program.
+// struct Program.
 //----------------------------------------------------------------------------------
 typedef struct Program {
     Statement *_statements;
@@ -67,9 +62,11 @@ void add_stmt_program(Program *const program, void *ptr, TypeStmt type);
 
 void free_program(Program *program);
 
+const char *string_program(Program *program);
+
 
 //----------------------------------------------------------------------------------
-// Expression Identifier.
+// struct Identifier.
 //----------------------------------------------------------------------------------
 typedef struct Identifier {
     Token _token;
@@ -81,8 +78,11 @@ Identifier new_identifier(const Token *const token, const char *value);
 
 void free_identifier(Identifier *ident);
 
+const char *string_identifier(const Identifier *const ident);
+
+
 //----------------------------------------------------------------------------------
-// Expression LetStatement.
+// struct LetStatement.
 //----------------------------------------------------------------------------------
 typedef struct LetStatement {
     Token _token;
@@ -91,14 +91,30 @@ typedef struct LetStatement {
 
 } LetStatement;
 
-//----------------------------------------------------------------------------------
-// Return Statement.
-//----------------------------------------------------------------------------------
+const char *string_letStmt(LetStatement *let_stmt);
 
+
+//----------------------------------------------------------------------------------
+// struct ReturnStatement.
+//----------------------------------------------------------------------------------
 typedef struct ReturnStatement {
     Token _token;
     Expression _value;
 
 } ReturnStatement;
+
+const char *string_returnStmt(ReturnStatement *return_stmt);
+
+
+//----------------------------------------------------------------------------------
+// struct ExpressionStatement.
+//----------------------------------------------------------------------------------
+typedef struct ExprStatement {
+    Token _token;
+    Expression _expression;
+
+} ExprStatement;
+
+const char *string_exprStmt(ExprStatement *expr_stmt);
 
 #endif //_AST_H
