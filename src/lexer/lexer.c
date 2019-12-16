@@ -45,6 +45,9 @@ Token next_token_lexer(Lexer *lexer) {
         case '=':
             if (peek_char(lexer) == '=') {
                 char *ch = (char *) malloc(sizeof(char) * 3);
+                if (ch == NULL) {
+                    // Falta implementar limpieza.
+                }
                 ch[0] = lexer->_ch;
                 read_char_lexer(lexer);
                 ch[1] = lexer->_ch;
@@ -58,6 +61,9 @@ Token next_token_lexer(Lexer *lexer) {
         case '!':
             if (peek_char(lexer) == '=') {
                 char *ch = (char *) malloc(sizeof(char) * 3);
+                if (ch == NULL) {
+                    // Falta implementar limpieza.
+                }
                 ch[0] = lexer->_ch;
                 read_char_lexer(lexer);
                 ch[1] = lexer->_ch;
@@ -72,6 +78,9 @@ Token next_token_lexer(Lexer *lexer) {
             if (peek_char(lexer) == '=') {
                 // allocate.
                 char *ch = (char *) malloc(sizeof(char) * 3);
+                if (ch == NULL) {
+                    // Falta implementar limpieza.
+                }
                 ch[0] = lexer->_ch;
                 read_char_lexer(lexer);
                 ch[1] = lexer->_ch;
@@ -171,7 +180,9 @@ static char *get_slice_str(Lexer *lexer, int begin) {
     int end = lexer->_position;
     int diff = end - begin;
     char *str = (char *) malloc(sizeof(char) * diff+1);
-
+    if (str == NULL) {
+        // Falta implementar limpieza.
+    }
     int index = 0;
     for (int k=begin; k < end; k++)
         str[index++] = lexer->_input[k];
@@ -200,6 +211,9 @@ static bool is_digit(char ch) {
 
 static char *to_str(const Lexer *lexer, size_t n) {
     char *str = (char *) malloc(sizeof(char) * n);
+    if (str == NULL) {
+        // Falta implementar limpieza.
+    }
     str[0] = lexer->_ch;
     str[1] = '\0';
 

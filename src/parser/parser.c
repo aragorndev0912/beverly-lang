@@ -50,6 +50,9 @@ void add_parsererror(ParserError *p_error, const char *error) {
     if (p_error->_errors == NULL) {
         p_error->_cap = PARSER_ERROR_SIZE;
         p_error->_errors = (char **) malloc(sizeof(char *) * p_error->_cap);
+        if (p_error->_errors == NULL) {
+            // Falta implementar limpieza.
+        }
         p_error->_errors[p_error->_len++] = copy_string(error);
     }
     else {
@@ -143,6 +146,9 @@ static Statement returnStmt_parser(Parser *parser) {
     Statement stmt = (Statement) {0};
 
     stmt._ptr = (ReturnStatement *) malloc(sizeof(ReturnStatement));
+    if (stmt._ptr == NULL) {
+        // Falta implementar limpieza.
+    }
     ((ReturnStatement *)stmt._ptr)->_token = new_token(
         parser->_current_token._type, 
         copy_string(parser->_current_token._literal)
@@ -167,6 +173,9 @@ static Statement letStmt_parser(Parser *parser) {
 
     // Reservo memoria para una estructura de tipo LetStatement.
     stmt._ptr = (LetStatement *) malloc(sizeof(LetStatement));
+    if (stmt._ptr == NULL) {
+        // Falta implementar limpieza.
+    }
 
     ((LetStatement *)stmt._ptr)->_token = new_token(parser->_current_token._type, copy_string(parser->_current_token._literal));
 

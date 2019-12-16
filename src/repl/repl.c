@@ -52,6 +52,9 @@ char *get_line(const char *prompt) {
     size_t max = diff;
 
     char *line = (char *) malloc(sizeof(char) * max);
+    if (line == NULL) {
+        // Falta implementar limpieza.
+    }
     printf("\n%s ", prompt);
     while (true) {
         ch = fgetc(stdin);

@@ -79,6 +79,9 @@ void add_stmt_program(Program *const program, void *ptr, TypeStmt type) {
     if (program->_statements == NULL) {
         program->_cap = STMT_CAP;
         program->_statements = (Statement *) malloc(sizeof(Statement) * program->_cap);
+        if (program->_statements == NULL) {
+            // Falta implementar limpieza.
+        }
     }
     else if ((program->_len) >= program->_cap) {
         program->_cap += STMT_CAP;

@@ -28,7 +28,7 @@ int main(void) {
     printf("__test_letStatement (COMPLETED).\n");
 
     assert(_test_returnStatement());
-    printf("_test_returnStatement (COMPLETED).\n");
+    printf("__test_returnStatement (COMPLETED).\n");
 
     return 0;
 }
