@@ -109,12 +109,12 @@ const char *string_returnStmt(ReturnStatement *return_stmt);
 //----------------------------------------------------------------------------------
 // struct ExpressionStatement.
 //----------------------------------------------------------------------------------
-typedef struct ExprStatement {
+typedef struct ExpressionStatement {
     Token _token;
     Expression _expression;
 
-} ExprStatement;
+} ExpressionStatement;
 
-const char *string_exprStmt(ExprStatement *expr_stmt);
+const char *string_exprStmt(ExpressionStatement *expr_stmt);
 
 #endif //_AST_H
