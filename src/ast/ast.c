@@ -126,7 +126,3 @@ const char *string_returnStmt(ReturnStatement *return_stmt) {
 //----------------------------------------------------------------------------------
 // Struct ExpressionStatement.
 //----------------------------------------------------------------------------------
-const char *string_exprStmt(ExpressionStatement *expr_stmt) {
-    // Falta implementar cuando expression != NULL.
-    return NULL;
-}

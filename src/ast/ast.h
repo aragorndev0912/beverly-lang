@@ -115,6 +115,5 @@ typedef struct ExpressionStatement {
 
 } ExpressionStatement;
 
-const char *string_exprStmt(ExpressionStatement *expr_stmt);
 
 #endif //_AST_H
