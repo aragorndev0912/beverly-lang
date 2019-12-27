@@ -72,8 +72,12 @@ void free_program(Program *program) {
 }
 
 const char *string_program(Program *program) {
-    // Falta implementar.
-    return NULL;
+    const char *string = NULL;
+
+
+
+
+    return string;
 }
 
 

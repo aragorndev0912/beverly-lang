@@ -8,3 +8,13 @@ char *copy_string(const char *string) {
 
     return nstring;
 }
+
+void add_string(const char **destiny, const char *origin) {
+    if (destiny == NULL) {
+        // I need to implement it.
+
+    }
+    else {
+        // I need to implement it.
+    }
+}
