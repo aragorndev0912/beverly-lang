@@ -181,6 +181,7 @@ const char *string_returnStmt(ReturnStatement *return_stmt) {
 }
 
 void free_returnStmt(ReturnStatement *return_stmt) {
+    free_token(&return_stmt->_token);
     if (return_stmt->__string != NULL) {
         free(return_stmt->__string);
         return_stmt->__string = NULL;
