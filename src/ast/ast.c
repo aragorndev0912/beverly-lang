@@ -33,6 +33,19 @@ void free_stmt(Statement *stmt) {
 //----------------------------------------------------------------------------------
 // Struct Expression.
 //----------------------------------------------------------------------------------
+void free_expression(Expression *expression) {
+    if (expression->_ptr != NULL) {
+        switch (expression->_type) {
+            case EXPR_IDENTIFIER:
+                free_identifier((Identifier *)expression->_ptr);
+                break;
+            
+            default:
+                break;
+        }
+    }
+}
+
 
 //----------------------------------------------------------------------------------
 // Struct Program.
@@ -70,11 +83,15 @@ void free_program(Program *program) {
 
             switch (program->_statements[k]._type) {
                 case TYPE_LET:
-                    free_letStmt(((LetStatement *)program->_statements[k]._ptr));
+                    free_letStmt((LetStatement *)program->_statements[k]._ptr);
                     break;
                 
                 case TYPE_RETURN:
-                    free_returnStmt(((ReturnStatement *)program->_statements[k]._ptr));
+                    free_returnStmt((ReturnStatement *)program->_statements[k]._ptr);
+                    break;
+                
+                case TYPE_EXPR_STMT:
+                    free_exprStmt((ExpressionStatement *)program->_statements[k]._ptr);
                     break;
 
                 default:
@@ -106,6 +123,7 @@ const char *string_program(Program *program) {
                     break;
 
                 default:
+                    // pass
                     continue;
             }
         }
@@ -198,4 +216,9 @@ const char *string_exprStmt(ExpressionStatement *expr_stmt) {
     // }
 
     return " ";
+}
+
+void free_exprStmt(ExpressionStatement *expr_stmt) {
+    free_expression(&expr_stmt->_expression);
+    free_token(&expr_stmt->_token);
 }

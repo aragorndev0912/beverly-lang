@@ -18,9 +18,11 @@ static bool is_current_token(const Parser *const parser, const char *token);
 static bool is_peek_token(const Parser *const parser, const char *token);
 static bool expect_token(Parser *parser, const char *token);
 
-
+static Statement exprStmt_parser(Parser *parser);
 static Statement letStmt_parser(Parser *parser);
 static Statement returnStmt_parser(Parser *parser);
+
+static Expression expression_parser(Parser *parser, Precedence pre);
 
 //----------------------------------------------------------------------------------
 // Implementacion de funciones ParserError.
@@ -138,6 +140,29 @@ Statement stmt_parser(Parser *parser) {
         return letStmt_parser(parser);
     else if (parser->_current_token._type == BEV_RETURN)
         return  returnStmt_parser(parser);
+    else
+        return exprStmt_parser(parser);
+
+    return stmt;
+}
+
+static Statement exprStmt_parser(Parser *parser) {
+    Statement stmt = (Statement) {._ptr=NULL, ._type=TYPE_FAILURE};
+    stmt._ptr = (ExpressionStatement *) malloc(sizeof(ExpressionStatement)); 
+    if (stmt._ptr == NULL) {
+        // I need to implement it.
+    }
+    stmt._type = TYPE_EXPR_STMT;
+
+    ((ExpressionStatement *)stmt._ptr)->_token = new_token(
+        parser->_current_token._type,
+        copy_string(parser->_current_token._literal)
+    );
+
+    ((ExpressionStatement *)stmt._ptr)->_expression = expression_parser(parser, LOWEST);
+
+    if (is_peek_token(parser, BEV_SEMICOLON))
+        next_token_parser(parser);
 
     return stmt;
 }
@@ -191,6 +216,12 @@ static Statement letStmt_parser(Parser *parser) {
     // Inicializo el identificador.
     ((LetStatement *)stmt._ptr)->_name = new_identifier(&parser->_current_token, parser->_current_token._literal);
 
+    if (!expect_token(parser, BEV_ASSIGN)) {
+        // Elimina la memoria reservada del token.
+        free_token(&((LetStatement *)stmt._ptr)->_token);
+        return (Statement) {._ptr=NULL, ._type=TYPE_FAILURE};;
+    }
+
     // Por ahora no se examina las expresiones.
     while (!is_current_token(parser, BEV_SEMICOLON)) 
         next_token_parser(parser);
@@ -208,6 +239,22 @@ void peek_error_parser(Parser *parser, const char *token) {
 //----------------------------------------------------------------------------------
 // Implementacion de funciones estaticas.
 //----------------------------------------------------------------------------------
+
+static Expression expression_parser(Parser *parser, Precedence pre) {
+    Expression expression = (Expression) {._ptr=NULL, ._type=EXPR_FAILURE};
+
+    if (strcmp(parser->_current_token._type, BEV_IDENT) == 0) {
+        expression._ptr = (Identifier *) malloc(sizeof(Identifier));
+        if (expression._ptr == NULL) {
+            // Falta implementar.
+        }
+        ((Identifier *)expression._ptr)->_token = new_token(parser->_current_token._type, copy_string(parser->_current_token._literal));
+        expression._type = EXPR_IDENTIFIER;
+    }
+
+    return expression;
+}
+
 static bool is_current_token(const Parser *const parser, const char *token) {
     return (strcmp(parser->_current_token._type, token) == 0);
 }

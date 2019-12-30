@@ -5,6 +5,18 @@
 #include "../lexer/lexer.h"
 #include "../token/token.h"
 
+typedef enum Precedence {
+    _ = 0,
+    LOWEST,
+    EQUALS, // ==
+    LESSGREATER, // > or <
+    SUM,    // +
+    PRODUCT,    // *
+    PREFIX, // -x or !x
+    CALL,  // foo(value)
+    
+} Precedence;
+
 //----------------------------------------------------------------------------------
 // Declaracion de ParserError.
 //----------------------------------------------------------------------------------

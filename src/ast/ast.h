@@ -24,6 +24,7 @@ typedef enum TypeStmt {
     TYPE_FAILURE = 0,
     TYPE_LET,
     TYPE_RETURN,
+    TYPE_EXPR_STMT,
 
 } TypeStmt;
 
@@ -41,10 +42,19 @@ void free_stmt(Statement *stmt);
 //----------------------------------------------------------------------------------
 // struct Expression.
 //----------------------------------------------------------------------------------
+typedef enum ExpressionType {
+    EXPR_FAILURE = 0,
+    EXPR_IDENTIFIER,
+
+} ExpressionType;
+
 typedef struct Expression {
-    Node _node;
+    void *_ptr;
+    ExpressionType _type;
 
 } Expression;
+
+void free_expression(Expression *expression);
 
 //----------------------------------------------------------------------------------
 // struct Program.
@@ -125,5 +135,7 @@ typedef struct ExpressionStatement {
 } ExpressionStatement;
 
 const char *string_exprStmt(ExpressionStatement *expr_stmt);
+
+void free_exprStmt(ExpressionStatement *expr_stmt);
 
 #endif //_AST_H
