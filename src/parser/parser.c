@@ -144,7 +144,8 @@ Statement stmt_parser(Parser *parser) {
 
 static Statement returnStmt_parser(Parser *parser) {
     Statement stmt = (Statement) {0};
-
+    stmt._type = TYPE_RETURN;
+    
     stmt._ptr = (ReturnStatement *) malloc(sizeof(ReturnStatement));
     if (stmt._ptr == NULL) {
         // I need to implement it.
@@ -153,16 +154,15 @@ static Statement returnStmt_parser(Parser *parser) {
         parser->_current_token._type, 
         copy_string(parser->_current_token._literal)
     );
-    stmt._type = TYPE_RETURN;
-
+    ((ReturnStatement *)stmt._ptr)->__string = NULL;
+    
     // Inicializo la Expresion con valores nulos.
     ((ReturnStatement *)stmt._ptr)->_value = (Expression) {0};
 
     next_token_parser(parser);
 
-    while (!is_current_token(parser, BEV_SEMICOLON)) {
+    while (!is_current_token(parser, BEV_SEMICOLON)) 
         next_token_parser(parser);
-    }
 
     return stmt;
 }
@@ -178,6 +178,7 @@ static Statement letStmt_parser(Parser *parser) {
     }
 
     ((LetStatement *)stmt._ptr)->_token = new_token(parser->_current_token._type, copy_string(parser->_current_token._literal));
+    ((LetStatement *)stmt._ptr)->__string = NULL;
 
     // Si el proximo token es diferente a un BEV_IDENT
     // genero un error (FAILURE).
@@ -191,10 +192,9 @@ static Statement letStmt_parser(Parser *parser) {
     ((LetStatement *)stmt._ptr)->_name = new_identifier(&parser->_current_token, parser->_current_token._literal);
 
     // Por ahora no se examina las expresiones.
-    while (!is_current_token(parser, BEV_SEMICOLON)) {
+    while (!is_current_token(parser, BEV_SEMICOLON)) 
         next_token_parser(parser);
-    }
-
+    
     return stmt;
 }
 

@@ -65,17 +65,37 @@ void add_stmt_program(Program *const program, void *ptr, TypeStmt type) {
 }
 
 void free_program(Program *program) {
-    for (int k=0; k < program->_len; k++)  
-        free_stmt(&program->_statements[k]);
+    if (program->_statements != NULL) {
+        for (int k=0; k < program->_len; k++)  {
+
+            switch (program->_statements[k]._type) {
+                case TYPE_LET:
+                    free_letStmt(((LetStatement *)program->_statements[k]._ptr));
+                    break;
+                
+                case TYPE_RETURN:
+                    free_returnStmt(((ReturnStatement *)program->_statements[k]._ptr));
+                    break;
+
+                default:
+                    printf("Error to delete...\n"); // Falta implementar.
+            }
+
+            free_stmt(&program->_statements[k]);
+        }
     
-    program->_statements = NULL;
+        program->_statements = NULL;
+    }
 }
 
 const char *string_program(Program *program) {
     const char *string = NULL;
 
-
-
+    if (program->_statements != NULL) {
+        for (size_t k=0; k < program->_len; k++) {
+            // falta implementar.
+        }
+    }
 
     return string;
 }
@@ -86,7 +106,6 @@ const char *string_program(Program *program) {
 //----------------------------------------------------------------------------------
 Identifier new_identifier(const Token *const token, const char *value) {
     Identifier ident = (Identifier) {0};
-    
     ident._token = new_token(token->_type, copy_string(token->_literal));
     ident._value = copy_string(value);
 
@@ -113,8 +132,20 @@ const char *string_identifier(const Identifier *const ident) {
 // Struct LetStatement.
 //----------------------------------------------------------------------------------
 const char *string_letStmt(LetStatement *let_stmt) {
-    // Falta implementar.
-    return NULL;
+    add_string(&let_stmt->__string, let_stmt->_token._literal);
+    add_string(&let_stmt->__string, string_identifier(&let_stmt->_name));
+
+    return (let_stmt->__string == NULL) ? ("") : (let_stmt->__string);
+}
+
+void free_letStmt(LetStatement *let_stmt) {
+    free_identifier(&let_stmt->_name);
+    free_token(&let_stmt->_token);
+    // free_expression(); falta por hacer.
+    if (let_stmt->__string != NULL) {
+        free(let_stmt->__string);
+        let_stmt->__string = NULL;
+    }
 }
 
 
@@ -122,11 +153,32 @@ const char *string_letStmt(LetStatement *let_stmt) {
 // Struct ReturnStatement.
 //----------------------------------------------------------------------------------
 const char *string_returnStmt(ReturnStatement *return_stmt) {
-    // Falta implementar.
-    return NULL;
+    add_string(&return_stmt->__string, return_stmt->_token._literal);
+
+    // Falta implementacion.
+    // if (return_stmt->_value != NULL) {
+    // }
+
+    add_string(&return_stmt->__string, ";");
+
+    return (return_stmt->__string) ? " ": return_stmt->__string;
+}
+
+void free_returnStmt(ReturnStatement *return_stmt) {
+    if (return_stmt->__string != NULL) {
+        free(return_stmt->__string);
+        return_stmt->__string = NULL;
+    }
 }
 
 
 //----------------------------------------------------------------------------------
 // Struct ExpressionStatement.
 //----------------------------------------------------------------------------------
+const char *string_exprStmt(ExpressionStatement *expr_stmt) {
+    // Falta implementacion.
+    // if (expr_stmt->_expression != NULL) {
+    // }
+
+    return " ";
+}

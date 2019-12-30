@@ -5,6 +5,9 @@
 #include "../lexer/lexer.h"
 #include "../token/token.h"
 
+//----------------------------------------------------------------------------------
+// Declaracion de ParserError.
+//----------------------------------------------------------------------------------
 typedef struct ParserError {
     char **_errors;
     size_t _len;
@@ -12,6 +15,16 @@ typedef struct ParserError {
 
 } ParserError;
 
+ParserError new_parsererror(void);
+
+void free_parsererror(ParserError *p_error);
+
+void add_parsererror(ParserError *p_error, const char *error);
+
+
+//----------------------------------------------------------------------------------
+// Declaracion de Parser.
+//----------------------------------------------------------------------------------
 typedef struct Parser {
     Lexer *_lexer;
     Token _current_token;
@@ -31,14 +44,5 @@ Program program_parser(Parser *parser);
 Statement stmt_parser(Parser *parser);
 
 void peek_error_parser(Parser *parser, const char *token);
-
-//----------------------------------------------------------------------------------
-// Declaracion de ParserError.
-//----------------------------------------------------------------------------------
-ParserError new_parsererror(void);
-
-void free_parsererror(ParserError *p_error);
-
-void add_parsererror(ParserError *p_error, const char *error);
 
 #endif //_PARSER_H

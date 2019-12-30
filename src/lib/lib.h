@@ -3,6 +3,6 @@
 
 char *copy_string(const char *string);
 
-void add_string(const char **destiny, const char *origin);
+void add_string(char **destiny, const char *origin);
 
 #endif //_LIB_H

@@ -89,10 +89,13 @@ typedef struct LetStatement {
     Identifier _name;
     Expression _value;
 
+    char *__string;
+
 } LetStatement;
 
 const char *string_letStmt(LetStatement *let_stmt);
 
+void free_letStmt(LetStatement *let_stmt);
 
 //----------------------------------------------------------------------------------
 // struct ReturnStatement.
@@ -101,9 +104,13 @@ typedef struct ReturnStatement {
     Token _token;
     Expression _value;
 
+    char *__string;
+
 } ReturnStatement;
 
 const char *string_returnStmt(ReturnStatement *return_stmt);
+
+void free_returnStmt(ReturnStatement *return_stmt);
 
 
 //----------------------------------------------------------------------------------
@@ -115,5 +122,6 @@ typedef struct ExpressionStatement {
 
 } ExpressionStatement;
 
+const char *string_exprStmt(ExpressionStatement *expr_stmt);
 
 #endif //_AST_H
