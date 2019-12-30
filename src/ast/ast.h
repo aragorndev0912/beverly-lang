@@ -54,6 +54,8 @@ typedef struct Program {
     size_t _len;
     size_t _cap;
 
+    char *__string;
+
 } Program;
 
 Program new_program(void);

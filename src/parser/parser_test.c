@@ -36,7 +36,6 @@ int main(void) {
 //----------------------------------------------------------------------------------
 // Implementacion de funciones estaticas.
 //----------------------------------------------------------------------------------
-
 static bool _test_returnStatement(void) {
     const char *input = 
     "return 5;\n\

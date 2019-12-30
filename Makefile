@@ -61,6 +61,14 @@ parser_test: obj obj/parser_test.o obj/parser.o obj/lexer.o obj/ast.o obj/token.
 obj/parser_test.o: src/parser/parser_test.c 
 	$(C) -c src/parser/parser_test.c -o obj/parser_test.o $(CCFLAGS)
 
+#------------------------------------------------------------------------
+# Test AST.
+#------------------------------------------------------------------------
+ast_test: obj obj/ast_test.o obj/parser.o obj/lexer.o obj/ast.o obj/token.o obj/lib.o
+	$(C) -o ast_test obj/ast_test.o obj/parser.o obj/lexer.o obj/ast.o obj/token.o obj/lib.o $(CCFLAGS)
+
+obj/ast_test.o: src/ast/ast_test.c
+	$(C) -c src/ast/ast_test.c -o obj/ast_test.o $(CCFLAGS)
 
 #------------------------------------------------------------------------
 # PHONY.

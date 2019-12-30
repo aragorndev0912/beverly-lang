@@ -86,18 +86,32 @@ void free_program(Program *program) {
     
         program->_statements = NULL;
     }
+
+    if (program->__string != NULL) {
+        free(program->__string);
+        program->__string = NULL;
+    }
 }
 
 const char *string_program(Program *program) {
-    const char *string = NULL;
-
     if (program->_statements != NULL) {
         for (size_t k=0; k < program->_len; k++) {
-            // falta implementar.
+            switch (program->_statements[k]._type) {
+                case TYPE_LET:
+                    add_string(&program->__string, string_letStmt(((LetStatement *)program->_statements[k]._ptr)));
+                    break;
+                
+                case TYPE_RETURN:
+                    add_string(&program->__string, string_returnStmt(((ReturnStatement *)program->_statements[k]._ptr)));
+                    break;
+
+                default:
+                    continue;
+            }
         }
     }
 
-    return string;
+    return (program->__string == NULL) ? " ": program->__string;
 }
 
 
@@ -133,7 +147,9 @@ const char *string_identifier(const Identifier *const ident) {
 //----------------------------------------------------------------------------------
 const char *string_letStmt(LetStatement *let_stmt) {
     add_string(&let_stmt->__string, let_stmt->_token._literal);
+    add_string(&let_stmt->__string, " ");
     add_string(&let_stmt->__string, string_identifier(&let_stmt->_name));
+    add_string(&let_stmt->__string, " = ");
 
     return (let_stmt->__string == NULL) ? ("") : (let_stmt->__string);
 }
@@ -154,14 +170,14 @@ void free_letStmt(LetStatement *let_stmt) {
 //----------------------------------------------------------------------------------
 const char *string_returnStmt(ReturnStatement *return_stmt) {
     add_string(&return_stmt->__string, return_stmt->_token._literal);
-
+    add_string(&return_stmt->__string, " ");
     // Falta implementacion.
     // if (return_stmt->_value != NULL) {
     // }
 
     add_string(&return_stmt->__string, ";");
 
-    return (return_stmt->__string) ? " ": return_stmt->__string;
+    return (return_stmt->__string == NULL) ? " ": return_stmt->__string;
 }
 
 void free_returnStmt(ReturnStatement *return_stmt) {
