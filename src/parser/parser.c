@@ -140,7 +140,7 @@ Statement stmt_parser(Parser *parser) {
         return letStmt_parser(parser);
     else if (parser->_current_token._type == BEV_RETURN)
         return  returnStmt_parser(parser);
-    else
+    else 
         return exprStmt_parser(parser);
 
     return stmt;
@@ -249,6 +249,7 @@ static Expression expression_parser(Parser *parser, Precedence pre) {
             // Falta implementar.
         }
         ((Identifier *)expression._ptr)->_token = new_token(parser->_current_token._type, copy_string(parser->_current_token._literal));
+        ((Identifier *)expression._ptr)->_value = copy_string(parser->_current_token._literal);
         expression._type = EXPR_IDENTIFIER;
     }
 

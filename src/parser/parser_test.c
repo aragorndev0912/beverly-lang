@@ -18,7 +18,9 @@ static bool checkParserErrors(const Parser *const parser);
 
 static bool __test_letStatement(void);
 
-static bool _test_returnStatement(void);
+static bool __test_returnStatement(void);
+
+static bool __test_identifier(void);
 
 //----------------------------------------------------------------------------------
 // Funcion main.
@@ -27,8 +29,11 @@ int main(void) {
     assert(__test_letStatement());
     printf("__test_letStatement (COMPLETED).\n");
 
-    assert(_test_returnStatement());
+    assert(__test_returnStatement());
     printf("__test_returnStatement (COMPLETED).\n");
+
+    assert(__test_identifier());
+    printf("__test_identifier (COMPLETED).\n");
 
     return 0;
 }
@@ -36,7 +41,44 @@ int main(void) {
 //----------------------------------------------------------------------------------
 // Implementacion de funciones estaticas.
 //----------------------------------------------------------------------------------
-static bool _test_returnStatement(void) {
+static bool __test_identifier(void) {
+    const char *input = "foobar";
+
+    Lexer lexer = new_lexer(input);
+    Parser parser = new_parser(&lexer);
+
+    Program program = program_parser(&parser);
+    if (checkParserErrors(&parser)) {
+        delete_data(&program, &lexer, &parser);
+        return false;
+    }
+
+    if (program._statements == NULL) {
+        delete_data(&program, &lexer, &parser);
+        printf("Error, program is NULL\n");
+        return false;
+    }
+
+    if (program._len != 1) {
+        delete_data(&program, &lexer, &parser);
+        printf("Error, program._len has been 1 statements. got=%d.\n", program._len);
+        return false;
+    }
+
+    ExpressionStatement *aux_exprStmt = ((ExpressionStatement *)program._statements[0]._ptr);
+    Identifier *aux_ident = ((Identifier *)aux_exprStmt->_expression._ptr);
+
+    if (strcmp(aux_ident->_value, "foobar") != 0) {
+        delete_data(&program, &lexer, &parser);
+        printf("Error, ident.value not %s. got=%s\n", "foobar", ((Identifier *)((ExpressionStatement *)program._statements[0]._ptr)->_expression._ptr)->_value);
+        return false;
+    }
+
+    delete_data(&program, &lexer, &parser);
+    return true;
+}
+
+static bool __test_returnStatement(void) {
     const char *input = 
     "return 5;\n\
     return 10;\n\
