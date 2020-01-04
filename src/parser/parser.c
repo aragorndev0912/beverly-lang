@@ -23,7 +23,6 @@ static Statement letStmt_parser(Parser *parser);
 static Statement returnStmt_parser(Parser *parser);
 
 static Expression expression_parser(Parser *parser, Precedence pre);
-
 //----------------------------------------------------------------------------------
 // Implementacion de funciones ParserError.
 //----------------------------------------------------------------------------------
@@ -251,6 +250,17 @@ static Expression expression_parser(Parser *parser, Precedence pre) {
         ((Identifier *)expression._ptr)->_token = new_token(parser->_current_token._type, copy_string(parser->_current_token._literal));
         ((Identifier *)expression._ptr)->_value = copy_string(parser->_current_token._literal);
         expression._type = EXPR_IDENTIFIER;
+    }
+    else if (strcmp(parser->_current_token._type, BEV_INT) == 0) {
+        expression._ptr = (IntegerLiteral *) malloc(sizeof(IntegerLiteral));
+        if (expression._ptr == NULL) {
+            // Falta implementar
+        }
+
+
+        ((IntegerLiteral *)expression._ptr)->_token = new_token(parser->_current_token._type, copy_string(parser->_current_token._literal));
+        ((IntegerLiteral *)expression._ptr)->_value = atoll(parser->_current_token._literal);
+        expression._type = EXPR_INTEGER;
     }
 
     return expression;

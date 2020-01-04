@@ -22,6 +22,8 @@ static bool __test_returnStatement(void);
 
 static bool __test_identifier(void);
 
+static bool __test_integerLiteral(void);
+
 //----------------------------------------------------------------------------------
 // Funcion main.
 //----------------------------------------------------------------------------------
@@ -35,12 +37,58 @@ int main(void) {
     assert(__test_identifier());
     printf("__test_identifier (COMPLETED).\n");
 
+    assert(__test_integerLiteral());
+    printf("__test_integerLiteral (COMPLETED).\n");
+
     return 0;
 }
 
 //----------------------------------------------------------------------------------
 // Implementacion de funciones estaticas.
 //----------------------------------------------------------------------------------
+static bool __test_integerLiteral(void) {
+    const char *input = "5";
+
+    Lexer lexer = new_lexer(input);
+    Parser parser = new_parser(&lexer);
+
+    Program program = program_parser(&parser);
+    if (checkParserErrors(&parser)) {
+        delete_data(&program, &lexer, &parser);
+        return false;
+    }
+
+    if (program._statements == NULL) {
+        printf("Error, program is NULL\n");
+        delete_data(&program, &lexer, &parser);
+        return false;
+    }
+
+    if (program._len != 1) {
+        printf("Error, program._len has been 1 statements. got=%d.\n", program._len);
+        delete_data(&program, &lexer, &parser);
+        return false;
+    }
+
+    ExpressionStatement *aux_exprStmt = ((ExpressionStatement *)program._statements[0]._ptr);
+    IntegerLiteral *aux_iLiteral = ((IntegerLiteral *)aux_exprStmt->_expression._ptr);
+
+    if (aux_iLiteral->_value != 5) {
+        printf("Error, value not %d. got=%d\n", 5, aux_iLiteral->_value);
+        delete_data(&program, &lexer, &parser);
+        return false;
+    }
+
+    if (strcmp(aux_iLiteral->_token._literal, "5") != 0) {
+        printf("Error, _literal not %s. got=%s\n", "5", aux_iLiteral->_token._literal);
+        delete_data(&program, &lexer, &parser);
+        return false;
+    }
+
+    delete_data(&program, &lexer, &parser);
+    return true;
+}
+
 static bool __test_identifier(void) {
     const char *input = "foobar";
 
@@ -54,14 +102,14 @@ static bool __test_identifier(void) {
     }
 
     if (program._statements == NULL) {
-        delete_data(&program, &lexer, &parser);
         printf("Error, program is NULL\n");
+        delete_data(&program, &lexer, &parser);
         return false;
     }
 
     if (program._len != 1) {
-        delete_data(&program, &lexer, &parser);
         printf("Error, program._len has been 1 statements. got=%d.\n", program._len);
+        delete_data(&program, &lexer, &parser);
         return false;
     }
 
@@ -69,8 +117,8 @@ static bool __test_identifier(void) {
     Identifier *aux_ident = ((Identifier *)aux_exprStmt->_expression._ptr);
 
     if (strcmp(aux_ident->_value, "foobar") != 0) {
-        delete_data(&program, &lexer, &parser);
         printf("Error, ident.value not %s. got=%s\n", "foobar", ((Identifier *)((ExpressionStatement *)program._statements[0]._ptr)->_expression._ptr)->_value);
+        delete_data(&program, &lexer, &parser);
         return false;
     }
 
@@ -94,14 +142,14 @@ static bool __test_returnStatement(void) {
     }
 
     if (program._statements == NULL) {
-        delete_data(&program, &lexer, &parser);
         printf("Error, program is NULL\n");
+        delete_data(&program, &lexer, &parser);
         return false;
     }
 
     if (program._len != 3) {
-        delete_data(&program, &lexer, &parser);
         printf("Error, program._len has been 3 statements. got=%d.\n", program._len);
+        delete_data(&program, &lexer, &parser);
         return false;
     }
 
@@ -140,14 +188,14 @@ static bool __test_letStatement(void) {
     }
 
     if (program._statements == NULL) {
-        delete_data(&program, &lexer, &parser);
         printf("Error, program is NULL\n");
+        delete_data(&program, &lexer, &parser);
         return false;
     }
 
     if (program._len != 3) {
-        delete_data(&program, &lexer, &parser);
         printf("Error, program._len has been 3 statements. got=%d.\n", program._len);
+        delete_data(&program, &lexer, &parser);
         return false;
     }
 
@@ -163,8 +211,8 @@ static bool __test_letStatement(void) {
             }
         }
         else {
-            printf("Error, statement with index '%d' is not LET type.\n", k);
             delete_data(&program, &lexer, &parser);
+            printf("Error, statement with index '%d' is not LET type.\n", k);
             return false;
         }
     }

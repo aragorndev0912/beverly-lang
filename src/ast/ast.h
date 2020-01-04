@@ -45,6 +45,7 @@ void free_stmt(Statement *stmt);
 typedef enum ExpressionType {
     EXPR_FAILURE = 0,
     EXPR_IDENTIFIER,
+    EXPR_INTEGER,
 
 } ExpressionType;
 
@@ -148,8 +149,10 @@ typedef struct IntegerLiteral {
 
 } IntegerLiteral;
 
-IntegerLiteral new_intLiteral(Token *token, long long value);
+IntegerLiteral new_integer_literal(const Token *token, long long value);
 
-const char *string_intLiteral(const IntegerLiteral *intLiteral);
+const char *string_integer_literal(const IntegerLiteral *intLiteral);
+
+void free_integer_literal(IntegerLiteral *IntegerLiteral);
 
 #endif //_AST_H

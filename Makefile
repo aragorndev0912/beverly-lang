@@ -1,5 +1,5 @@
 NAME := beverly
-C := clang
+C := gcc
 CCFLAGS := -Wall -pedantic -std=c99
 LEXER_TEST := lexer_test
 PARSER_TEST := parser_test

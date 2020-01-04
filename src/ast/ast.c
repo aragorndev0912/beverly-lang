@@ -1,5 +1,6 @@
 #include "ast.h"
 #include "../lib/lib.h"
+#include "../lib/bool.h"
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -35,13 +36,25 @@ void free_stmt(Statement *stmt) {
 //----------------------------------------------------------------------------------
 void free_expression(Expression *expression) {
     if (expression->_ptr != NULL) {
+        bool flag = false;
         switch (expression->_type) {
             case EXPR_IDENTIFIER:
                 free_identifier((Identifier *)expression->_ptr);
+                flag = true;
                 break;
             
+            case EXPR_INTEGER:
+                free_integer_literal((IntegerLiteral *)expression->_ptr);
+                flag = true;
+                break;
+
             default:
                 break;
+        }
+
+        if (flag) {
+            free(expression->_ptr);
+            expression->_ptr = NULL;
         }
     }
 }
@@ -221,4 +234,24 @@ const char *string_exprStmt(ExpressionStatement *expr_stmt) {
 void free_exprStmt(ExpressionStatement *expr_stmt) {
     free_expression(&expr_stmt->_expression);
     free_token(&expr_stmt->_token);
+}
+
+
+//----------------------------------------------------------------------------------
+// struct IntegerLiteral.
+//----------------------------------------------------------------------------------
+IntegerLiteral new_integer_literal(const Token *token, long long value) {
+    IntegerLiteral int_literal = (IntegerLiteral) {0};
+    int_literal._token = new_token(token->_type, copy_string(token->_literal));
+    int_literal._value = value;
+
+    return int_literal;
+}
+
+const char *string_integer_literal(const IntegerLiteral *int_literal) {
+    return int_literal->_token._literal;
+}
+
+void free_integer_literal(IntegerLiteral *int_literal) {
+    free_token(&int_literal->_token);
 }
