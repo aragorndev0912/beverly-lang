@@ -1,7 +1,9 @@
 NAME := beverly
-C := clang
+C := gcc
 CCFLAGS := -Wall -pedantic -std=c99
 LEXER_TEST := lexer_test
+PARSER_TEST := parser_test
+AST_TEST := ast_test
 DEBUG := 1
 
 ifdef DEBUG
@@ -47,7 +49,7 @@ obj:
 # Test Lexer.
 #------------------------------------------------------------------------
 lexer_test: obj obj/lexer_test.o obj/token.o obj/lexer.o obj/lib.o
-	$(C) -o $(LEXER_TEST) obj/lexer_test.o obj/token.o obj/lexer.o obj/lib.o $(CCFLAGS)
+	$(C) -o $(LEXER_TEST).exe obj/lexer_test.o obj/token.o obj/lexer.o obj/lib.o $(CCFLAGS)
 
 obj/lexer_test.o: src/lexer/lexer_test.c
 	$(C) -c src/lexer/lexer_test.c -o obj/lexer_test.o $(CCFLAGS)
@@ -56,7 +58,7 @@ obj/lexer_test.o: src/lexer/lexer_test.c
 # Test Parser.
 #------------------------------------------------------------------------
 parser_test: obj obj/parser_test.o obj/parser.o obj/lexer.o obj/ast.o obj/token.o obj/lib.o
-	$(C) -o parser_test obj/parser_test.o obj/parser.o obj/lexer.o obj/ast.o obj/token.o obj/lib.o $(CCFLAGS)
+	$(C) -o $(PARSER_TEST).exe obj/parser_test.o obj/parser.o obj/lexer.o obj/ast.o obj/token.o obj/lib.o $(CCFLAGS)
 
 obj/parser_test.o: src/parser/parser_test.c 
 	$(C) -c src/parser/parser_test.c -o obj/parser_test.o $(CCFLAGS)
@@ -65,7 +67,7 @@ obj/parser_test.o: src/parser/parser_test.c
 # Test AST.
 #------------------------------------------------------------------------
 ast_test: obj obj/ast_test.o obj/parser.o obj/lexer.o obj/ast.o obj/token.o obj/lib.o
-	$(C) -o ast_test obj/ast_test.o obj/parser.o obj/lexer.o obj/ast.o obj/token.o obj/lib.o $(CCFLAGS)
+	$(C) -o $(AST_TEST).exe obj/ast_test.o obj/parser.o obj/lexer.o obj/ast.o obj/token.o obj/lib.o $(CCFLAGS)
 
 obj/ast_test.o: src/ast/ast_test.c
 	$(C) -c src/ast/ast_test.c -o obj/ast_test.o $(CCFLAGS)
@@ -79,5 +81,7 @@ clean:
 cleanall:
 	del /s *.o
 	del *.exe
+	del *.ilk
+	del *.pdb
 	rmdir /s obj
 	rmdir /s dist
