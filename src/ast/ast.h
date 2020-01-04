@@ -46,6 +46,7 @@ typedef enum ExpressionType {
     EXPR_FAILURE = 0,
     EXPR_IDENTIFIER,
     EXPR_INTEGER,
+    EXPR_PREFIX,
 
 } ExpressionType;
 
@@ -154,5 +155,20 @@ IntegerLiteral new_integer_literal(const Token *token, long long value);
 const char *string_integer_literal(const IntegerLiteral *intLiteral);
 
 void free_integer_literal(IntegerLiteral *IntegerLiteral);
+
+
+//----------------------------------------------------------------------------------
+// struct PrefixExpression.
+//----------------------------------------------------------------------------------
+typedef struct PrefixExpression {
+    Token _token;
+    char *_operator;
+    Expression _right;
+
+} PrefixExpression;
+
+const char *string_prefix_expression(PrefixExpression *prefix_expression);
+
+void free_prefix_expression(PrefixExpression *prefix_expression);
 
 #endif //_AST_H

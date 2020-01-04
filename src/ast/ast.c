@@ -47,6 +47,11 @@ void free_expression(Expression *expression) {
                 free_integer_literal((IntegerLiteral *)expression->_ptr);
                 flag = true;
                 break;
+            
+            case EXPR_PREFIX:
+                free_prefix_expression((PrefixExpression *)expression->_ptr);
+                flag = true;
+                break;
 
             default:
                 break;
@@ -254,4 +259,23 @@ const char *string_integer_literal(const IntegerLiteral *int_literal) {
 
 void free_integer_literal(IntegerLiteral *int_literal) {
     free_token(&int_literal->_token);
+}
+
+
+//----------------------------------------------------------------------------------
+// struct PrefixExpression.
+//----------------------------------------------------------------------------------
+const char *string_prefix_expression(PrefixExpression *prefix_expression) {
+    // Falta implementar.
+    return NULL;
+}
+
+void free_prefix_expression(PrefixExpression *prefix_expression) {
+    if (prefix_expression->_operator != NULL) {
+        free(prefix_expression->_operator);
+        prefix_expression->_operator = NULL;
+    }
+
+    free_token(&prefix_expression->_token);
+    free_expression(&prefix_expression->_right);
 }

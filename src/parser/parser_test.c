@@ -24,6 +24,8 @@ static bool __test_identifier(void);
 
 static bool __test_integerLiteral(void);
 
+static bool __test_prefixExpression(void);
+
 //----------------------------------------------------------------------------------
 // Funcion main.
 //----------------------------------------------------------------------------------
@@ -46,6 +48,10 @@ int main(void) {
 //----------------------------------------------------------------------------------
 // Implementacion de funciones estaticas.
 //----------------------------------------------------------------------------------
+static bool __test_prefixExpression(void) {
+    // Falta implementar
+}
+
 static bool __test_integerLiteral(void) {
     const char *input = "5";
 

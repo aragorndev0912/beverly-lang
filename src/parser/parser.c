@@ -262,6 +262,19 @@ static Expression expression_parser(Parser *parser, Precedence pre) {
         ((IntegerLiteral *)expression._ptr)->_value = atoll(parser->_current_token._literal);
         expression._type = EXPR_INTEGER;
     }
+    else if (strcmp(parser->_current_token._type, BEV_NOT) == 0 || strcmp(parser->_current_token._type, BEV_MINUS) == 0) {
+        expression._ptr = (PrefixExpression *) malloc(sizeof(PrefixExpression));
+        if (expression._ptr == NULL) {
+            // Falta implementar.
+        }
+
+        ((PrefixExpression *)expression._ptr)->_token = new_token(parser->_current_token._type, copy_string(parser->_current_token._literal));
+        ((PrefixExpression *)expression._ptr)->_operator = copy_string(parser->_current_token._literal);
+    
+        next_token_parser(parser);
+        ((PrefixExpression *)expression._ptr)->_right = expression_parser(parser, PREFIX);
+        expression._type = EXPR_PREFIX;
+    }
 
     return expression;
 }
