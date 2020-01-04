@@ -1,5 +1,5 @@
 NAME := beverly
-C := gcc
+C := clang
 CCFLAGS := -Wall -pedantic -std=c99
 LEXER_TEST := lexer_test
 DEBUG := 1
@@ -11,7 +11,7 @@ else
 endif
 
 main: dist obj obj/main.o obj/repl.o obj/token.o obj/lexer.o obj/lib.o
-	$(C) -o dist/$(NAME) obj/main.o obj/repl.o obj/token.o obj/lexer.o obj/lib.o $(CCFLAGS)
+	$(C) -o dist/$(NAME).exe obj/main.o obj/repl.o obj/token.o obj/lexer.o obj/lib.o $(CCFLAGS)
 
 obj/main.o: main.c src/repl/repl.h
 	$(C) -c main.c -o obj/main.o $(CCFLAGS)

@@ -239,7 +239,6 @@ void peek_error_parser(Parser *parser, const char *token) {
 //----------------------------------------------------------------------------------
 // Implementacion de funciones estaticas.
 //----------------------------------------------------------------------------------
-
 static Expression expression_parser(Parser *parser, Precedence pre) {
     Expression expression = (Expression) {._ptr=NULL, ._type=EXPR_FAILURE};
 
@@ -248,6 +247,7 @@ static Expression expression_parser(Parser *parser, Precedence pre) {
         if (expression._ptr == NULL) {
             // Falta implementar.
         }
+        // Inicializacion de Identifier.
         ((Identifier *)expression._ptr)->_token = new_token(parser->_current_token._type, copy_string(parser->_current_token._literal));
         ((Identifier *)expression._ptr)->_value = copy_string(parser->_current_token._literal);
         expression._type = EXPR_IDENTIFIER;

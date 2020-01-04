@@ -138,4 +138,18 @@ const char *string_exprStmt(ExpressionStatement *expr_stmt);
 
 void free_exprStmt(ExpressionStatement *expr_stmt);
 
+
+//----------------------------------------------------------------------------------
+// struct IntegerLiteral.
+//----------------------------------------------------------------------------------
+typedef struct IntegerLiteral {
+    Token _token;
+    long long _value; // 8 bytes
+
+} IntegerLiteral;
+
+IntegerLiteral new_intLiteral(Token *token, long long value);
+
+const char *string_intLiteral(const IntegerLiteral *intLiteral);
+
 #endif //_AST_H
