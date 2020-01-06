@@ -54,9 +54,13 @@ typedef struct Expression {
     void *_ptr;
     ExpressionType _type;
 
+    char *__string;
+
 } Expression;
 
 void free_expression(Expression *expression);
+
+const char *string_expression(Expression *expression);
 
 //----------------------------------------------------------------------------------
 // struct Program.
@@ -133,6 +137,8 @@ void free_returnStmt(ReturnStatement *return_stmt);
 typedef struct ExpressionStatement {
     Token _token;
     Expression _expression;
+
+    char *__string;
 
 } ExpressionStatement;
 

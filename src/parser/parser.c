@@ -159,6 +159,7 @@ static Statement exprStmt_parser(Parser *parser) {
     );
 
     ((ExpressionStatement *)stmt._ptr)->_expression = expression_parser(parser, LOWEST);
+    ((ExpressionStatement *)stmt._ptr)->__string = NULL;
 
     if (is_peek_token(parser, BEV_SEMICOLON))
         next_token_parser(parser);
@@ -239,7 +240,7 @@ void peek_error_parser(Parser *parser, const char *token) {
 // Implementacion de funciones estaticas.
 //----------------------------------------------------------------------------------
 static Expression expression_parser(Parser *parser, Precedence pre) {
-    Expression expression = (Expression) {._ptr=NULL, ._type=EXPR_FAILURE};
+    Expression expression = (Expression) {._ptr=NULL, ._type=EXPR_FAILURE, .__string=NULL};
 
     if (strcmp(parser->_current_token._type, BEV_IDENT) == 0) {
         expression._ptr = (Identifier *) malloc(sizeof(Identifier));

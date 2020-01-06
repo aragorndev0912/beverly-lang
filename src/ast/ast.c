@@ -64,6 +64,11 @@ void free_expression(Expression *expression) {
     }
 }
 
+const char *string_expression(Expression *expression) {
+    // Falta implementar.
+    return (expression->__string == NULL) ? " " : expression->__string;
+}
+
 
 //----------------------------------------------------------------------------------
 // Struct Program.
@@ -229,16 +234,18 @@ void free_returnStmt(ReturnStatement *return_stmt) {
 // Struct ExpressionStatement.
 //----------------------------------------------------------------------------------
 const char *string_exprStmt(ExpressionStatement *expr_stmt) {
-    // Falta implementacion.
-    // if (expr_stmt->_expression != NULL) {
-    // }
-
-    return " ";
+    // add_string(expr_stmt->__string, expr_stmt->_token._literal);
+    return (expr_stmt->__string == NULL) ? " " :expr_stmt->__string;
 }
 
 void free_exprStmt(ExpressionStatement *expr_stmt) {
     free_expression(&expr_stmt->_expression);
     free_token(&expr_stmt->_token);
+
+    if (expr_stmt->__string != NULL) {
+        free(expr_stmt->__string);
+        expr_stmt->__string = NULL;
+    }
 }
 
 
