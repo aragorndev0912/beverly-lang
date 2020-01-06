@@ -22,7 +22,7 @@ static bool __test_returnStatement(void);
 
 static bool __test_identifier(void);
 
-static bool __test_integerLiteral(void);
+static bool __test_integerLiteral(const Expression *expression, const long long *value);
 
 static bool __test_prefixExpression(void);
 
@@ -39,8 +39,8 @@ int main(void) {
     assert(__test_identifier());
     printf("__test_identifier (COMPLETED).\n");
 
-    assert(__test_integerLiteral());
-    printf("__test_integerLiteral (COMPLETED).\n");
+    assert(__test_prefixExpression());
+    printf("__test_prefixExpression (COMPLETED).\n");
 
     return 0;
 }
@@ -48,50 +48,76 @@ int main(void) {
 //----------------------------------------------------------------------------------
 // Implementacion de funciones estaticas.
 //----------------------------------------------------------------------------------
+typedef struct PrefixTest {
+    const char *input;
+    const char *operator;
+    long long   value;
+
+} PrefixTest;
+
 static bool __test_prefixExpression(void) {
-    // Falta implementar
+    PrefixTest prefixTest[2] = {
+        (PrefixTest) { .input="not 9", .operator="not", 9 },
+        (PrefixTest) { .input="-45", .operator="-", 45 },
+    };
+
+    for (int k=0; k < 2; k++) {
+        Lexer lexer = new_lexer(prefixTest[k].input);
+        Parser parser = new_parser(&lexer);
+        Program program = program_parser(&parser);
+        if (checkParserErrors(&parser)) {
+            delete_data(&program, &lexer, &parser);
+            return false;
+        }
+
+        if (program._statements == NULL) {
+            printf("Error, program is NULL\n");
+            delete_data(&program, &lexer, &parser);
+            return false;
+        }
+
+        if (program._len != 1) {
+            printf("Error, program._len has been 1 statements. got=%d.\n", program._len);
+            delete_data(&program, &lexer, &parser);
+            return false;
+        }
+
+        ExpressionStatement *aux_exprStmt = ((ExpressionStatement *)program._statements[0]._ptr);
+        PrefixExpression *aux_prefixExpression = ((PrefixExpression *)aux_exprStmt->_expression._ptr);
+
+        if (strcmp(aux_prefixExpression->_operator, prefixTest[k].operator) != 0) {
+            printf("Error, operator not %s. got=%s\n", prefixTest[k].operator, aux_prefixExpression->_operator);
+            delete_data(&program, &lexer, &parser);
+            return false;
+        } 
+
+        if (!__test_integerLiteral(&aux_prefixExpression->_right, prefixTest[k].value)) {
+            delete_data(&program, &lexer, &parser);
+            return false;
+        }
+
+        delete_data(&program, &lexer, &parser);
+    }
+
+    
+    return true;
 }
 
-static bool __test_integerLiteral(void) {
-    const char *input = "5";
+static bool __test_integerLiteral(const Expression *expression, const long long *value) {
+    IntegerLiteral *aux_iLiteral = ((IntegerLiteral *)expression->_ptr);
 
-    Lexer lexer = new_lexer(input);
-    Parser parser = new_parser(&lexer);
-
-    Program program = program_parser(&parser);
-    if (checkParserErrors(&parser)) {
-        delete_data(&program, &lexer, &parser);
+    if (aux_iLiteral->_value != value) {
+        printf("Error, value not %d. got=%d\n", value, aux_iLiteral->_value);
         return false;
     }
 
-    if (program._statements == NULL) {
-        printf("Error, program is NULL\n");
-        delete_data(&program, &lexer, &parser);
-        return false;
-    }
-
-    if (program._len != 1) {
-        printf("Error, program._len has been 1 statements. got=%d.\n", program._len);
-        delete_data(&program, &lexer, &parser);
-        return false;
-    }
-
-    ExpressionStatement *aux_exprStmt = ((ExpressionStatement *)program._statements[0]._ptr);
-    IntegerLiteral *aux_iLiteral = ((IntegerLiteral *)aux_exprStmt->_expression._ptr);
-
-    if (aux_iLiteral->_value != 5) {
-        printf("Error, value not %d. got=%d\n", 5, aux_iLiteral->_value);
-        delete_data(&program, &lexer, &parser);
-        return false;
-    }
-
-    if (strcmp(aux_iLiteral->_token._literal, "5") != 0) {
+    char buffer[sizeof(value) * 8 + 1];
+    ltoa(value, buffer, 10);
+    if (strcmp(aux_iLiteral->_token._literal, buffer) != 0) {
         printf("Error, _literal not %s. got=%s\n", "5", aux_iLiteral->_token._literal);
-        delete_data(&program, &lexer, &parser);
         return false;
     }
 
-    delete_data(&program, &lexer, &parser);
     return true;
 }
 
