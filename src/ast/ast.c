@@ -52,6 +52,11 @@ void free_expression(Expression *expression) {
                 free_prefix_expression((PrefixExpression *)expression->_ptr);
                 flag = true;
                 break;
+            
+            case EXPR_INFIX:
+                free_infix_expression((InfixExpression *)expression->_ptr);
+                flag = true;
+                break;
 
             default:
                 break;
@@ -285,4 +290,31 @@ void free_prefix_expression(PrefixExpression *prefix_expression) {
 
     free_token(&prefix_expression->_token);
     free_expression(&prefix_expression->_right);
+}
+
+//----------------------------------------------------------------------------------
+// struct InfixExpression.
+//----------------------------------------------------------------------------------
+const char *string_infix_expression(InfixExpression *infix_expression) {
+    // Falta implementar.
+
+    return NULL;
+}
+
+void free_infix_expression(InfixExpression *infix_expression) {
+    if (infix_expression != NULL) {
+        free_token(&infix_expression->_token);
+        free_expression(&infix_expression->_left);
+        free_expression(&infix_expression->_right);
+
+        if (infix_expression->_operator != NULL) {
+            free(infix_expression->_operator);
+            infix_expression->_operator = NULL;
+        }
+
+        if (infix_expression->__string != NULL) {
+            free(infix_expression->__string);
+            infix_expression->__string = NULL;
+        }
+    }
 }

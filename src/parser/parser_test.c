@@ -22,9 +22,11 @@ static bool __test_returnStatement(void);
 
 static bool __test_identifier(void);
 
-static bool __test_integerLiteral(const Expression *expression, const long long *value);
+static bool __test_integerLiteral(const Expression *expression, const long long value);
 
 static bool __test_prefixExpression(void);
+
+static bool __test_infixExpression(void);
 
 //----------------------------------------------------------------------------------
 // Funcion main.
@@ -42,12 +44,84 @@ int main(void) {
     assert(__test_prefixExpression());
     printf("__test_prefixExpression (COMPLETED).\n");
 
+    assert(__test_infixExpression());
+    printf("__test_infixExpression (COMPLETED).\n");
+
     return 0;
 }
 
 //----------------------------------------------------------------------------------
 // Implementacion de funciones estaticas.
 //----------------------------------------------------------------------------------
+typedef struct InfixTest {
+    const char *input;
+    long long left;
+    const char *operator;
+    long long right;
+
+} InfixTest;
+
+static bool __test_infixExpression(void) {
+    InfixTest infix_test[] = {
+        (InfixTest) {.input="5 + 5", .left=5, .operator="+", .right=5},
+        (InfixTest) {.input="5 - 5", .left=5, .operator="-", .right=5},
+        (InfixTest) {.input="5 * 5", .left=5, .operator="*", .right=5},
+        (InfixTest) {.input="5 / 5", .left=5, .operator="/", .right=5},
+        (InfixTest) {.input="5 > 5", .left=5, .operator=">", .right=5},
+        (InfixTest) {.input="5 < 5", .left=5, .operator="<", .right=5},
+        (InfixTest) {.input="5 == 5", .left=5, .operator="==", .right=5},
+        (InfixTest) {.input="5 != 5", .left=5, .operator="!=", .right=5},
+    };
+
+    size_t len = sizeof(infix_test) / sizeof(InfixTest);
+    for (size_t k=0; k < len; k++) {
+        Lexer lexer = new_lexer(infix_test[k].input);
+        Parser parser = new_parser(&lexer);
+        Program program = program_parser(&parser);
+        if (checkParserErrors(&parser)) {
+            delete_data(&program, &lexer, &parser);
+            return false;
+        }
+
+        if (program._statements == NULL) {
+            printf("Error, program is NULL\n");
+            delete_data(&program, &lexer, &parser);
+            return false;
+        }
+
+        if (program._len != 1) {
+            printf("Error, program._len has been 1 statements. got=%d.\n", program._len);
+            delete_data(&program, &lexer, &parser);
+            return false;
+        }
+
+        ExpressionStatement *aux_exprStmt = ((ExpressionStatement *)program._statements[0]._ptr);
+        InfixExpression *aux_infixExpression = ((InfixExpression *)aux_exprStmt->_expression._ptr);
+
+        if (!__test_integerLiteral(&aux_infixExpression->_left, infix_test[k].left)) {
+            delete_data(&program, &lexer, &parser);
+            return false;
+        }
+
+        if (strcmp(aux_infixExpression->_operator, infix_test[k].operator) != 0) {
+            printf("expr.operator is not '%s'. got=%s\n", infix_test[k].operator, aux_infixExpression->_operator);
+            delete_data(&program, &lexer, &parser);
+            return false;
+        }
+
+
+        if (!__test_integerLiteral(&aux_infixExpression->_right, infix_test[k].right)) {
+            delete_data(&program, &lexer, &parser);
+            return false;
+        }
+
+        delete_data(&program, &lexer, &parser);
+    }
+
+    
+    return true;
+}
+
 typedef struct PrefixTest {
     const char *input;
     const char *operator;
@@ -103,7 +177,7 @@ static bool __test_prefixExpression(void) {
     return true;
 }
 
-static bool __test_integerLiteral(const Expression *expression, const long long *value) {
+static bool __test_integerLiteral(const Expression *expression, const long long value) {
     IntegerLiteral *aux_iLiteral = ((IntegerLiteral *)expression->_ptr);
 
     if (aux_iLiteral->_value != value) {

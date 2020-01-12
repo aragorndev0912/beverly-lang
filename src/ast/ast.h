@@ -47,6 +47,7 @@ typedef enum ExpressionType {
     EXPR_IDENTIFIER,
     EXPR_INTEGER,
     EXPR_PREFIX,
+    EXPR_INFIX,
 
 } ExpressionType;
 
@@ -176,5 +177,25 @@ typedef struct PrefixExpression {
 const char *string_prefix_expression(PrefixExpression *prefix_expression);
 
 void free_prefix_expression(PrefixExpression *prefix_expression);
+
+
+
+//----------------------------------------------------------------------------------
+// struct InfixExpression.
+//----------------------------------------------------------------------------------
+
+typedef struct InfixExpression {
+    Token _token;
+    char *_operator;
+    Expression _left;
+    Expression _right;
+
+    char *__string;
+
+} InfixExpression;
+
+const char *string_infix_expression(InfixExpression *infix_expression);
+
+void free_infix_expression(InfixExpression *infix_expression);
 
 #endif //_AST_H

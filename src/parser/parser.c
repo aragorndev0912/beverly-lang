@@ -23,6 +23,10 @@ static Statement letStmt_parser(Parser *parser);
 static Statement returnStmt_parser(Parser *parser);
 
 static Expression expression_parser(Parser *parser, Precedence pre);
+static Precedence token_precedence(const Token *token);
+
+static Expression new_infix_expression(Parser *parser, const Expression *left);
+
 //----------------------------------------------------------------------------------
 // Implementacion de funciones ParserError.
 //----------------------------------------------------------------------------------
@@ -236,12 +240,37 @@ void peek_error_parser(Parser *parser, const char *token) {
     add_parsererror(&parser->error, msg);
 }
 
+
 //----------------------------------------------------------------------------------
 // Implementacion de funciones estaticas.
 //----------------------------------------------------------------------------------
+static Precedence token_precedence(const Token *token) {
+    if (strcmp(token->_type, BEV_EQUAL) == 0)
+        return EQUALS;
+    else if (strcmp(token->_type, BEV_NOT_EQUAL) == 0)
+        return EQUALS;
+    else if (strcmp(token->_type, BEV_LT) == 0)
+        return LESSGREATER;     
+    else if (strcmp(token->_type, BEV_GT) == 0)
+        return LESSGREATER;
+    else if (strcmp(token->_type, BEV_PLUS) == 0)
+        return SUM;
+    else if (strcmp(token->_type, BEV_MINUS) == 0)
+        return SUM;     
+    else if (strcmp(token->_type, BEV_DIV) == 0)
+        return PRODUCT;
+    else if (strcmp(token->_type, BEV_MULT) == 0)
+        return PRODUCT;
+    else if (strcmp(token->_type, BEV_LPAREN) == 0)
+        return CALL;
+    
+    return LOWEST;
+}
+
 static Expression expression_parser(Parser *parser, Precedence pre) {
     Expression expression = (Expression) {._ptr=NULL, ._type=EXPR_FAILURE, .__string=NULL};
 
+    // Opciones de prefix.
     if (strcmp(parser->_current_token._type, BEV_IDENT) == 0) {
         expression._ptr = (Identifier *) malloc(sizeof(Identifier));
         if (expression._ptr == NULL) {
@@ -276,6 +305,38 @@ static Expression expression_parser(Parser *parser, Precedence pre) {
         ((PrefixExpression *)expression._ptr)->_right = expression_parser(parser, PREFIX);
         expression._type = EXPR_PREFIX;
     }
+
+    // Validar expresion.
+    if (expression._ptr == NULL) {
+        // Agregar error.
+        return expression;
+    }
+
+    while (strcmp(parser->_peek_token._type, BEV_SEMICOLON) != 0 && pre < token_precedence(&parser->_peek_token)) {
+        next_token_parser(parser);
+        expression = new_infix_expression(parser, &expression);
+    }
+
+    return expression;
+}
+
+static Expression new_infix_expression(Parser *parser, const Expression *left) {
+    Expression expression = (Expression) {._ptr=NULL, ._type=EXPR_FAILURE, .__string=NULL};
+
+    // Inicializo Expression.
+    expression._ptr = (InfixExpression *) malloc(sizeof(InfixExpression));
+    expression.__string = NULL;
+    expression._type = EXPR_INFIX;
+
+    // Inicializo el contenido de Expression.
+    ((InfixExpression *)expression._ptr)->__string = NULL;
+    ((InfixExpression *)expression._ptr)->_left = (*left);
+    ((InfixExpression *)expression._ptr)->_operator = copy_string(parser->_current_token._literal);
+    ((InfixExpression *)expression._ptr)->_token = new_token(parser->_current_token._type, copy_string(parser->_current_token._literal));
+
+    Precedence pre = token_precedence(&parser->_current_token);
+    next_token_parser(parser);
+    ((InfixExpression *)expression._ptr)->_right = expression_parser(parser, pre);
 
     return expression;
 }
