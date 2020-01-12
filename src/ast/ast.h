@@ -3,6 +3,7 @@
 
 #include <stddef.h>
 #include "../token/token.h"
+#include "../lib/bool.h"
 
 //----------------------------------------------------------------------------------
 // struct Node.
@@ -48,6 +49,7 @@ typedef enum ExpressionType {
     EXPR_INTEGER,
     EXPR_PREFIX,
     EXPR_INFIX,
+    EXPR_BOOLEAN,
 
 } ExpressionType;
 
@@ -198,5 +200,19 @@ typedef struct InfixExpression {
 const char *string_infix_expression(InfixExpression *infix_expression);
 
 void free_infix_expression(InfixExpression *infix_expression);
+
+
+//----------------------------------------------------------------------------------
+// struct Boolean.
+//----------------------------------------------------------------------------------
+typedef struct Boolean {
+    Token _token;
+    bool _value;
+
+} Boolean;
+
+const char *string_boolean(Boolean *boolean);
+
+void free_boolean(Boolean *boolean);
 
 #endif //_AST_H

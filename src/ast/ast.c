@@ -57,6 +57,11 @@ void free_expression(Expression *expression) {
                 free_infix_expression((InfixExpression *)expression->_ptr);
                 flag = true;
                 break;
+            
+            case EXPR_BOOLEAN:
+                free_boolean((Boolean *)expression->_ptr);
+                flag = true;
+                break;
 
             default:
                 break;
@@ -87,6 +92,10 @@ const char *string_expression(Expression *expression) {
             
             case EXPR_INFIX:
                 add_string(&expression->__string, string_infix_expression((InfixExpression *)expression->_ptr));
+                break;
+            
+            case EXPR_BOOLEAN:
+                add_string(&expression->__string, string_boolean((Boolean *)expression->_ptr));
                 break;
 
             default:
@@ -360,5 +369,18 @@ void free_infix_expression(InfixExpression *infix_expression) {
             free(infix_expression->__string);
             infix_expression->__string = NULL;
         }
+    }
+}
+
+//----------------------------------------------------------------------------------
+// struct Boolean.
+//----------------------------------------------------------------------------------
+const char *string_boolean(Boolean *boolean) {
+    return boolean->_token._literal;
+}
+
+void free_boolean(Boolean *boolean) {
+    if (boolean != NULL) {
+        free_token(&boolean->_token);
     }
 }

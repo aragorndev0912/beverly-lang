@@ -66,19 +66,23 @@ typedef struct OperatorTest {
 
 static bool __test_OperatorPrecedence(void) {
     OperatorTest tests[] = {
-        (OperatorTest) {.input="-a * b", "((-a) * b)"},
-        (OperatorTest) {.input="not-a", "(not(-a))"},
-        (OperatorTest) {.input="a + b + c", "((a + b) + c)"},
-        (OperatorTest) {.input="a + b - c", "((a + b) - c)"},
-        (OperatorTest) {.input="a * b * c", "((a * b) * c)"},
-        (OperatorTest) {.input="a * b / c", "((a * b) / c)"},
-        (OperatorTest) {.input="a + b / c", "(a + (b / c))"},
-        (OperatorTest) {.input="a + b * c + d / e - f", "(((a + (b * c)) + (d / e)) - f)"},
-        (OperatorTest) {.input="3 + 4; -5 * 5", "(3 + 4)((-5) * 5)"},
-        (OperatorTest) {.input="5 > 4 == 3 < 4", "((5 > 4) == (3 < 4))"},
-        (OperatorTest) {.input="5 < 4 != 3 > 4", "((5 < 4) != (3 > 4))"},
-        (OperatorTest) {.input="3 + 4 * 5 == 3 * 1 + 4 * 5", "((3 + (4 * 5)) == ((3 * 1) + (4 * 5)))"},
-        (OperatorTest) {.input="3 + 4 * 5 == 3 * 1 + 4 * 5", "((3 + (4 * 5)) == ((3 * 1) + (4 * 5)))"},
+        (OperatorTest) {.input="-a * b", .expected="((-a) * b)"},
+        (OperatorTest) {.input="not-a", .expected="(not(-a))"},
+        (OperatorTest) {.input="a + b + c", .expected="((a + b) + c)"},
+        (OperatorTest) {.input="a + b - c", .expected="((a + b) - c)"},
+        (OperatorTest) {.input="a * b * c", .expected="((a * b) * c)"},
+        (OperatorTest) {.input="a * b / c", .expected="((a * b) / c)"},
+        (OperatorTest) {.input="a + b / c", .expected="(a + (b / c))"},
+        (OperatorTest) {.input="a + b * c + d / e - f", .expected="(((a + (b * c)) + (d / e)) - f)"},
+        (OperatorTest) {.input="3 + 4; -5 * 5", .expected="(3 + 4)((-5) * 5)"},
+        (OperatorTest) {.input="5 > 4 == 3 < 4", .expected="((5 > 4) == (3 < 4))"},
+        (OperatorTest) {.input="5 < 4 != 3 > 4", .expected="((5 < 4) != (3 > 4))"},
+        (OperatorTest) {.input="3 + 4 * 5 == 3 * 1 + 4 * 5", .expected="((3 + (4 * 5)) == ((3 * 1) + (4 * 5)))"},
+        (OperatorTest) {.input="3 + 4 * 5 == 3 * 1 + 4 * 5", .expected="((3 + (4 * 5)) == ((3 * 1) + (4 * 5)))"},
+        (OperatorTest) {.input="true", .expected="true"},
+        (OperatorTest) {.input="false", .expected="false"},
+        (OperatorTest) {.input="3 > 5 == false", .expected="((3 > 5) == false)"},
+        (OperatorTest) {.input="3 < 5 == true", .expected="((3 < 5) == true)"},
     };
 
     size_t len = sizeof(tests) / sizeof(OperatorTest);

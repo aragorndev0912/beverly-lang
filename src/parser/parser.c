@@ -292,6 +292,17 @@ static Expression expression_parser(Parser *parser, Precedence pre) {
         ((IntegerLiteral *)expression._ptr)->_value = atoll(parser->_current_token._literal);
         expression._type = EXPR_INTEGER;
     }
+    else if (strcmp(parser->_current_token._type, BEV_FALSE) == 0 || strcmp(parser->_current_token._type, BEV_TRUE) == 0) {
+        expression._ptr = (Boolean *) malloc(sizeof(Boolean));
+        if (expression._ptr == NULL) {
+            // Falta implementar.
+        }
+
+        // Inicializo Boolean.
+        ((Boolean *)expression._ptr)->_token = new_token(parser->_current_token._type, copy_string(parser->_current_token._literal));
+        ((Boolean *)expression._ptr)->_value = (strcmp(parser->_current_token._type, BEV_TRUE) == 0) ? 1 : 0;
+        expression._type = EXPR_BOOLEAN;
+    }
     else if (strcmp(parser->_current_token._type, BEV_NOT) == 0 || strcmp(parser->_current_token._type, BEV_MINUS) == 0) {
         expression._ptr = (PrefixExpression *) malloc(sizeof(PrefixExpression));
         if (expression._ptr == NULL) {
