@@ -295,7 +295,7 @@ void free_exprStmt(ExpressionStatement *expr_stmt) {
 //----------------------------------------------------------------------------------
 // struct IntegerLiteral.
 //----------------------------------------------------------------------------------
-IntegerLiteral new_integer_literal(const Token *token, long long value) {
+IntegerLiteral new_integer_literal(const Token *token, int value) {
     IntegerLiteral int_literal = (IntegerLiteral) {0};
     int_literal._token = new_token(token->_type, copy_string(token->_literal));
     int_literal._value = value;

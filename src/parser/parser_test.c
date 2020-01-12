@@ -22,13 +22,15 @@ static bool __test_returnStatement(void);
 
 static bool __test_identifier(void);
 
-static bool __test_integerLiteral(const Expression *expression, const long long value);
+static bool __test_integerLiteral(const Expression *expression, int value);
 
 static bool __test_prefixExpression(void);
 
 static bool __test_infixExpression(void);
 
 static bool __test_OperatorPrecedence(void);
+
+static bool __test_BooleanLiteral(const Expression *expression, bool value);
 
 //----------------------------------------------------------------------------------
 // Funcion main.
@@ -118,9 +120,9 @@ static bool __test_OperatorPrecedence(void) {
 
 typedef struct InfixTest {
     const char *input;
-    long long left;
+    int left;
     const char *operator;
-    long long right;
+    int right;
 
 } InfixTest;
 
@@ -134,6 +136,9 @@ static bool __test_infixExpression(void) {
         (InfixTest) {.input="5 < 54", .left=5, .operator="<", .right=54},
         (InfixTest) {.input="40 == 12", .left=40, .operator="==", .right=12},
         (InfixTest) {.input="13 != 13", .left=13, .operator="!=", .right=13},
+        (InfixTest) {.input="true == true", .left=true, .operator="==", .right=true},
+        (InfixTest) {.input="true != false", .left=true, .operator="!=", .right=false},
+        (InfixTest) {.input="false != false", .left=false, .operator="!=", .right=false},
     };
 
     size_t len = sizeof(infix_test) / sizeof(InfixTest);
@@ -161,9 +166,24 @@ static bool __test_infixExpression(void) {
         ExpressionStatement *aux_exprStmt = ((ExpressionStatement *)program._statements[0]._ptr);
         InfixExpression *aux_infixExpression = ((InfixExpression *)aux_exprStmt->_expression._ptr);
 
-        if (!__test_integerLiteral(&aux_infixExpression->_left, infix_test[k].left)) {
-            delete_data(&program, &lexer, &parser);
-            return false;
+        switch (aux_infixExpression->_left._type) {
+            case EXPR_INTEGER:
+                if (!__test_integerLiteral(&aux_infixExpression->_left, infix_test[k].left)) {
+                    delete_data(&program, &lexer, &parser);
+                    return false;
+                }
+                break;
+            
+            case EXPR_BOOLEAN:
+                if (!__test_BooleanLiteral(&aux_infixExpression->_left, (bool) infix_test[k].left)) {
+                    delete_data(&program, &lexer, &parser);
+                    return false;
+                }
+                break;
+            
+            default:
+                printf("Error ExpressionType: %d\n", aux_infixExpression->_left._type);
+                return false;
         }
 
         if (strcmp(aux_infixExpression->_operator, infix_test[k].operator) != 0) {
@@ -172,10 +192,24 @@ static bool __test_infixExpression(void) {
             return false;
         }
 
-
-        if (!__test_integerLiteral(&aux_infixExpression->_right, infix_test[k].right)) {
-            delete_data(&program, &lexer, &parser);
-            return false;
+        switch(aux_infixExpression->_right._type) {
+            case EXPR_INTEGER:
+                if (!__test_integerLiteral(&aux_infixExpression->_right, infix_test[k].right)) {
+                    delete_data(&program, &lexer, &parser);
+                    return false;
+                }
+                break;
+            
+            case EXPR_BOOLEAN:
+                if (!__test_BooleanLiteral(&aux_infixExpression->_right, (bool) infix_test[k].right)) {
+                    delete_data(&program, &lexer, &parser);
+                    return false;
+                }
+                break;
+            
+            default:
+                printf("Error ExpressionType: %d\n", aux_infixExpression->_right._type);
+                return false;
         }
 
         delete_data(&program, &lexer, &parser);
@@ -188,7 +222,7 @@ static bool __test_infixExpression(void) {
 typedef struct PrefixTest {
     const char *input;
     const char *operator;
-    long long   value;
+    int   value;
 
 } PrefixTest;
 
@@ -240,7 +274,23 @@ static bool __test_prefixExpression(void) {
     return true;
 }
 
-static bool __test_integerLiteral(const Expression *expression, const long long value) {
+static bool __test_BooleanLiteral(const Expression *expression, bool value) {
+    Boolean *boolean = (Boolean *)expression->_ptr;
+
+    if (boolean->_value != value) {
+        printf("boolean->_value not %d, got='%d'.\n", value, boolean->_value);
+        return false;
+    }
+
+    if (strcmp(boolean->_token._literal, ((value) ? "true" : "false"))) {
+        printf("boolen->_token._literal not '%s', got='%s'.\n", ((value) ? "true" : "false"), boolean->_token._literal);
+        return false;
+    }
+
+    return true;
+}
+
+static bool __test_integerLiteral(const Expression *expression, int value) {
     IntegerLiteral *aux_iLiteral = ((IntegerLiteral *)expression->_ptr);
 
     if (aux_iLiteral->_value != value) {
@@ -249,9 +299,10 @@ static bool __test_integerLiteral(const Expression *expression, const long long 
     }
 
     char buffer[sizeof(value) * 8 + 1];
-    ltoa(value, buffer, 10);
+    // ltoa(value, buffer, 10);
+    itoa(value, buffer, 10);
     if (strcmp(aux_iLiteral->_token._literal, buffer) != 0) {
-        printf("Error, _literal not %s. got=%s\n", "5", aux_iLiteral->_token._literal);
+        printf("Error, _literal not %s. got=%s\n", buffer, aux_iLiteral->_token._literal);
         return false;
     }
 

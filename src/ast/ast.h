@@ -155,11 +155,11 @@ void free_exprStmt(ExpressionStatement *expr_stmt);
 //----------------------------------------------------------------------------------
 typedef struct IntegerLiteral {
     Token _token;
-    long long _value; // 8 bytes
+    int _value; // 8 bytes
 
 } IntegerLiteral;
 
-IntegerLiteral new_integer_literal(const Token *token, long long value);
+IntegerLiteral new_integer_literal(const Token *token, int value);
 
 const char *string_integer_literal(const IntegerLiteral *intLiteral);
 
