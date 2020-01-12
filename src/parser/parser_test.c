@@ -63,14 +63,14 @@ typedef struct InfixTest {
 
 static bool __test_infixExpression(void) {
     InfixTest infix_test[] = {
-        (InfixTest) {.input="5 + 5", .left=5, .operator="+", .right=5},
-        (InfixTest) {.input="5 - 5", .left=5, .operator="-", .right=5},
-        (InfixTest) {.input="5 * 5", .left=5, .operator="*", .right=5},
-        (InfixTest) {.input="5 / 5", .left=5, .operator="/", .right=5},
-        (InfixTest) {.input="5 > 5", .left=5, .operator=">", .right=5},
-        (InfixTest) {.input="5 < 5", .left=5, .operator="<", .right=5},
-        (InfixTest) {.input="5 == 5", .left=5, .operator="==", .right=5},
-        (InfixTest) {.input="5 != 5", .left=5, .operator="!=", .right=5},
+        (InfixTest) {.input="10 + 8", .left=10, .operator="+", .right=8},
+        (InfixTest) {.input="23 - 5", .left=23, .operator="-", .right=5},
+        (InfixTest) {.input="123 * 46", .left=123, .operator="*", .right=46},
+        (InfixTest) {.input="88 / 99", .left=88, .operator="/", .right=99},
+        (InfixTest) {.input="54 > 5", .left=54, .operator=">", .right=5},
+        (InfixTest) {.input="5 < 54", .left=5, .operator="<", .right=54},
+        (InfixTest) {.input="40 == 12", .left=40, .operator="==", .right=12},
+        (InfixTest) {.input="13 != 13", .left=13, .operator="!=", .right=13},
     };
 
     size_t len = sizeof(infix_test) / sizeof(InfixTest);
