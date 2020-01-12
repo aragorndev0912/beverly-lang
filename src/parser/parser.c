@@ -27,6 +27,7 @@ static Precedence token_precedence(const Token *token);
 
 static Expression new_infix_expression(Parser *parser, const Expression *left);
 
+
 //----------------------------------------------------------------------------------
 // Implementacion de funciones ParserError.
 //----------------------------------------------------------------------------------
@@ -318,6 +319,15 @@ static Expression expression_parser(Parser *parser, Precedence pre) {
         next_token_parser(parser);
         ((PrefixExpression *)expression._ptr)->_right = expression_parser(parser, PREFIX);
         expression._type = EXPR_PREFIX;
+    }
+    else if (strcmp(parser->_current_token._type, BEV_LPAREN) == 0) {
+        next_token_parser(parser); 
+
+        expression = expression_parser(parser, LOWEST);
+        if (!expect_token(parser, BEV_RPAREN)) {
+            printf("Error in group_expression_parser.\n");
+            return (Expression) {._ptr=NULL, ._type=EXPR_FAILURE, .__string=NULL};
+        }
     }
 
     // Validar expresion.
