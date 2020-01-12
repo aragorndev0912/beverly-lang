@@ -172,6 +172,8 @@ typedef struct PrefixExpression {
     char *_operator;
     Expression _right;
 
+    char *__string;
+
 } PrefixExpression;
 
 const char *string_prefix_expression(PrefixExpression *prefix_expression);
@@ -183,7 +185,6 @@ void free_prefix_expression(PrefixExpression *prefix_expression);
 //----------------------------------------------------------------------------------
 // struct InfixExpression.
 //----------------------------------------------------------------------------------
-
 typedef struct InfixExpression {
     Token _token;
     char *_operator;

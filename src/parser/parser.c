@@ -298,9 +298,11 @@ static Expression expression_parser(Parser *parser, Precedence pre) {
             // Falta implementar.
         }
 
+        // Inicializo PrefixExpression.
         ((PrefixExpression *)expression._ptr)->_token = new_token(parser->_current_token._type, copy_string(parser->_current_token._literal));
         ((PrefixExpression *)expression._ptr)->_operator = copy_string(parser->_current_token._literal);
-    
+        ((PrefixExpression *)expression._ptr)->__string = NULL;
+
         next_token_parser(parser);
         ((PrefixExpression *)expression._ptr)->_right = expression_parser(parser, PREFIX);
         expression._type = EXPR_PREFIX;

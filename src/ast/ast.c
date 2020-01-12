@@ -71,6 +71,29 @@ void free_expression(Expression *expression) {
 
 const char *string_expression(Expression *expression) {
     // Falta implementar.
+    if (expression->_ptr != NULL) {
+        switch (expression->_type) {
+            case EXPR_IDENTIFIER:
+                add_string(&expression->__string, string_identifier((Identifier *)expression->_ptr));
+                break;
+            
+            case EXPR_INTEGER:
+                add_string(&expression->__string, string_integer_literal((IntegerLiteral *)expression->_ptr));
+                break;
+            
+            case EXPR_PREFIX:
+                add_string(&expression->__string, string_prefix_expression((PrefixExpression *)expression->_ptr));
+                break;
+            
+            case EXPR_INFIX:
+                add_string(&expression->__string, string_infix_expression((InfixExpression *)expression->_ptr));
+                break;
+
+            default:
+                break;
+        }
+    }
+    
     return (expression->__string == NULL) ? " " : expression->__string;
 }
 
@@ -150,6 +173,10 @@ const char *string_program(Program *program) {
                     add_string(&program->__string, string_returnStmt(((ReturnStatement *)program->_statements[k]._ptr)));
                     break;
 
+                case TYPE_EXPR_STMT:
+                    add_string(&program->__string, string_exprStmt(((ExpressionStatement *)program->_statements[k]._ptr)));
+                    break;
+
                 default:
                     // pass
                     continue;
@@ -197,6 +224,8 @@ const char *string_letStmt(LetStatement *let_stmt) {
     add_string(&let_stmt->__string, string_identifier(&let_stmt->_name));
     add_string(&let_stmt->__string, " = ");
 
+    // if (let_stmt->_value._ptr)
+
     return (let_stmt->__string == NULL) ? ("") : (let_stmt->__string);
 }
 
@@ -239,8 +268,8 @@ void free_returnStmt(ReturnStatement *return_stmt) {
 // Struct ExpressionStatement.
 //----------------------------------------------------------------------------------
 const char *string_exprStmt(ExpressionStatement *expr_stmt) {
-    // add_string(expr_stmt->__string, expr_stmt->_token._literal);
-    return (expr_stmt->__string == NULL) ? " " :expr_stmt->__string;
+    add_string(&expr_stmt->__string, string_expression(&expr_stmt->_expression));
+    return expr_stmt->__string;
 }
 
 void free_exprStmt(ExpressionStatement *expr_stmt) {
@@ -278,8 +307,12 @@ void free_integer_literal(IntegerLiteral *int_literal) {
 // struct PrefixExpression.
 //----------------------------------------------------------------------------------
 const char *string_prefix_expression(PrefixExpression *prefix_expression) {
-    // Falta implementar.
-    return NULL;
+    add_string(&prefix_expression->__string, "(");
+    add_string(&prefix_expression->__string, prefix_expression->_operator);
+    add_string(&prefix_expression->__string, string_expression(&prefix_expression->_right));
+    add_string(&prefix_expression->__string, ")");
+    
+    return prefix_expression->__string;
 }
 
 void free_prefix_expression(PrefixExpression *prefix_expression) {
@@ -290,15 +323,26 @@ void free_prefix_expression(PrefixExpression *prefix_expression) {
 
     free_token(&prefix_expression->_token);
     free_expression(&prefix_expression->_right);
+
+    if (prefix_expression->__string != NULL) {
+        free(prefix_expression->__string);
+        prefix_expression->__string = NULL;
+    }
 }
 
 //----------------------------------------------------------------------------------
 // struct InfixExpression.
 //----------------------------------------------------------------------------------
 const char *string_infix_expression(InfixExpression *infix_expression) {
-    // Falta implementar.
+    add_string(&infix_expression->__string, "(");
+    add_string(&infix_expression->__string, string_expression(&infix_expression->_left));
+    add_string(&infix_expression->__string, " ");
+    add_string(&infix_expression->__string, infix_expression->_operator);
+    add_string(&infix_expression->__string, " ");
+    add_string(&infix_expression->__string, string_expression(&infix_expression->_right));
+    add_string(&infix_expression->__string, ")");
 
-    return NULL;
+    return infix_expression->__string;
 }
 
 void free_infix_expression(InfixExpression *infix_expression) {

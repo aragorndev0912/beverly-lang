@@ -28,6 +28,8 @@ static bool __test_prefixExpression(void);
 
 static bool __test_infixExpression(void);
 
+static bool __test_OperatorPrecedence(void);
+
 //----------------------------------------------------------------------------------
 // Funcion main.
 //----------------------------------------------------------------------------------
@@ -47,12 +49,69 @@ int main(void) {
     assert(__test_infixExpression());
     printf("__test_infixExpression (COMPLETED).\n");
 
+    assert(__test_OperatorPrecedence());
+    printf("__test_OperatorPrecedence (COMPLETED).\n");
+
     return 0;
 }
 
 //----------------------------------------------------------------------------------
 // Implementacion de funciones estaticas.
 //----------------------------------------------------------------------------------
+typedef struct OperatorTest {
+    const char *input;
+    const char *expected;
+
+} OperatorTest;
+
+static bool __test_OperatorPrecedence(void) {
+    OperatorTest tests[] = {
+        (OperatorTest) {.input="-a * b", "((-a) * b)"},
+        (OperatorTest) {.input="not-a", "(not(-a))"},
+        (OperatorTest) {.input="a + b + c", "((a + b) + c)"},
+        (OperatorTest) {.input="a + b - c", "((a + b) - c)"},
+        (OperatorTest) {.input="a * b * c", "((a * b) * c)"},
+        (OperatorTest) {.input="a * b / c", "((a * b) / c)"},
+        (OperatorTest) {.input="a + b / c", "(a + (b / c))"},
+        (OperatorTest) {.input="a + b * c + d / e - f", "(((a + (b * c)) + (d / e)) - f)"},
+        (OperatorTest) {.input="3 + 4; -5 * 5", "(3 + 4)((-5) * 5)"},
+        (OperatorTest) {.input="5 > 4 == 3 < 4", "((5 > 4) == (3 < 4))"},
+        (OperatorTest) {.input="5 < 4 != 3 > 4", "((5 < 4) != (3 > 4))"},
+        (OperatorTest) {.input="3 + 4 * 5 == 3 * 1 + 4 * 5", "((3 + (4 * 5)) == ((3 * 1) + (4 * 5)))"},
+        (OperatorTest) {.input="3 + 4 * 5 == 3 * 1 + 4 * 5", "((3 + (4 * 5)) == ((3 * 1) + (4 * 5)))"},
+    };
+
+    size_t len = sizeof(tests) / sizeof(OperatorTest);
+    for (size_t k=0; k < len; k++) {
+        Lexer lexer = new_lexer(tests[k].input);
+        Parser parser = new_parser(&lexer);
+        Program program = program_parser(&parser);
+        if (checkParserErrors(&parser)) {
+            delete_data(&program, &lexer, &parser);
+            return false;
+        }
+
+        const char *__string = string_program(&program);
+        if (__string == NULL) {
+            printf("__string is equal to NULL.\n");
+            delete_data(&program, &lexer, &parser);
+            return false;
+        }
+
+        if (strcmp(__string, tests[k].expected) != 0) {
+            printf("expected='%s', got='%s'.\n", tests[k].expected, __string);
+            delete_data(&program, &lexer, &parser);
+            return false;
+        }
+
+        delete_data(&program, &lexer, &parser);
+    }
+
+
+    return true;
+}
+
+
 typedef struct InfixTest {
     const char *input;
     long long left;
