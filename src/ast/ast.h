@@ -33,12 +33,15 @@ typedef struct Statement {
     void *_ptr;
     TypeStmt _type;
 
+    char *__string;
+
 } Statement;
 
 Statement new_stmt(void *ptr, TypeStmt type);
 
 void free_stmt(Statement *stmt);
 
+const char *string_stmt(Statement *stmt);
 
 //----------------------------------------------------------------------------------
 // struct Expression.
@@ -214,5 +217,41 @@ typedef struct Boolean {
 const char *string_boolean(Boolean *boolean);
 
 void free_boolean(Boolean *boolean);
+
+
+//----------------------------------------------------------------------------------
+// struct BlockStatement.
+//----------------------------------------------------------------------------------
+typedef struct BlockStatement {
+    Token _token;
+    Statement *_statements;
+    size_t len;
+    size_t cap;
+
+    char *__string;
+
+} BlockStatement;
+
+void free_block_statement(BlockStatement *block_statement);
+
+const char *string_block_statement(BlockStatement *block_statement);
+
+
+//----------------------------------------------------------------------------------
+// struct IfExpression.
+//----------------------------------------------------------------------------------
+typedef struct IfExpression {
+    Token _token;
+    Expression _condition;
+    BlockStatement _if_consequence;
+    BlockStatement _else_consequence;
+
+    char *__string;
+
+} IfExpression;
+
+void free_if_expression(IfExpression *if_expression);
+
+const char *string_if_expression(IfExpression *if_expression);
 
 #endif //_AST_H

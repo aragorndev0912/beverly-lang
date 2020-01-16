@@ -28,6 +28,35 @@ void free_stmt(Statement *stmt) {
         free(stmt->_ptr);
         stmt->_ptr = NULL;
     }
+
+    if (stmt->__string != NULL) {
+        free(stmt->__string);
+        stmt->__string = NULL;
+    }
+}
+
+const char *string_stmt(Statement *stmt) {
+
+    switch (stmt->_type) {
+        case TYPE_LET:
+            add_string(&stmt->__string, string_letStmt((LetStatement *)stmt->_ptr));
+            break;
+
+        case TYPE_RETURN:
+            add_string(&stmt->__string, string_returnStmt((ReturnStatement *)stmt->_ptr));
+            break;
+        
+        case TYPE_EXPR_STMT:
+            add_string(&stmt->__string, string_exprStmt((ExpressionStatement *)stmt->_ptr));
+            break;
+        
+        default:
+            // Falta validar.
+            print("Error...\n");
+            break;
+    }
+
+    return stmt->__string;
 }
 
 
@@ -383,4 +412,65 @@ void free_boolean(Boolean *boolean) {
     if (boolean != NULL) {
         free_token(&boolean->_token);
     }
+}
+
+
+//----------------------------------------------------------------------------------
+// struct BlockStatement.
+//----------------------------------------------------------------------------------
+
+void free_block_statement(BlockStatement *block_statement) {
+    free_token(&block_statement->_token);
+
+    if (block_statement->_statements != NULL) {
+        for (size_t k=0; k < block_statement->len; k++) 
+            free_stmt(&block_statement->_statements[k]);
+
+        free(block_statement->_statements);
+        block_statement->_statements = NULL;
+    }
+
+    if (block_statement->__string != NULL) {
+        free(block_statement);
+        block_statement = NULL;
+    }
+}
+
+const char *string_block_statement(BlockStatement *block_statement) {
+
+    for (size_t k=0; k < block_statement->len; k++)
+        add_string(&block_statement->__string, string_stmt(&block_statement->_statements[k]));
+
+    return block_statement->__string;
+}
+
+
+//----------------------------------------------------------------------------------
+// struct IfExpression.
+//----------------------------------------------------------------------------------
+void free_if_expression(IfExpression *if_expression) {
+    free_token(&if_expression->_token);
+    free_expression(&if_expression->_condition);
+    free_block_statement(&if_expression->_if_consequence);
+    free_block_statement(&if_expression->_else_consequence);
+
+    if (if_expression->__string != NULL) {
+        free(if_expression->__string);
+        if_expression->__string = NULL;
+    }
+}
+
+const char *string_if_expression(IfExpression *if_expression) {
+    add_string(&if_expression->__string, "if");
+
+    add_string(&if_expression->__string, string_expression(&if_expression->_condition));
+    add_string(&if_expression->__string, " ");
+    add_string(&if_expression->__string, string_block_statement(&if_expression->_if_consequence));
+
+    if (if_expression->_else_consequence._statements != NULL) {
+        add_string(&if_expression->__string, " ");
+        add_string(&if_expression->__string, string_block_statement(&if_expression->_else_consequence)); 
+    }
+
+    return if_expression->__string;
 }
