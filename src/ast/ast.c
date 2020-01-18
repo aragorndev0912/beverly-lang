@@ -52,7 +52,7 @@ const char *string_stmt(Statement *stmt) {
         
         default:
             // Falta validar.
-            print("Error...\n");
+            printf("Error...\n");
             break;
     }
 
@@ -91,6 +91,11 @@ void free_expression(Expression *expression) {
                 free_boolean((Boolean *)expression->_ptr);
                 flag = true;
                 break;
+            
+            case EXPR_IF:
+                free_if_expression((IfExpression *)expression->_ptr);
+                flag = true;
+                break;
 
             default:
                 break;
@@ -126,6 +131,10 @@ const char *string_expression(Expression *expression) {
             case EXPR_BOOLEAN:
                 add_string(&expression->__string, string_boolean((Boolean *)expression->_ptr));
                 break;
+            
+            case EXPR_IF:
+                add_string(&expression->__string, string_if_expression((IfExpression *)expression->_ptr));
+                break;
 
             default:
                 break;
@@ -150,6 +159,7 @@ void add_stmt_program(Program *const program, void *ptr, TypeStmt type) {
         program->_statements = (Statement *) malloc(sizeof(Statement) * program->_cap);
         if (program->_statements == NULL) {
             // Falta implementar limpieza.
+            printf("Error al reservar memoria para stmt program.\n");
         }
     }
     else if ((program->_len) >= program->_cap) {
@@ -157,13 +167,11 @@ void add_stmt_program(Program *const program, void *ptr, TypeStmt type) {
         Statement *stmt_aux = (Statement *) realloc(program->_statements, sizeof(Statement) * program->_cap);
         if (stmt_aux == NULL) {
             // Falta implementar limpiza (OJO).
+            printf("Error al redimencionar memoria para stmt program.\n");
         }
         program->_statements = stmt_aux;
     }
-
-    program->_statements[program->_len]._ptr = ptr;
-    program->_statements[program->_len]._type = type;
-    program->_len += 1;
+    program->_statements[program->_len++] = (Statement) {._ptr=ptr, ._type=type, .__string=NULL}; 
 }
 
 void free_program(Program *program) {
@@ -423,8 +431,27 @@ void free_block_statement(BlockStatement *block_statement) {
     free_token(&block_statement->_token);
 
     if (block_statement->_statements != NULL) {
-        for (size_t k=0; k < block_statement->len; k++) 
+        for (size_t k=0; k < block_statement->_len; k++)  {
+            switch (block_statement->_statements[k]._type) {
+                case TYPE_LET:
+                    free_letStmt((LetStatement *)block_statement->_statements[k]._ptr);
+                    break;
+                
+                case TYPE_RETURN:
+                    free_returnStmt((ReturnStatement *)block_statement->_statements[k]._ptr);
+                    break;
+                
+                case TYPE_EXPR_STMT:
+                    free_exprStmt((ExpressionStatement *)block_statement->_statements[k]._ptr);
+                    break;
+
+                default:
+                    printf("Error to delete...\n"); // Falta implementar.
+            }
+
+            
             free_stmt(&block_statement->_statements[k]);
+        }
 
         free(block_statement->_statements);
         block_statement->_statements = NULL;
@@ -438,10 +465,38 @@ void free_block_statement(BlockStatement *block_statement) {
 
 const char *string_block_statement(BlockStatement *block_statement) {
 
-    for (size_t k=0; k < block_statement->len; k++)
+    for (size_t k=0; k < block_statement->_len; k++)
         add_string(&block_statement->__string, string_stmt(&block_statement->_statements[k]));
 
     return block_statement->__string;
+}
+
+static const size_t SIZE_BLOCK = 10;
+
+void add_element_block_statement(BlockStatement *block_statement, Statement statement) {
+    if (block_statement->_statements == NULL) {
+        block_statement->_cap = SIZE_BLOCK;
+        block_statement->_statements = (Statement *) malloc(sizeof(Statement) * block_statement->_cap);
+        if (block_statement->_statements == NULL) {
+            // Falta implementar.
+            printf("Error al reservar memoria statement block.\n");
+        }
+        block_statement->_statements[block_statement->_len++] = (Statement) {._ptr=statement._ptr, ._type=statement._type, .__string=statement.__string};
+    }
+    else {
+        if (block_statement->_len >= block_statement->_cap) {
+            block_statement->_cap += SIZE_BLOCK;
+            Statement *aux = (Statement *) realloc(block_statement->_statements, block_statement->_cap);
+            if (aux == NULL) {
+                // falta implementar.
+                printf("Error al redimensionar statement block.\n");
+            }
+
+            block_statement->_statements = aux;
+        }
+
+        block_statement->_statements[block_statement->_len++] = (Statement) {._ptr=statement._ptr, ._type=statement._type, .__string=statement.__string};
+    }
 }
 
 

@@ -32,6 +32,8 @@ static bool __test_OperatorPrecedence(void);
 
 static bool __test_BooleanLiteral(const Expression *expression, bool value);
 
+static bool __test_IfExpression(void);
+
 //----------------------------------------------------------------------------------
 // Funcion main.
 //----------------------------------------------------------------------------------
@@ -54,12 +56,96 @@ int main(void) {
     assert(__test_OperatorPrecedence());
     printf("__test_OperatorPrecedence (COMPLETED).\n");
 
+    assert(__test_IfExpression());
+    printf("__test_IfExpression (COMPLETED).\n");
+
     return 0;
 }
 
 //----------------------------------------------------------------------------------
 // Implementacion de funciones estaticas.
 //----------------------------------------------------------------------------------
+static bool __test_IfExpression(void) {
+    const char *input = "if (x < y) { z }";
+
+    Lexer lexer = new_lexer(input);
+    Parser parser = new_parser(&lexer);
+    Program program = program_parser(&parser);
+    if (checkParserErrors(&parser)) {
+        delete_data(&program, &lexer, &parser);
+        return false;
+    }
+
+    if (program._statements == NULL) {
+        printf("Error, program is NULL\n");
+        delete_data(&program, &lexer, &parser);
+        return false;
+    }
+
+    if (program._len != 1) {
+        printf("Error, program._len has been 1 statements. got=%d.\n", program._len);
+        delete_data(&program, &lexer, &parser);
+        return false;
+    }
+
+    ExpressionStatement *aux_exprStmt = ((ExpressionStatement *)program._statements[0]._ptr);
+    IfExpression *if_expresion = ((IfExpression *)aux_exprStmt->_expression._ptr);
+
+    // BEGIN:InfixTest
+    InfixExpression *infix = (InfixExpression *) if_expresion->_condition._ptr;
+   
+    Identifier *_left = (Identifier *) infix->_left._ptr;
+    if (strcmp(_left->_token._literal, "x") != 0) {
+        printf("Error, left must be '%s'. got=%s.\n", "x", _left->_token._literal);
+        delete_data(&program, &lexer, &parser);
+        return false;
+    }
+    
+    if (strcmp(infix->_operator, "<") != 0) {
+        printf("Error, operator must be '%s'. got=%s.\n", "<", infix->_operator);
+        delete_data(&program, &lexer, &parser);
+        return false;
+    }
+
+    Identifier *_right = (Identifier *) infix->_right._ptr;
+    if (strcmp(_right->_token._literal, "y") != 0) {
+        printf("Error, right must be '%s'. got=%s.\n", "y", _right->_token._literal);
+        delete_data(&program, &lexer, &parser);
+        return false;
+    }
+    // END:InfixTest
+
+    // BEGIN:CONSECUENCE
+    BlockStatement consecuence = if_expresion->_if_consequence;
+    if (consecuence._len != 1) {
+        printf("Error, consecuence._len has been 1 statements. got=%d.\n", consecuence._len);
+        delete_data(&program, &lexer, &parser);
+        return false;
+    }
+
+    ExpressionStatement *expr = (ExpressionStatement *) consecuence._statements[0]._ptr;
+    Identifier *ident = (Identifier *)expr->_expression._ptr;
+    if (strcmp(ident->_token._literal, "z") != 0) {
+        printf("Error, ident must be '%s'. got=%s.\n", "z", ident->_token._literal);
+        delete_data(&program, &lexer, &parser);
+        return false;
+    }
+    // END:CONSECUENCE
+
+    // BEGIN:ALTERNATIVE
+    BlockStatement alternative = if_expresion->_else_consequence;
+    if (alternative._statements != NULL && alternative._len == 0) {
+        printf("Error, alternative must be NULL. got=%d.\n", alternative._len);
+        delete_data(&program, &lexer, &parser);
+        return false;
+    }
+    // END:ALTERNATIVE
+
+    delete_data(&program, &lexer, &parser);
+    return true;
+}
+
+
 typedef struct OperatorTest {
     const char *input;
     const char *expected;

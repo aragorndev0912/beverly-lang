@@ -27,7 +27,7 @@ static Precedence token_precedence(const Token *token);
 
 static Expression new_infix_expression(Parser *parser, const Expression *left);
 
-
+static BlockStatement new_block_statement(Parser *parser);
 //----------------------------------------------------------------------------------
 // Implementacion de funciones ParserError.
 //----------------------------------------------------------------------------------
@@ -329,6 +329,39 @@ static Expression expression_parser(Parser *parser, Precedence pre) {
             return (Expression) {._ptr=NULL, ._type=EXPR_FAILURE, .__string=NULL};
         }
     }
+    else if (strcmp(parser->_current_token._type, BEV_IF) == 0) {
+        expression._ptr = (IfExpression *) malloc(sizeof(IfExpression));
+        if (expression._ptr == NULL) {
+            printf("Error al reservar memoria para IfExpression.\n");
+        }
+        expression._type = EXPR_IF;
+
+        ((IfExpression *)expression._ptr)->__string = NULL;
+        ((IfExpression *)expression._ptr)->_token = new_token(parser->_current_token._type, copy_string(parser->_current_token._literal));
+        
+        if (!expect_token(parser, BEV_LPAREN)) {
+            return (Expression) {._ptr=NULL, ._type=EXPR_FAILURE, .__string=NULL};
+        }
+        next_token_parser(parser);
+        ((IfExpression *)expression._ptr)->_condition = expression_parser(parser, LOWEST);
+        if (!expect_token(parser, BEV_RPAREN)) {
+            return (Expression) {._ptr=NULL, ._type=EXPR_FAILURE, .__string=NULL};
+        }
+        if (!expect_token(parser, BEV_LBRACE)) {
+            return (Expression) {._ptr=NULL, ._type=EXPR_FAILURE, .__string=NULL};
+        }
+        ((IfExpression *)expression._ptr)->_if_consequence = new_block_statement(parser);
+
+        if (is_peek_token(parser, BEV_ELSE)) {
+            next_token_parser(parser);
+
+            if (!expect_token(parser, BEV_LBRACE)) {
+                return (Expression) {._ptr=NULL, ._type=EXPR_FAILURE, .__string=NULL};
+            }
+
+            ((IfExpression *)expression._ptr)->_else_consequence = new_block_statement(parser);
+        }
+    }
 
     // Validar expresion.
     if (expression._ptr == NULL) {
@@ -343,6 +376,22 @@ static Expression expression_parser(Parser *parser, Precedence pre) {
 
     return expression;
 }
+
+static BlockStatement new_block_statement(Parser *parser) {
+    BlockStatement block = (BlockStatement) {._statements=NULL, ._len=0, ._cap=0, .__string=NULL};
+    block._token = new_token(parser->_current_token._type, copy_string(parser->_current_token._literal));
+    next_token_parser(parser);
+    while (!is_current_token(parser, BEV_RBRACE)) {
+        Statement statement = stmt_parser(parser);
+        if (statement._ptr != NULL)
+            add_element_block_statement(&block, statement);
+        
+        next_token_parser(parser);
+    }
+
+    return block;
+}
+
 
 static Expression new_infix_expression(Parser *parser, const Expression *left) {
     Expression expression = (Expression) {._ptr=NULL, ._type=EXPR_FAILURE, .__string=NULL};

@@ -53,6 +53,7 @@ typedef enum ExpressionType {
     EXPR_PREFIX,
     EXPR_INFIX,
     EXPR_BOOLEAN,
+    EXPR_IF,
 
 } ExpressionType;
 
@@ -225,8 +226,8 @@ void free_boolean(Boolean *boolean);
 typedef struct BlockStatement {
     Token _token;
     Statement *_statements;
-    size_t len;
-    size_t cap;
+    size_t _len;
+    size_t _cap;
 
     char *__string;
 
@@ -236,6 +237,7 @@ void free_block_statement(BlockStatement *block_statement);
 
 const char *string_block_statement(BlockStatement *block_statement);
 
+void add_element_block_statement(BlockStatement *block_statement, Statement statement);
 
 //----------------------------------------------------------------------------------
 // struct IfExpression.
