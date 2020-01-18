@@ -54,6 +54,7 @@ typedef enum ExpressionType {
     EXPR_INFIX,
     EXPR_BOOLEAN,
     EXPR_IF,
+    EXPR_FUNCTION,
 
 } ExpressionType;
 
@@ -255,5 +256,34 @@ typedef struct IfExpression {
 void free_if_expression(IfExpression *if_expression);
 
 const char *string_if_expression(IfExpression *if_expression);
+
+
+//----------------------------------------------------------------------------------
+// struct FunctionLiteral.
+//----------------------------------------------------------------------------------
+typedef struct Parameter {
+    Identifier *_identifiers;
+    size_t _len;
+    size_t _cap;
+
+} Parameter;
+
+void add_parameter(Parameter *parameter, Identifier identifier);
+
+void free_parameter(Parameter *parameter);
+
+typedef struct FunctionLiteral {
+    Token _token;
+    Parameter _parameters;
+    BlockStatement _block;
+
+    char *__strings;
+
+} FunctionLiteral;
+
+const char *string_function_literal(FunctionLiteral *function);
+
+void free_function_literal(FunctionLiteral *function);
+
 
 #endif //_AST_H

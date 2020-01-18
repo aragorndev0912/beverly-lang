@@ -96,6 +96,11 @@ void free_expression(Expression *expression) {
                 free_if_expression((IfExpression *)expression->_ptr);
                 flag = true;
                 break;
+            
+            case EXPR_FUNCTION:
+                free_function_literal((FunctionLiteral *)expression->_ptr);
+                flag = true;
+                break;
 
             default:
                 break;
@@ -134,6 +139,10 @@ const char *string_expression(Expression *expression) {
             
             case EXPR_IF:
                 add_string(&expression->__string, string_if_expression((IfExpression *)expression->_ptr));
+                break;
+            
+            case EXPR_FUNCTION:
+                add_string(&expression->__string, string_function_literal((FunctionLiteral *)expression->_ptr));
                 break;
 
             default:
@@ -528,4 +537,70 @@ const char *string_if_expression(IfExpression *if_expression) {
     }
 
     return if_expression->__string;
+}
+
+
+//----------------------------------------------------------------------------------
+// struct FunctionLiteral.
+//----------------------------------------------------------------------------------
+
+static const size_t SIZE_PARAMETERS = 10;
+
+void add_parameter(Parameter *parameter, Identifier identifier) {
+    if (parameter->_identifiers == NULL) {
+        parameter->_cap = SIZE_PARAMETERS;
+        parameter->_len = 0;
+        parameter->_identifiers = (Identifier *) malloc(sizeof(Identifier) * parameter->_cap);
+        if (parameter->_identifiers == NULL) {
+            // Falta implementacion.
+            printf("Error al reservar memoria en la estructura Parameter.\n");
+            return;
+        }
+    }
+    else if (parameter->_len >= parameter->_cap) {
+        parameter->_cap += SIZE_PARAMETERS;
+        Identifier *aux = (Identifier *) realloc(parameter->_identifiers, parameter->_cap);
+        if (aux == NULL) {
+            printf("Errpr al redimensionar la memoria de la estructura Parameter.\n");
+            return;
+        }
+        parameter->_identifiers = aux;
+        aux = NULL;
+    }
+    parameter->_identifiers[parameter->_len++] = (Identifier) {._token=identifier._token, ._value=identifier._value};
+}
+
+void free_parameter(Parameter *parameter) {
+    if (parameter->_identifiers != NULL) {
+        for (size_t k=0; k < parameter->_len; k++) 
+            free_identifier(&parameter->_identifiers[k]);
+
+        free(parameter->_identifiers);
+        parameter->_identifiers = NULL;
+    }
+}
+
+const char *string_function_literal(FunctionLiteral *function){
+    
+    add_string(&function->__strings, function->_token._literal);
+    add_string(&function->__strings, "(");
+    for (size_t k=0; k < function->_parameters._len; k++) {
+        add_string(&function->__strings, string_identifier(&function->_parameters._identifiers[k]));
+        if (k < (function->_parameters._len - 1)) 
+            add_string(&function->__strings, ", ");
+    }
+
+    add_string(&function->__strings, ")");
+    add_string(&function->__strings, string_block_statement(&function->_block));
+    return function->__strings;
+}
+
+void free_function_literal(FunctionLiteral *function){
+    free_token(&function->_token);
+    free_parameter(&function->_parameters);
+    free_block_statement(&function->_block);
+    if (function->__strings != NULL) {
+        free(function->__strings);
+        function->__strings = NULL;
+    }
 }

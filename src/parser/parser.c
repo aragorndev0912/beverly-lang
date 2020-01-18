@@ -28,6 +28,8 @@ static Precedence token_precedence(const Token *token);
 static Expression new_infix_expression(Parser *parser, const Expression *left);
 
 static BlockStatement new_block_statement(Parser *parser);
+
+static void function_parameters(Parser *parser, Parameter *parameter);
 //----------------------------------------------------------------------------------
 // Implementacion de funciones ParserError.
 //----------------------------------------------------------------------------------
@@ -333,9 +335,9 @@ static Expression expression_parser(Parser *parser, Precedence pre) {
         expression._ptr = (IfExpression *) malloc(sizeof(IfExpression));
         if (expression._ptr == NULL) {
             printf("Error al reservar memoria para IfExpression.\n");
+            return (Expression) {._ptr=NULL, ._type=EXPR_FAILURE, .__string=NULL};
         }
         expression._type = EXPR_IF;
-
         ((IfExpression *)expression._ptr)->__string = NULL;
         ((IfExpression *)expression._ptr)->_token = new_token(parser->_current_token._type, copy_string(parser->_current_token._literal));
         
@@ -362,6 +364,32 @@ static Expression expression_parser(Parser *parser, Precedence pre) {
             ((IfExpression *)expression._ptr)->_else_consequence = new_block_statement(parser);
         }
     }
+    else if (strcmp(parser->_current_token._type, BEV_FUNCTION) == 0) {
+        expression._ptr = (FunctionLiteral *) malloc(sizeof(FunctionLiteral));
+        if (expression._ptr == NULL) {
+            printf("Error al reservar memoria para IfExpression.\n");
+            return (Expression) {._ptr=NULL, ._type=EXPR_FAILURE, .__string=NULL};
+        }
+
+        expression._type = EXPR_FUNCTION;
+        ((FunctionLiteral *)expression._ptr)->_token = new_token(parser->_current_token._type, copy_string(parser->_current_token._literal)); 
+        ((FunctionLiteral *)expression._ptr)->__strings = NULL;
+        ((FunctionLiteral *)expression._ptr)->_parameters._identifiers = NULL; 
+        ((FunctionLiteral *)expression._ptr)->_parameters._cap = 0;
+        ((FunctionLiteral *)expression._ptr)->_parameters._len = 0;
+
+        if (!expect_token(parser, BEV_LPAREN)) {
+            return (Expression) {._ptr=NULL, ._type=EXPR_FAILURE, .__string=NULL};
+        }
+
+        function_parameters(parser, &((FunctionLiteral *)expression._ptr)->_parameters);
+
+        if (!expect_token(parser, BEV_LBRACE)) {
+            return (Expression) {._ptr=NULL, ._type=EXPR_FAILURE, .__string=NULL};
+        }
+
+        ((FunctionLiteral *)expression._ptr)->_block = new_block_statement(parser);
+    }
 
     // Validar expresion.
     if (expression._ptr == NULL) {
@@ -376,6 +404,32 @@ static Expression expression_parser(Parser *parser, Precedence pre) {
 
     return expression;
 }
+
+static void function_parameters(Parser *parser, Parameter *parameter) {
+    if (is_peek_token(parser, BEV_RPAREN)) {
+        next_token_parser(parser);
+        return;
+    }
+
+    next_token_parser(parser);
+
+    Identifier ident = new_identifier(&parser->_current_token, parser->_current_token._literal);
+    add_parameter(parameter, ident);
+
+    while (is_peek_token(parser, BEV_COMMA)) {
+        next_token_parser(parser);
+        next_token_parser(parser);
+        add_parameter(
+            parameter, 
+            new_identifier(&parser->_current_token, parser->_current_token._literal)
+        );
+    }
+
+    if (!expect_token(parser, BEV_RPAREN)) {
+        return;
+    }
+}
+
 
 static BlockStatement new_block_statement(Parser *parser) {
     BlockStatement block = (BlockStatement) {._statements=NULL, ._len=0, ._cap=0, .__string=NULL};

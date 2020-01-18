@@ -34,6 +34,10 @@ static bool __test_BooleanLiteral(const Expression *expression, bool value);
 
 static bool __test_IfExpression(void);
 
+static bool __test_FunctionLiteral(void);
+
+static bool __test_FunctionLiteralParams(void);
+
 //----------------------------------------------------------------------------------
 // Funcion main.
 //----------------------------------------------------------------------------------
@@ -59,12 +63,155 @@ int main(void) {
     assert(__test_IfExpression());
     printf("__test_IfExpression (COMPLETED).\n");
 
+    assert(__test_FunctionLiteral());
+    printf("__test_FunctionLiteral (COMPLETED).\n");
+
+    assert(__test_FunctionLiteralParams());
+    printf("__test_FunctionLiteralParams (COMPLETED).\n");
+
     return 0;
 }
 
 //----------------------------------------------------------------------------------
 // Implementacion de funciones estaticas.
 //----------------------------------------------------------------------------------
+typedef struct TestParams {
+    const char *input;
+    const char *expect[4];
+
+} TestParams;
+
+static bool __test_FunctionLiteralParams(void) {
+    
+    TestParams tests[] = {
+        (TestParams) {.input="fn() {};", .expect={NULL}},
+        (TestParams) {.input="fn(x) {};", .expect={"x"}},
+        (TestParams) {.input="fn(x, y) {};", .expect={"x", "y"}},
+        (TestParams) {.input="fn(x, y, z) {};", .expect={"x", "y", "z"}},
+        (TestParams) {.input="fn(x, y, z, w) {};", .expect={"x", "y", "z", "w"}},
+    };
+
+    size_t len = sizeof(tests)/sizeof(TestParams);
+    for (size_t k=0; k < len; k++) {
+        Lexer lexer = new_lexer(tests[k].input);
+        Parser parser = new_parser(&lexer);
+        Program program = program_parser(&parser);
+        if (checkParserErrors(&parser)) {
+            delete_data(&program, &lexer, &parser);
+            return false;
+        }
+
+        ExpressionStatement *aux_exprStmt = ((ExpressionStatement *)program._statements[0]._ptr);
+        FunctionLiteral *function = ((FunctionLiteral *)aux_exprStmt->_expression._ptr);
+
+        if (function->_parameters._len != k) {
+            printf("Error params len '%d', got='%d'\n", k, function->_parameters._len);
+            delete_data(&program, &lexer, &parser);
+            return false;
+        }
+
+        delete_data(&program, &lexer, &parser);
+    }
+
+    return true;
+}
+
+
+static bool __test_FunctionLiteral(void) {
+    const char *input = "fn(x, y) { x + y }";
+
+    Lexer lexer = new_lexer(input);
+    Parser parser = new_parser(&lexer);
+    Program program = program_parser(&parser);
+    if (checkParserErrors(&parser)) {
+        delete_data(&program, &lexer, &parser);
+        return false;
+    }
+
+    if (program._statements == NULL) {
+        printf("Error, program is NULL\n");
+        delete_data(&program, &lexer, &parser);
+        return false;
+    }
+
+    if (program._len != 1) {
+        printf("Error, program._len has been 1 statements. got=%d.\n", program._len);
+        delete_data(&program, &lexer, &parser);
+        return false;
+    }
+
+    ExpressionStatement *aux_exprStmt = ((ExpressionStatement *)program._statements[0]._ptr);
+    
+    if (aux_exprStmt->_expression._type != EXPR_FUNCTION) {
+        printf("Error, expression type is not EXPR_FUNCTION. got=%d.\n", aux_exprStmt->_expression._type);
+        delete_data(&program, &lexer, &parser);
+        return false;
+    }
+    FunctionLiteral *function = ((FunctionLiteral *)aux_exprStmt->_expression._ptr);
+
+    if (function->_parameters._len != 2) {
+        printf("Error, params wrong want='2'. got=%d.\n", function->_parameters._len);
+        delete_data(&program, &lexer, &parser);
+        return false;
+    }
+
+    // BEGIN:BODY
+    BlockStatement block = function->_block;
+
+    if (block._statements == NULL) {
+        printf("Error, block is NULL.\n");
+        delete_data(&program, &lexer, &parser);
+        return false;
+    }
+
+    if (block._len != 1) {
+        printf("Error, block must be '%d' instrucction(s), got='%d'.\n", 1, block._len);
+        delete_data(&program, &lexer, &parser);
+        return false;
+    }
+
+    if (block._statements[0]._type != TYPE_EXPR_STMT) {
+        printf("Error, block must be TYPE_EXPR_STMT', got='%d'.\n", block._statements[0]._type);
+        delete_data(&program, &lexer, &parser);
+        return false;
+    }
+
+    ExpressionStatement *expr_stmt = (ExpressionStatement *) block._statements[0]._ptr;
+    if (expr_stmt->_expression._type != EXPR_INFIX) {
+        printf("Error, block must be EXPR_INFIX', got='%d'.\n", expr_stmt->_expression._type);
+        delete_data(&program, &lexer, &parser);
+        return false;
+    }
+
+    InfixExpression *infix = (InfixExpression *) expr_stmt->_expression._ptr;
+
+    Identifier *_left = (Identifier *) infix->_left._ptr;
+    if (strcmp(_left->_token._literal, "x") != 0) {
+        printf("Error, left must be '%s'. got=%s.\n", "x", _left->_token._literal);
+        delete_data(&program, &lexer, &parser);
+        return false;
+    }
+    
+    if (strcmp(infix->_operator, "+") != 0) {
+        printf("Error, operator must be '%s'. got=%s.\n", "+", infix->_operator);
+        delete_data(&program, &lexer, &parser);
+        return false;
+    }
+
+    Identifier *_right = (Identifier *) infix->_right._ptr;
+    if (strcmp(_right->_token._literal, "y") != 0) {
+        printf("Error, right must be '%s'. got=%s.\n", "y", _right->_token._literal);
+        delete_data(&program, &lexer, &parser);
+        return false;
+    }
+
+    // END:BODY
+
+    delete_data(&program, &lexer, &parser);
+    return true;
+}
+
+
 static bool __test_IfExpression(void) {
     const char *input = "if (x < y) { z }";
 
