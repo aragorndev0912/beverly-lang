@@ -363,6 +363,8 @@ static Expression expression_parser(Parser *parser, Precedence pre) {
 
             ((IfExpression *)expression._ptr)->_else_consequence = new_block_statement(parser);
         }
+        else 
+            ((IfExpression *)expression._ptr)->_else_consequence = (BlockStatement) {._statements=NULL, ._len=0, ._cap=0, .__string=NULL};
     }
     else if (strcmp(parser->_current_token._type, BEV_FUNCTION) == 0) {
         expression._ptr = (FunctionLiteral *) malloc(sizeof(FunctionLiteral));
@@ -437,7 +439,7 @@ static BlockStatement new_block_statement(Parser *parser) {
     next_token_parser(parser);
     while (!is_current_token(parser, BEV_RBRACE)) {
         Statement statement = stmt_parser(parser);
-        if (statement._ptr != NULL)
+        if (statement._ptr != NULL) 
             add_element_block_statement(&block, statement);
         
         next_token_parser(parser);

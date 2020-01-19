@@ -190,21 +190,22 @@ void free_program(Program *program) {
             switch (program->_statements[k]._type) {
                 case TYPE_LET:
                     free_letStmt((LetStatement *)program->_statements[k]._ptr);
+                    free_stmt(&program->_statements[k]);
                     break;
                 
                 case TYPE_RETURN:
                     free_returnStmt((ReturnStatement *)program->_statements[k]._ptr);
+                    free_stmt(&program->_statements[k]);
                     break;
                 
                 case TYPE_EXPR_STMT:
                     free_exprStmt((ExpressionStatement *)program->_statements[k]._ptr);
+                    free_stmt(&program->_statements[k]);
                     break;
 
                 default:
-                    printf("Error to delete...\n"); // Falta implementar.
+                    printf("Error to delete --> %d...\n", program->_statements[k]._type); // Falta implementar.
             }
-
-            free_stmt(&program->_statements[k]);
         }
     
         program->_statements = NULL;
@@ -444,22 +445,22 @@ void free_block_statement(BlockStatement *block_statement) {
             switch (block_statement->_statements[k]._type) {
                 case TYPE_LET:
                     free_letStmt((LetStatement *)block_statement->_statements[k]._ptr);
+                    free_stmt(&block_statement->_statements[k]);
                     break;
                 
                 case TYPE_RETURN:
                     free_returnStmt((ReturnStatement *)block_statement->_statements[k]._ptr);
+                    free_stmt(&block_statement->_statements[k]);
                     break;
                 
                 case TYPE_EXPR_STMT:
                     free_exprStmt((ExpressionStatement *)block_statement->_statements[k]._ptr);
+                    free_stmt(&block_statement->_statements[k]);
                     break;
 
                 default:
-                    printf("Error to delete...\n"); // Falta implementar.
+                    printf("(free block)Error to delete --> ... %d, k=%d\n", block_statement->_statements[k]._type, k); // Falta implementar.
             }
-
-            
-            free_stmt(&block_statement->_statements[k]);
         }
 
         free(block_statement->_statements);
@@ -484,6 +485,7 @@ static const size_t SIZE_BLOCK = 10;
 
 void add_element_block_statement(BlockStatement *block_statement, Statement statement) {
     if (block_statement->_statements == NULL) {
+        block_statement->_len = 0;
         block_statement->_cap = SIZE_BLOCK;
         block_statement->_statements = (Statement *) malloc(sizeof(Statement) * block_statement->_cap);
         if (block_statement->_statements == NULL) {

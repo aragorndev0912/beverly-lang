@@ -211,13 +211,13 @@ static bool __test_FunctionLiteral(void) {
     return true;
 }
 
-
 static bool __test_IfExpression(void) {
     const char *input = "if (x < y) { z }";
 
     Lexer lexer = new_lexer(input);
     Parser parser = new_parser(&lexer);
     Program program = program_parser(&parser);
+    
     if (checkParserErrors(&parser)) {
         delete_data(&program, &lexer, &parser);
         return false;
