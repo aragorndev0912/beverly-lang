@@ -55,6 +55,7 @@ typedef enum ExpressionType {
     EXPR_BOOLEAN,
     EXPR_IF,
     EXPR_FUNCTION,
+    EXPR_CALL_FUNCTION,
 
 } ExpressionType;
 
@@ -285,5 +286,32 @@ const char *string_function_literal(FunctionLiteral *function);
 
 void free_function_literal(FunctionLiteral *function);
 
+
+//----------------------------------------------------------------------------------
+// struct CallExpression.
+//----------------------------------------------------------------------------------
+typedef struct Argument {
+    Expression *_expressions;
+    size_t _len;
+    size_t _cap;
+
+} Argument;
+
+void add_argument(Argument *argument, Expression expression);
+
+void free_argument(Argument *argument);
+
+typedef struct CallExpression {
+    Token _token;
+    Expression _function;
+    Argument _arguments;
+
+    char *__string;
+
+} CallExpression;
+
+const char *string_call_expression(CallExpression *call);
+
+void free_call_expression(CallExpression *call);
 
 #endif //_AST_H

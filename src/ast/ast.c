@@ -101,6 +101,13 @@ void free_expression(Expression *expression) {
                 free_function_literal((FunctionLiteral *)expression->_ptr);
                 flag = true;
                 break;
+            
+            case EXPR_CALL_FUNCTION:
+                printf("BEFORE: free_call_expression\n");
+                free_call_expression((CallExpression *)expression->_ptr);
+                printf("AFTER: free_call_expression\n");
+                flag = true;
+                break;
 
             default:
                 break;
@@ -143,6 +150,10 @@ const char *string_expression(Expression *expression) {
             
             case EXPR_FUNCTION:
                 add_string(&expression->__string, string_function_literal((FunctionLiteral *)expression->_ptr));
+                break;
+            
+            case EXPR_CALL_FUNCTION:
+                add_string(&expression->__string, string_call_expression((CallExpression *)expression->_ptr));
                 break;
 
             default:
@@ -591,7 +602,6 @@ const char *string_function_literal(FunctionLiteral *function){
         if (k < (function->_parameters._len - 1)) 
             add_string(&function->__strings, ", ");
     }
-
     add_string(&function->__strings, ")");
     add_string(&function->__strings, string_block_statement(&function->_block));
     return function->__strings;
@@ -604,5 +614,69 @@ void free_function_literal(FunctionLiteral *function){
     if (function->__strings != NULL) {
         free(function->__strings);
         function->__strings = NULL;
+    }
+}
+
+
+//----------------------------------------------------------------------------------
+// struct CallExpression.
+//----------------------------------------------------------------------------------
+
+static const size_t SIZE_ARGUMENT_CALL = 10;
+
+void add_argument(Argument *argument, Expression expression) {
+    if (argument->_expressions == NULL) {
+        argument->_len = 0;
+        argument->_cap = SIZE_ARGUMENT_CALL;
+
+        argument->_expressions = (Expression *) malloc(sizeof(Expression) * argument->_cap);
+        if (argument->_expressions == NULL) {
+            printf("Error al reservar memoria para la estructura Argument.\n");
+            return;
+        }
+    }
+    else if (argument->_len >= argument->_cap) {
+        argument->_cap += SIZE_ARGUMENT_CALL;
+        Expression *aux = (Expression *) realloc(argument->_expressions, argument->_cap);
+        if (aux == NULL) {
+            printf("Error al redimensionar memoria para la estructura Argument.\n");
+            return;
+        }
+        argument->_expressions = aux;
+    }
+    argument->_expressions[argument->_len++] = (Expression) {._ptr=expression._ptr, ._type=expression._type, .__string=expression.__string};
+}
+
+void free_argument(Argument *argument) {
+    if (argument->_expressions != NULL) {
+        for (size_t k=0; k < argument->_len; k++) {
+            printf("\t\t\t-- delete expression.\n");
+            free_expression(&argument->_expressions[k]);
+        }
+
+        free(argument->_expressions);
+        argument->_expressions = NULL;
+    }
+}
+
+const char *string_call_expression(CallExpression *call) {
+    add_string(&call->__string, string_expression(&call->_function));
+    add_string(&call->__string, "(");
+    for (size_t k=0; k < call->_arguments._len; k++) {
+        add_string(&call->__string, string_expression(&call->_arguments._expressions[k]));
+        if (k < (call->_arguments._len - 1))
+            add_string(&call->__string, ", ");
+    }
+    add_string(&call->__string, ")");
+    return call->__string;
+}
+
+void free_call_expression(CallExpression *call) {
+    free_token(&call->_token);
+    free_expression(&call->_function);
+    free_argument(&call->_arguments);
+    if (call->__string != NULL) {
+        free(call->__string);
+        call->__string = NULL;
     }
 }

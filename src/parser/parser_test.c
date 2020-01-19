@@ -38,6 +38,8 @@ static bool __test_FunctionLiteral(void);
 
 static bool __test_FunctionLiteralParams(void);
 
+static bool __test_CallExpression(void);
+
 //----------------------------------------------------------------------------------
 // Funcion main.
 //----------------------------------------------------------------------------------
@@ -69,12 +71,35 @@ int main(void) {
     assert(__test_FunctionLiteralParams());
     printf("__test_FunctionLiteralParams (COMPLETED).\n");
 
+    assert(__test_CallExpression());
+    printf("__test_CallExpression (COMPLETED).\n");
+
+
     return 0;
 }
 
 //----------------------------------------------------------------------------------
 // Implementacion de funciones estaticas.
 //----------------------------------------------------------------------------------
+static bool __test_CallExpression(void) {
+    const char *input = "add(1, 2 * 3, 4 + 5)";
+
+    Lexer lexer = new_lexer(input);
+    Parser parser = new_parser(&lexer);
+    Program program = program_parser(&parser);
+    
+    if (checkParserErrors(&parser)) {
+        delete_data(&program, &lexer, &parser);
+        return false;
+    }
+
+    // Falta implementar las pruebas.
+
+    delete_data(&program, &lexer, &parser);
+    return true;
+}
+
+
 typedef struct TestParams {
     const char *input;
     const char *expect[4];
@@ -115,7 +140,6 @@ static bool __test_FunctionLiteralParams(void) {
 
     return true;
 }
-
 
 static bool __test_FunctionLiteral(void) {
     const char *input = "fn(x, y) { x + y }";
@@ -323,6 +347,9 @@ static bool __test_OperatorPrecedence(void) {
         (OperatorTest) {.input="2 / (5 + 5)", .expected="(2 / (5 + 5))"},
         (OperatorTest) {.input="-(5 + 5)", .expected="(-(5 + 5))"},
         (OperatorTest) {.input="not(true == true)", .expected="(not(true == true))"},
+        (OperatorTest) {.input="a + add(b * c) + d", .expected="((a + add((b * c))) + d)"},
+        (OperatorTest) {.input="add(a, b, 1, 2 * 3, 4 + 5, add(6, 7 * 8))", .expected="add(a, b, 1, (2 * 3), (4 + 5), add(6, (7 * 8)))"},
+        (OperatorTest) {.input="add(a + b + c * d / f + g)", .expected="add((((a + b) + ((c * d) / f)) + g))"},
     };
 
     size_t len = sizeof(tests) / sizeof(OperatorTest);

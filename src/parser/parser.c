@@ -6,12 +6,6 @@
 #include <stdio.h>
 
 //----------------------------------------------------------------------------------
-// Declaracion de constantes.
-//----------------------------------------------------------------------------------
-
-static const size_t PARSER_ERROR_SIZE = 10;
-
-//----------------------------------------------------------------------------------
 // Declaracion de funciones estaticas.
 //----------------------------------------------------------------------------------
 static bool is_current_token(const Parser *const parser, const char *token);
@@ -30,9 +24,16 @@ static Expression new_infix_expression(Parser *parser, const Expression *left);
 static BlockStatement new_block_statement(Parser *parser);
 
 static void function_parameters(Parser *parser, Parameter *parameter);
+
+static bool is_call_expression(const Parser *parser, const Expression *expression);
+
+static Expression new_call_expression(Parser *parser, const Expression *function);
+
 //----------------------------------------------------------------------------------
 // Implementacion de funciones ParserError.
 //----------------------------------------------------------------------------------
+static const size_t PARSER_ERROR_SIZE = 10;
+
 ParserError new_parsererror(void) {
     ParserError p_error;
     p_error._errors = NULL;
@@ -247,6 +248,13 @@ void peek_error_parser(Parser *parser, const char *token) {
 //----------------------------------------------------------------------------------
 // Implementacion de funciones estaticas.
 //----------------------------------------------------------------------------------
+static bool is_call_expression(const Parser *parser, const Expression *expression) {
+    return (
+        is_peek_token(parser, BEV_LPAREN)  && 
+        (expression->_type == EXPR_IDENTIFIER || expression->_type == EXPR_FUNCTION)
+    );
+}
+
 static Precedence token_precedence(const Token *token) {
     if (strcmp(token->_type, BEV_EQUAL) == 0)
         return EQUALS;
@@ -399,6 +407,17 @@ static Expression expression_parser(Parser *parser, Precedence pre) {
         return expression;
     }
 
+    // BEGIN:CallExpression
+
+    if (is_call_expression(parser, &expression)) {
+        expression = new_call_expression(parser, &expression);
+        if (expression._ptr == NULL) 
+            return expression;
+    }
+
+
+    // END:CallExpression
+
     while (strcmp(parser->_peek_token._type, BEV_SEMICOLON) != 0 && pre < token_precedence(&parser->_peek_token)) {
         next_token_parser(parser);
         expression = new_infix_expression(parser, &expression);
@@ -406,6 +425,43 @@ static Expression expression_parser(Parser *parser, Precedence pre) {
 
     return expression;
 }
+
+static Expression new_call_expression(Parser *parser, const Expression *function) {
+    Expression expression = (Expression) {._ptr=NULL, ._type=EXPR_FAILURE, .__string=NULL};
+
+    expression._ptr = (CallExpression *) malloc(sizeof(CallExpression));
+    if (expression._ptr == NULL) {
+        printf("Error al instanciar la estructura CallExpression.\n");
+        return (Expression) {._ptr=NULL, ._type=EXPR_FAILURE, .__string=NULL};
+    }
+    next_token_parser(parser);
+    expression._type = EXPR_CALL_FUNCTION;
+    ((CallExpression *)expression._ptr)->__string = NULL;
+    ((CallExpression *)expression._ptr)->_token = new_token(parser->_current_token._type, copy_string(parser->_current_token._literal));
+    ((CallExpression *)expression._ptr)->_function = (Expression) {._ptr=function->_ptr, ._type=function->_type, .__string=function->__string};
+    ((CallExpression *)expression._ptr)->_arguments = (Argument) {._expressions=NULL, ._len=0, ._cap=0};
+
+    if (is_peek_token(parser, BEV_RPAREN)) {
+        next_token_parser(parser);
+        return expression;
+    }
+    
+    next_token_parser(parser);
+    add_argument(&((CallExpression *)expression._ptr)->_arguments, expression_parser(parser, LOWEST));
+
+    while (is_peek_token(parser, BEV_COMMA)) {
+        next_token_parser(parser);
+        next_token_parser(parser);
+        add_argument(&((CallExpression *)expression._ptr)->_arguments, expression_parser(parser, LOWEST));
+    }
+
+    if (!expect_token(parser, BEV_RPAREN)) {
+        return (Expression) {._ptr=NULL, ._type=EXPR_FAILURE, .__string=NULL};
+    }
+
+    return expression;
+}
+
 
 static void function_parameters(Parser *parser, Parameter *parameter) {
     if (is_peek_token(parser, BEV_RPAREN)) {
