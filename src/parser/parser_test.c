@@ -347,9 +347,9 @@ static bool __test_OperatorPrecedence(void) {
         (OperatorTest) {.input="2 / (5 + 5)", .expected="(2 / (5 + 5))"},
         (OperatorTest) {.input="-(5 + 5)", .expected="(-(5 + 5))"},
         (OperatorTest) {.input="not(true == true)", .expected="(not(true == true))"},
-        (OperatorTest) {.input="a + add(b * c) + d", .expected="((a + add((b * c))) + d)"},
-        (OperatorTest) {.input="add(a, b, 1, 2 * 3, 4 + 5, add(6, 7 * 8))", .expected="add(a, b, 1, (2 * 3), (4 + 5), add(6, (7 * 8)))"},
-        (OperatorTest) {.input="add(a + b + c * d / f + g)", .expected="add((((a + b) + ((c * d) / f)) + g))"},
+        (OperatorTest) {.input="a + foo(b * c) + d", .expected="((a + foo((b * c))) + d)"},
+        (OperatorTest) {.input="foo(a, b, 1, 2 * 3, 4 + 5, foo(6, 7 * 8))", .expected="foo(a, b, 1, (2 * 3), (4 + 5), foo(6, (7 * 8)))"},
+        (OperatorTest) {.input="foo(a + b + c * d / f + g)", .expected="foo((((a + b) + ((c * d) / f)) + g))"},
     };
 
     size_t len = sizeof(tests) / sizeof(OperatorTest);

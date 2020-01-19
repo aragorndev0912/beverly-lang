@@ -103,9 +103,7 @@ void free_expression(Expression *expression) {
                 break;
             
             case EXPR_CALL_FUNCTION:
-                printf("BEFORE: free_call_expression\n");
                 free_call_expression((CallExpression *)expression->_ptr);
-                printf("AFTER: free_call_expression\n");
                 flag = true;
                 break;
 
@@ -649,10 +647,8 @@ void add_argument(Argument *argument, Expression expression) {
 
 void free_argument(Argument *argument) {
     if (argument->_expressions != NULL) {
-        for (size_t k=0; k < argument->_len; k++) {
-            printf("\t\t\t-- delete expression.\n");
+        for (size_t k=0; k < argument->_len; k++) 
             free_expression(&argument->_expressions[k]);
-        }
 
         free(argument->_expressions);
         argument->_expressions = NULL;
