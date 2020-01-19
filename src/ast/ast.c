@@ -288,10 +288,9 @@ const char *string_letStmt(LetStatement *let_stmt) {
     add_string(&let_stmt->__string, " ");
     add_string(&let_stmt->__string, string_identifier(&let_stmt->_name));
     add_string(&let_stmt->__string, " = ");
+    add_string(&let_stmt->__string, string_expression(&let_stmt->_value));
 
-    // if (let_stmt->_value._ptr)
-
-    return (let_stmt->__string == NULL) ? ("") : (let_stmt->__string);
+    return let_stmt->__string;
 }
 
 void free_letStmt(LetStatement *let_stmt) {
@@ -311,10 +310,7 @@ void free_letStmt(LetStatement *let_stmt) {
 const char *string_returnStmt(ReturnStatement *return_stmt) {
     add_string(&return_stmt->__string, return_stmt->_token._literal);
     add_string(&return_stmt->__string, " ");
-    // Falta implementacion.
-    // if (return_stmt->_value != NULL) {
-    // }
-
+    add_string(&return_stmt->__string, string_expression(&return_stmt->_value));
     add_string(&return_stmt->__string, ";");
 
     return (return_stmt->__string == NULL) ? " ": return_stmt->__string;

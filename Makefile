@@ -12,8 +12,8 @@ else
 	CCFLAGS += -O3
 endif
 
-main: dist obj obj/main.o obj/repl.o obj/token.o obj/lexer.o obj/lib.o
-	$(C) -o dist/$(NAME).exe obj/main.o obj/repl.o obj/token.o obj/lexer.o obj/lib.o $(CCFLAGS)
+main: dist obj obj/main.o obj/repl.o obj/token.o obj/lexer.o obj/lib.o obj/parser.o obj/ast.o
+	$(C) -o dist/$(NAME).exe obj/main.o obj/repl.o obj/token.o obj/lexer.o obj/lib.o obj/parser.o obj/ast.o $(CCFLAGS)
 
 obj/main.o: main.c src/repl/repl.h
 	$(C) -c main.c -o obj/main.o $(CCFLAGS)
@@ -24,7 +24,7 @@ obj/lexer.o: src/lexer/lexer.c src/lexer/lexer.h src/lib/bool.h src/token/token.
 obj/token.o: src/token/token.c src/token/token.h
 	$(C) -c src/token/token.c -o obj/token.o $(CCFLAGS) 
 
-obj/repl.o: src/repl/repl.c src/repl/repl.h src/lib/bool.h 
+obj/repl.o: src/repl/repl.c src/repl/repl.h src/lib/bool.h
 	$(C) -c src/repl/repl.c -o obj/repl.o $(CCFLAGS)  
 
 obj/ast.o: src/ast/ast.c src/ast/ast.h src/token/token.h src/lib/lib.h

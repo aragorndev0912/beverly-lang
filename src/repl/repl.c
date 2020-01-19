@@ -1,9 +1,14 @@
 #include "repl.h"
 #include "../lib/bool.h"
+#include "../parser/parser.h"
 #include <stdio.h>
 #include <stdlib.h>
 
 static char *get_line(const char *prompt);
+
+static void print_errors(const ParserError *errors);
+
+static void delete_data(Program *program, Lexer *lexer, Parser *parser);
 
 Repl new_repl(const char *prompt) {
     Repl repl = {0};
@@ -14,31 +19,39 @@ Repl new_repl(const char *prompt) {
 
 void start_repl(Repl *repl) {
     char *line = NULL;
-    Lexer lexer = {0};
-    Token token = {0};
+    Lexer lexer = (Lexer){0};
+    Parser parser = (Parser){0};
+    Program program = (Program){0};
 
     while (true) {
         line = get_line(repl->_prompt);
-        // printf("%s\n", line);
         lexer = new_lexer(line);
-
-        token = next_token_lexer(&lexer);
-        while (token._type != NULL && token._type != BEV_EOF) {
-            printf("type: %s literal: %s\n", token._type, token._literal);    
-
-            free_token(&token);
-            token = next_token_lexer(&lexer);
+        parser = new_parser(&lexer);
+        program = program_parser(&parser);
+        if (parser.error._errors != NULL) {
+            print_errors(&parser.error);
+            delete_data(&program, &lexer, &parser);
+            continue;
         }
-        
-        if (token._type == BEV_EOF)
-            free_token(&token);
+
+        printf("%s\n", string_program(&program));
 
         free(line);
         line = NULL;
-
-        free_lexer(&lexer);
+        delete_data(&program, &lexer, &parser);
     }
     
+}
+
+static void print_errors(const ParserError *errors) {
+    for (size_t k=0; k < errors->_len; k++) 
+        printf("\t%s\n", errors->_errors[k]);
+}
+
+static void delete_data(Program *program, Lexer *lexer, Parser *parser) {
+    free_program(program);
+    free_lexer(lexer);
+    free_parser(parser);
 }
 
 void free_repl(Repl *repl) {
