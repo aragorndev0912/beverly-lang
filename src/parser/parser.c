@@ -142,7 +142,7 @@ Program program_parser(Parser *parser) {
 }
 
 Statement stmt_parser(Parser *parser) {
-    Statement stmt = (Statement) {._ptr=NULL, ._type=TYPE_FAILURE};
+    Statement stmt = (Statement) {._ptr=NULL, ._type=TYPE_FAILURE, .__string=NULL};
     if (parser->_current_token._type == BEV_LET) 
         return letStmt_parser(parser);
     else if (parser->_current_token._type == BEV_RETURN)
@@ -154,7 +154,7 @@ Statement stmt_parser(Parser *parser) {
 }
 
 static Statement exprStmt_parser(Parser *parser) {
-    Statement stmt = (Statement) {._ptr=NULL, ._type=TYPE_FAILURE};
+    Statement stmt = (Statement) {._ptr=NULL, ._type=TYPE_FAILURE, .__string=NULL};
     stmt._ptr = (ExpressionStatement *) malloc(sizeof(ExpressionStatement)); 
     if (stmt._ptr == NULL) {
         // I need to implement it.
@@ -176,12 +176,13 @@ static Statement exprStmt_parser(Parser *parser) {
 }
 
 static Statement returnStmt_parser(Parser *parser) {
-    Statement stmt = (Statement) {0};
+    Statement stmt = (Statement) {._ptr=NULL, ._type=TYPE_FAILURE, .__string=NULL};
     stmt._type = TYPE_RETURN;
     
     stmt._ptr = (ReturnStatement *) malloc(sizeof(ReturnStatement));
     if (stmt._ptr == NULL) {
         // I need to implement it.
+        return (Statement) {._ptr=NULL, ._type=TYPE_FAILURE, .__string=NULL};
     }
     ((ReturnStatement *)stmt._ptr)->_token = new_token(
         parser->_current_token._type, 
@@ -200,13 +201,15 @@ static Statement returnStmt_parser(Parser *parser) {
 }
 
 static Statement letStmt_parser(Parser *parser) {
-    Statement stmt = (Statement) {0};
+    Statement stmt = (Statement) {._ptr=NULL, ._type=TYPE_FAILURE, .__string=NULL};
     stmt._type = TYPE_LET;
 
     // Reservo memoria para una estructura de tipo LetStatement.
     stmt._ptr = (LetStatement *) malloc(sizeof(LetStatement));
     if (stmt._ptr == NULL) {
         // I need to implement it.
+        add_parsererror(&parser->error, "Error al reservar memoria: LetStatement\n");
+        return stmt;
     }
 
     ((LetStatement *)stmt._ptr)->_token = new_token(parser->_current_token._type, copy_string(parser->_current_token._literal));
@@ -216,8 +219,8 @@ static Statement letStmt_parser(Parser *parser) {
     // genero un error (FAILURE).
     if (!expect_token(parser, BEV_IDENT)) {
         // Elimina la memoria reservada del token.
-        free_token(&((LetStatement *)stmt._ptr)->_token);
-        return (Statement) {._ptr=NULL, ._type=TYPE_FAILURE};;
+        free_letStmt(((LetStatement *)stmt._ptr));
+        return (Statement) {._ptr=NULL, ._type=TYPE_FAILURE};
     }
 
     // Inicializo el identificador.
@@ -225,7 +228,7 @@ static Statement letStmt_parser(Parser *parser) {
 
     if (!expect_token(parser, BEV_ASSIGN)) {
         // Elimina la memoria reservada del token.
-        free_token(&((LetStatement *)stmt._ptr)->_token);
+        free_letStmt(((LetStatement *)stmt._ptr));
         return (Statement) {._ptr=NULL, ._type=TYPE_FAILURE};;
     }
 

@@ -15,7 +15,7 @@ static char *to_str(const Lexer *lexer, size_t n);
 static char peek_char(const Lexer *lexer);
 
 Lexer new_lexer(const char *input) {
-    Lexer lexer = {0};
+    Lexer lexer = (Lexer){0};
     lexer._input = input;
     lexer._len_input = strlen(lexer._input);
     read_char_lexer(&lexer);
