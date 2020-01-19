@@ -661,7 +661,7 @@ static bool __test_letStatement(void) {
     const char *input = 
     "let x = 5;\n\
     let y = 10;\n\
-    let foobar = 838383;";
+    let foobar = y;";
 
     Lexer lexer = new_lexer(input);
     Parser parser = new_parser(&lexer);

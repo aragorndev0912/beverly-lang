@@ -189,12 +189,11 @@ static Statement returnStmt_parser(Parser *parser) {
     );
     ((ReturnStatement *)stmt._ptr)->__string = NULL;
     
-    // Inicializo la Expresion con valores nulos.
-    ((ReturnStatement *)stmt._ptr)->_value = (Expression) {0};
-
     next_token_parser(parser);
+    // Inicializo la Expresion con valores nulos.
+    ((ReturnStatement *)stmt._ptr)->_value = expression_parser(parser, LOWEST);
 
-    while (!is_current_token(parser, BEV_SEMICOLON)) 
+    if (is_peek_token(parser, BEV_SEMICOLON))
         next_token_parser(parser);
 
     return stmt;
@@ -230,10 +229,13 @@ static Statement letStmt_parser(Parser *parser) {
         return (Statement) {._ptr=NULL, ._type=TYPE_FAILURE};;
     }
 
-    // Por ahora no se examina las expresiones.
-    while (!is_current_token(parser, BEV_SEMICOLON)) 
+    next_token_parser(parser);
+
+    ((LetStatement *)stmt._ptr)->_value = expression_parser(parser, LOWEST);
+
+    if (is_peek_token(parser, BEV_SEMICOLON)) 
         next_token_parser(parser);
-    
+
     return stmt;
 }
 
