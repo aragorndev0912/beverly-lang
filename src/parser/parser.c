@@ -14,11 +14,11 @@ static bool is_peek_token(const Parser *const parser, const char *token);
 
 static bool expect_token(Parser *parser, const char *token);
 
-static Statement exprStmt_parser(Parser *parser);
+static Statement expression_statement_parser(Parser *parser);
 
-static Statement letStmt_parser(Parser *parser);
+static Statement let_statement_parser(Parser *parser);
 
-static Statement returnStmt_parser(Parser *parser);
+static Statement return_statement_parser(Parser *parser);
 
 static Expression expression_parser(Parser *parser, Precedence pre);
 
@@ -151,11 +151,11 @@ Program program_parser(Parser *parser) {
 Statement stmt_parser(Parser *parser) {
     Statement stmt = (Statement) {._ptr=NULL, ._type=TYPE_FAILURE, .__string=NULL};
     if (parser->_current_token._type == BEV_LET) 
-        return letStmt_parser(parser);
+        return let_statement_parser(parser);
     else if (parser->_current_token._type == BEV_RETURN)
-        return  returnStmt_parser(parser);
+        return  return_statement_parser(parser);
     else 
-        return exprStmt_parser(parser);
+        return expression_statement_parser(parser);
 
     return stmt;
 }
@@ -171,11 +171,10 @@ void peek_error_parser(Parser *parser, const char *token) {
 //----------------------------------------------------------------------------------
 // Implementacion de funciones estaticas.
 //----------------------------------------------------------------------------------
-static Statement exprStmt_parser(Parser *parser) {
+static Statement expression_statement_parser(Parser *parser) {
     Statement stmt = (Statement) {._ptr=NULL, ._type=TYPE_FAILURE, .__string=NULL};
     stmt._ptr = (ExpressionStatement *) malloc(sizeof(ExpressionStatement)); 
     if (stmt._ptr == NULL) {
-        // I need to implement it.
         add_parsererror(&parser->error, "Error al reservar memoria: ExpressionStatement.\n");
         return (Statement) {._ptr=NULL, ._type=TYPE_FAILURE, .__string=NULL};
     }
@@ -197,7 +196,7 @@ static Statement exprStmt_parser(Parser *parser) {
     return stmt;
 }
 
-static Statement returnStmt_parser(Parser *parser) {
+static Statement return_statement_parser(Parser *parser) {
     Statement stmt = (Statement) {._ptr=NULL, ._type=TYPE_FAILURE, .__string=NULL};
     stmt._type = TYPE_RETURN;
     
@@ -227,7 +226,7 @@ static Statement returnStmt_parser(Parser *parser) {
     return stmt;
 }
 
-static Statement letStmt_parser(Parser *parser) {
+static Statement let_statement_parser(Parser *parser) {
     Statement stmt = (Statement) {._ptr=NULL, ._type=TYPE_FAILURE, .__string=NULL};
     stmt._type = TYPE_LET;
 
