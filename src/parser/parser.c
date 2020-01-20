@@ -9,14 +9,19 @@
 // Declaracion de funciones estaticas.
 //----------------------------------------------------------------------------------
 static bool is_current_token(const Parser *const parser, const char *token);
+
 static bool is_peek_token(const Parser *const parser, const char *token);
+
 static bool expect_token(Parser *parser, const char *token);
 
 static Statement exprStmt_parser(Parser *parser);
+
 static Statement letStmt_parser(Parser *parser);
+
 static Statement returnStmt_parser(Parser *parser);
 
 static Expression expression_parser(Parser *parser, Precedence pre);
+
 static Precedence token_precedence(const Token *token);
 
 static Expression new_infix_expression(Parser *parser, const Expression *left);
@@ -28,6 +33,7 @@ static void function_parameters(Parser *parser, Parameter *parameter);
 static bool is_call_expression(const Parser *parser, const Expression *expression);
 
 static Expression new_call_expression(Parser *parser, const Expression *function);
+
 
 //----------------------------------------------------------------------------------
 // Implementacion de funciones ParserError.
@@ -78,6 +84,7 @@ void add_parsererror(ParserError *p_error, const char *error) {
         p_error->_errors[p_error->_len++] = copy_string(error);
     }
 }
+
 
 //----------------------------------------------------------------------------------
 // Implementacion de funciones Parser.
@@ -153,6 +160,17 @@ Statement stmt_parser(Parser *parser) {
     return stmt;
 }
 
+void peek_error_parser(Parser *parser, const char *token) {
+    char msg[200];
+    sprintf(msg, "expected next token to be %s, got '%s' instead\n", token, parser->_peek_token._literal);
+
+    add_parsererror(&parser->error, msg);
+}
+
+
+//----------------------------------------------------------------------------------
+// Implementacion de funciones estaticas.
+//----------------------------------------------------------------------------------
 static Statement exprStmt_parser(Parser *parser) {
     Statement stmt = (Statement) {._ptr=NULL, ._type=TYPE_FAILURE, .__string=NULL};
     stmt._ptr = (ExpressionStatement *) malloc(sizeof(ExpressionStatement)); 
@@ -170,7 +188,7 @@ static Statement exprStmt_parser(Parser *parser) {
     );
 
     ((ExpressionStatement *)stmt._ptr)->_expression = expression_parser(parser, LOWEST);
-    if (((ExpressionStatement *)stmt._ptr)->_expression._ptr == NULL) 
+    if (((ExpressionStatement *)stmt._ptr)->_expression._type == EXPR_FAILURE) 
         return (Statement) {._ptr=NULL, ._type=TYPE_FAILURE, .__string=NULL};
 
     if (is_peek_token(parser, BEV_SEMICOLON))
@@ -198,7 +216,7 @@ static Statement returnStmt_parser(Parser *parser) {
 
     // Inicializo la Expresion con valores nulos.
     ((ReturnStatement *)stmt._ptr)->_value = expression_parser(parser, LOWEST);
-    if (((ReturnStatement *)stmt._ptr)->_value._ptr == NULL) {
+    if (((ReturnStatement *)stmt._ptr)->_value._type == EXPR_FAILURE) {
         free_returnStmt(((ReturnStatement *)stmt._ptr));
         return (Statement) {._ptr=NULL, ._type=TYPE_FAILURE, .__string=NULL};
     }
@@ -227,7 +245,7 @@ static Statement letStmt_parser(Parser *parser) {
     // genero un error (FAILURE).
     if (!expect_token(parser, BEV_IDENT)) {
         free_letStmt(((LetStatement *)stmt._ptr));
-        return (Statement) {._ptr=NULL, ._type=TYPE_FAILURE};
+        return (Statement) {._ptr=NULL, ._type=TYPE_FAILURE, .__string=NULL};
     }
 
     // Inicializo el identificador.
@@ -235,15 +253,15 @@ static Statement letStmt_parser(Parser *parser) {
 
     if (!expect_token(parser, BEV_ASSIGN)) {
         free_letStmt(((LetStatement *)stmt._ptr));
-        return (Statement) {._ptr=NULL, ._type=TYPE_FAILURE};;
+        return (Statement) {._ptr=NULL, ._type=TYPE_FAILURE, .__string=NULL};
     }
 
     next_token_parser(parser);
 
     ((LetStatement *)stmt._ptr)->_value = expression_parser(parser, LOWEST);
-    if (((LetStatement *)stmt._ptr)->_value._ptr == NULL) {
+    if (((LetStatement *)stmt._ptr)->_value._type == EXPR_FAILURE) {
         free_letStmt(((LetStatement *)stmt._ptr));
-        return (Statement) {._ptr=NULL, ._type=TYPE_FAILURE};
+        return (Statement) {._ptr=NULL, ._type=TYPE_FAILURE, .__string=NULL};
     }
 
     if (is_peek_token(parser, BEV_SEMICOLON)) 
@@ -252,17 +270,6 @@ static Statement letStmt_parser(Parser *parser) {
     return stmt;
 }
 
-void peek_error_parser(Parser *parser, const char *token) {
-    char msg[200];
-    sprintf(msg, "expected next token to be %s, got '%s' instead\n", token, parser->_peek_token._literal);
-
-    add_parsererror(&parser->error, msg);
-}
-
-
-//----------------------------------------------------------------------------------
-// Implementacion de funciones estaticas.
-//----------------------------------------------------------------------------------
 static bool is_call_expression(const Parser *parser, const Expression *expression) {
     return (
         is_peek_token(parser, BEV_LPAREN)  && 
@@ -481,7 +488,6 @@ static Expression new_call_expression(Parser *parser, const Expression *function
     return expression;
 }
 
-
 static void function_parameters(Parser *parser, Parameter *parameter) {
     if (is_peek_token(parser, BEV_RPAREN)) {
         next_token_parser(parser);
@@ -507,7 +513,6 @@ static void function_parameters(Parser *parser, Parameter *parameter) {
     }
 }
 
-
 static BlockStatement new_block_statement(Parser *parser) {
     BlockStatement block = (BlockStatement) {._statements=NULL, ._len=0, ._cap=0, .__string=NULL};
     block._token = new_token(parser->_current_token._type, copy_string(parser->_current_token._literal));
@@ -522,7 +527,6 @@ static BlockStatement new_block_statement(Parser *parser) {
 
     return block;
 }
-
 
 static Expression new_infix_expression(Parser *parser, const Expression *left) {
     Expression expression = (Expression) {._ptr=NULL, ._type=EXPR_FAILURE, .__string=NULL};
