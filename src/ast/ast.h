@@ -48,6 +48,7 @@ const char *string_stmt(Statement *stmt);
 //----------------------------------------------------------------------------------
 typedef enum ExpressionType {
     EXPR_FAILURE = 0,
+    EXPR_VOID,
     EXPR_IDENTIFIER,
     EXPR_INTEGER,
     EXPR_PREFIX,
@@ -120,6 +121,8 @@ typedef struct LetStatement {
 
 } LetStatement;
 
+LetStatement new_letStmt(void);
+
 const char *string_letStmt(LetStatement *let_stmt);
 
 void free_letStmt(LetStatement *let_stmt);
@@ -134,6 +137,8 @@ typedef struct ReturnStatement {
     char *__string;
 
 } ReturnStatement;
+
+ReturnStatement new_returnStmt(void);
 
 const char *string_returnStmt(ReturnStatement *return_stmt);
 
@@ -150,6 +155,8 @@ typedef struct ExpressionStatement {
     char *__string;
 
 } ExpressionStatement;
+
+ExpressionStatement new_exprStmt(void);
 
 const char *string_exprStmt(ExpressionStatement *expr_stmt);
 

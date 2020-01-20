@@ -9,7 +9,7 @@ DEBUG := 1
 ifdef DEBUG
 	CCFLAGS += -g
 else
-	CCFLAGS += -O3
+	CCFLAGS += -O2
 endif
 
 main: dist obj obj/main.o obj/repl.o obj/token.o obj/lexer.o obj/lib.o obj/parser.o obj/ast.o

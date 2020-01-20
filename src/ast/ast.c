@@ -283,6 +283,26 @@ const char *string_identifier(const Identifier *const ident) {
 //----------------------------------------------------------------------------------
 // Struct LetStatement.
 //----------------------------------------------------------------------------------
+LetStatement new_letStmt(void) {
+    LetStatement let_statement = (LetStatement){0};
+    let_statement._token = (Token){._type=BEV_UNDEFINED, ._literal=NULL};
+    let_statement._name = (Identifier){
+        ._token=(Token){._type=BEV_UNDEFINED, ._literal=NULL},
+        ._value=NULL  
+    };
+
+    let_statement._value = (Expression){
+        ._ptr=NULL,
+        ._type=EXPR_FAILURE,
+        .__string=NULL,
+    };
+
+    let_statement.__string = NULL;
+
+    return let_statement;
+}
+
+
 const char *string_letStmt(LetStatement *let_stmt) {
     add_string(&let_stmt->__string, let_stmt->_token._literal);
     add_string(&let_stmt->__string, " ");
@@ -301,12 +321,24 @@ void free_letStmt(LetStatement *let_stmt) {
         free(let_stmt->__string);
         let_stmt->__string = NULL;
     }
+
+    if (let_stmt->_value._ptr != NULL)
+        free_expression(&let_stmt->_value);
 }
 
 
 //----------------------------------------------------------------------------------
 // Struct ReturnStatement.
 //----------------------------------------------------------------------------------
+ReturnStatement new_returnStmt(void) {
+    ReturnStatement return_statement = (ReturnStatement){0};
+    return_statement._token = (Token){._type=BEV_UNDEFINED, ._literal=NULL};
+    return_statement._value = (Expression){._ptr=NULL, ._type=EXPR_FAILURE, .__string=NULL,};
+    return_statement.__string = NULL;
+
+    return return_statement;
+}
+
 const char *string_returnStmt(ReturnStatement *return_stmt) {
     add_string(&return_stmt->__string, return_stmt->_token._literal);
     add_string(&return_stmt->__string, " ");
@@ -322,12 +354,24 @@ void free_returnStmt(ReturnStatement *return_stmt) {
         free(return_stmt->__string);
         return_stmt->__string = NULL;
     }
+
+    if (return_stmt->_value._ptr != NULL)
+        free_expression(&return_stmt->_value);
 }
 
 
 //----------------------------------------------------------------------------------
 // Struct ExpressionStatement.
 //----------------------------------------------------------------------------------
+ExpressionStatement new_exprStmt(void) {
+    ExpressionStatement expression_statement = (ExpressionStatement){0};
+    expression_statement._token = (Token){._type=BEV_UNDEFINED, ._literal=NULL};
+    expression_statement._expression = (Expression){._ptr=NULL, ._type=EXPR_FAILURE, .__string=NULL,};
+    expression_statement.__string = NULL;
+
+    return expression_statement;
+}
+
 const char *string_exprStmt(ExpressionStatement *expr_stmt) {
     add_string(&expr_stmt->__string, string_expression(&expr_stmt->_expression));
     return expr_stmt->__string;

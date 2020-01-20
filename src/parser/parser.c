@@ -158,16 +158,20 @@ static Statement exprStmt_parser(Parser *parser) {
     stmt._ptr = (ExpressionStatement *) malloc(sizeof(ExpressionStatement)); 
     if (stmt._ptr == NULL) {
         // I need to implement it.
+        add_parsererror(&parser->error, "Error al reservar memoria: ExpressionStatement.\n");
+        return (Statement) {._ptr=NULL, ._type=TYPE_FAILURE, .__string=NULL};
     }
     stmt._type = TYPE_EXPR_STMT;
 
+    *((ExpressionStatement *)stmt._ptr) = new_exprStmt();
     ((ExpressionStatement *)stmt._ptr)->_token = new_token(
         parser->_current_token._type,
         copy_string(parser->_current_token._literal)
     );
 
     ((ExpressionStatement *)stmt._ptr)->_expression = expression_parser(parser, LOWEST);
-    ((ExpressionStatement *)stmt._ptr)->__string = NULL;
+    if (((ExpressionStatement *)stmt._ptr)->_expression._ptr == NULL) 
+        return (Statement) {._ptr=NULL, ._type=TYPE_FAILURE, .__string=NULL};
 
     if (is_peek_token(parser, BEV_SEMICOLON))
         next_token_parser(parser);
@@ -181,18 +185,23 @@ static Statement returnStmt_parser(Parser *parser) {
     
     stmt._ptr = (ReturnStatement *) malloc(sizeof(ReturnStatement));
     if (stmt._ptr == NULL) {
-        // I need to implement it.
+        add_parsererror(&parser->error, "Error al reservar memoria: ReturnStatement.\n");
         return (Statement) {._ptr=NULL, ._type=TYPE_FAILURE, .__string=NULL};
     }
+    *((ReturnStatement *)stmt._ptr) = new_returnStmt();
     ((ReturnStatement *)stmt._ptr)->_token = new_token(
         parser->_current_token._type, 
         copy_string(parser->_current_token._literal)
     );
-    ((ReturnStatement *)stmt._ptr)->__string = NULL;
     
     next_token_parser(parser);
+
     // Inicializo la Expresion con valores nulos.
     ((ReturnStatement *)stmt._ptr)->_value = expression_parser(parser, LOWEST);
+    if (((ReturnStatement *)stmt._ptr)->_value._ptr == NULL) {
+        free_returnStmt(((ReturnStatement *)stmt._ptr));
+        return (Statement) {._ptr=NULL, ._type=TYPE_FAILURE, .__string=NULL};
+    }
 
     if (is_peek_token(parser, BEV_SEMICOLON))
         next_token_parser(parser);
@@ -207,18 +216,16 @@ static Statement letStmt_parser(Parser *parser) {
     // Reservo memoria para una estructura de tipo LetStatement.
     stmt._ptr = (LetStatement *) malloc(sizeof(LetStatement));
     if (stmt._ptr == NULL) {
-        // I need to implement it.
         add_parsererror(&parser->error, "Error al reservar memoria: LetStatement\n");
         return stmt;
     }
 
+    *((LetStatement *)stmt._ptr) = new_letStmt();
     ((LetStatement *)stmt._ptr)->_token = new_token(parser->_current_token._type, copy_string(parser->_current_token._literal));
-    ((LetStatement *)stmt._ptr)->__string = NULL;
 
     // Si el proximo token es diferente a un BEV_IDENT
     // genero un error (FAILURE).
     if (!expect_token(parser, BEV_IDENT)) {
-        // Elimina la memoria reservada del token.
         free_letStmt(((LetStatement *)stmt._ptr));
         return (Statement) {._ptr=NULL, ._type=TYPE_FAILURE};
     }
@@ -227,7 +234,6 @@ static Statement letStmt_parser(Parser *parser) {
     ((LetStatement *)stmt._ptr)->_name = new_identifier(&parser->_current_token, parser->_current_token._literal);
 
     if (!expect_token(parser, BEV_ASSIGN)) {
-        // Elimina la memoria reservada del token.
         free_letStmt(((LetStatement *)stmt._ptr));
         return (Statement) {._ptr=NULL, ._type=TYPE_FAILURE};;
     }
@@ -235,6 +241,10 @@ static Statement letStmt_parser(Parser *parser) {
     next_token_parser(parser);
 
     ((LetStatement *)stmt._ptr)->_value = expression_parser(parser, LOWEST);
+    if (((LetStatement *)stmt._ptr)->_value._ptr == NULL) {
+        free_letStmt(((LetStatement *)stmt._ptr));
+        return (Statement) {._ptr=NULL, ._type=TYPE_FAILURE};
+    }
 
     if (is_peek_token(parser, BEV_SEMICOLON)) 
         next_token_parser(parser);
@@ -290,7 +300,8 @@ static Expression expression_parser(Parser *parser, Precedence pre) {
     if (strcmp(parser->_current_token._type, BEV_IDENT) == 0) {
         expression._ptr = (Identifier *) malloc(sizeof(Identifier));
         if (expression._ptr == NULL) {
-            // Falta implementar.
+            add_parsererror(&parser->error, "Error al reservar memoria: Identifier.\n");
+            return (Expression) {._ptr=NULL, ._type=EXPR_FAILURE, .__string=NULL};
         }
         // Inicializacion de Identifier.
         ((Identifier *)expression._ptr)->_token = new_token(parser->_current_token._type, copy_string(parser->_current_token._literal));
@@ -300,7 +311,8 @@ static Expression expression_parser(Parser *parser, Precedence pre) {
     else if (strcmp(parser->_current_token._type, BEV_INT) == 0) {
         expression._ptr = (IntegerLiteral *) malloc(sizeof(IntegerLiteral));
         if (expression._ptr == NULL) {
-            // Falta implementar
+            add_parsererror(&parser->error, "Error al reservar memoria: IntegerLiteral.\n");
+            return (Expression) {._ptr=NULL, ._type=EXPR_FAILURE, .__string=NULL};
         }
 
 
@@ -313,6 +325,8 @@ static Expression expression_parser(Parser *parser, Precedence pre) {
         expression._ptr = (Boolean *) malloc(sizeof(Boolean));
         if (expression._ptr == NULL) {
             // Falta implementar.
+            add_parsererror(&parser->error, "Error al reservar memoria: Boolean.\n");
+            return (Expression) {._ptr=NULL, ._type=EXPR_FAILURE, .__string=NULL};
         }
 
         // Inicializo Boolean.
