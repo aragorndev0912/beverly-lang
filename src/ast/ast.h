@@ -304,7 +304,7 @@ typedef struct Argument {
 
 } Argument;
 
-void add_argument(Argument *argument, Expression expression);
+bool add_argument(Argument *argument, Expression expression);
 
 void free_argument(Argument *argument);
 

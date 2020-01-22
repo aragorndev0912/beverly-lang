@@ -488,7 +488,6 @@ void free_boolean(Boolean *boolean) {
 
 void free_block_statement(BlockStatement *block_statement) {
     free_token(&block_statement->_token);
-
     if (block_statement->_statements != NULL) {
         for (size_t k=0; k < block_statement->_len; k++)  {
             switch (block_statement->_statements[k]._type) {
@@ -662,27 +661,26 @@ void free_function_literal(FunctionLiteral *function){
 
 static const size_t SIZE_ARGUMENT_CALL = 10;
 
-void add_argument(Argument *argument, Expression expression) {
+bool add_argument(Argument *argument, Expression expression) {
     if (argument->_expressions == NULL) {
         argument->_len = 0;
         argument->_cap = SIZE_ARGUMENT_CALL;
 
         argument->_expressions = (Expression *) malloc(sizeof(Expression) * argument->_cap);
-        if (argument->_expressions == NULL) {
-            printf("Error al reservar memoria para la estructura Argument.\n");
-            return;
-        }
+        if (argument->_expressions == NULL) 
+            return false;
     }
     else if (argument->_len >= argument->_cap) {
         argument->_cap += SIZE_ARGUMENT_CALL;
         Expression *aux = (Expression *) realloc(argument->_expressions, argument->_cap);
-        if (aux == NULL) {
-            printf("Error al redimensionar memoria para la estructura Argument.\n");
-            return;
-        }
+        if (aux == NULL) 
+            return false;
+            
         argument->_expressions = aux;
     }
     argument->_expressions[argument->_len++] = (Expression) {._ptr=expression._ptr, ._type=expression._type, .__string=expression.__string};
+
+    return true;
 }
 
 void free_argument(Argument *argument) {

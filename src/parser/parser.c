@@ -477,6 +477,7 @@ static Expression function_expression(Parser *parser) {
     ((FunctionLiteral *)expression._ptr)->_parameters._identifiers = NULL; 
     ((FunctionLiteral *)expression._ptr)->_parameters._cap = 0;
     ((FunctionLiteral *)expression._ptr)->_parameters._len = 0;
+    ((FunctionLiteral *)expression._ptr)->_block = (BlockStatement){0};
 
     if (!expect_token(parser, BEV_LPAREN)) {
         free_function_literal(((FunctionLiteral *)expression._ptr));
@@ -537,7 +538,7 @@ static Expression expression_parser(Parser *parser, Precedence pre) {
 
     if (is_call_expression(parser, &expression)) {
         expression = new_call_expression(parser, &expression);
-        if (expression._ptr == NULL) 
+        if (expression._type == EXPR_FAILURE) 
             return expression;
     }
 
@@ -557,9 +558,10 @@ static Expression new_call_expression(Parser *parser, const Expression *function
 
     expression._ptr = (CallExpression *) malloc(sizeof(CallExpression));
     if (expression._ptr == NULL) {
-        printf("Error al instanciar la estructura CallExpression.\n");
-        return (Expression) {._ptr=NULL, ._type=EXPR_FAILURE, .__string=NULL};
+        add_parsererror(&parser->error, "Error reserving memory: CallExpression.\n");
+        return expression;
     }
+    
     next_token_parser(parser);
     expression._type = EXPR_CALL_FUNCTION;
     ((CallExpression *)expression._ptr)->__string = NULL;
@@ -573,15 +575,24 @@ static Expression new_call_expression(Parser *parser, const Expression *function
     }
     
     next_token_parser(parser);
-    add_argument(&((CallExpression *)expression._ptr)->_arguments, expression_parser(parser, LOWEST));
+    if (!add_argument(&((CallExpression *)expression._ptr)->_arguments, expression_parser(parser, LOWEST))) {
+        add_parsererror(&parser->error, "Error reserving memory: ArgumentFunction.\n");
+        free_call_expression(((CallExpression *)expression._ptr));
+        return (Expression) {._ptr=NULL, ._type=EXPR_FAILURE, .__string=NULL};
+    }
 
     while (is_peek_token(parser, BEV_COMMA)) {
         next_token_parser(parser);
         next_token_parser(parser);
-        add_argument(&((CallExpression *)expression._ptr)->_arguments, expression_parser(parser, LOWEST));
+        if (!add_argument(&((CallExpression *)expression._ptr)->_arguments, expression_parser(parser, LOWEST))) {
+            add_parsererror(&parser->error, "Error reserving memory: ArgumentFunction.\n");
+            free_call_expression(((CallExpression *)expression._ptr));
+            return (Expression) {._ptr=NULL, ._type=EXPR_FAILURE, .__string=NULL};
+        }
     }
 
     if (!expect_token(parser, BEV_RPAREN)) {
+        free_call_expression(((CallExpression *)expression._ptr));
         return (Expression) {._ptr=NULL, ._type=EXPR_FAILURE, .__string=NULL};
     }
 
