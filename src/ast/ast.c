@@ -302,7 +302,6 @@ LetStatement new_letStmt(void) {
     return let_statement;
 }
 
-
 const char *string_letStmt(LetStatement *let_stmt) {
     add_string(&let_stmt->__string, let_stmt->_token._literal);
     add_string(&let_stmt->__string, " ");
@@ -658,7 +657,6 @@ void free_function_literal(FunctionLiteral *function){
 //----------------------------------------------------------------------------------
 // struct CallExpression.
 //----------------------------------------------------------------------------------
-
 static const size_t SIZE_ARGUMENT_CALL = 10;
 
 bool add_argument(Argument *argument, Expression expression) {

@@ -49,6 +49,8 @@ static Expression if_expression(Parser *parser);
 
 static Expression function_expression(Parser *parser);
 
+static Expression evaluation_expression(Parser *parser);
+
 //----------------------------------------------------------------------------------
 // Implementacion de funciones ParserError.
 //----------------------------------------------------------------------------------
@@ -499,11 +501,8 @@ static Expression function_expression(Parser *parser) {
     return expression;
 }
 
-// END:AST_EXPRESSIONS
-
-static Expression expression_parser(Parser *parser, Precedence pre) {
+static Expression evaluation_expression(Parser *parser) {
     Expression expression = (Expression) {._ptr=NULL, ._type=EXPR_FAILURE, .__string=NULL};
-
     // Identifier Expression.
     if (strcmp(parser->_current_token._type, BEV_IDENT) == 0) 
         expression = identifier_expression(parser);
@@ -530,19 +529,25 @@ static Expression expression_parser(Parser *parser, Precedence pre) {
     else if (strcmp(parser->_current_token._type, BEV_FUNCTION) == 0) 
         expression = function_expression(parser);
 
+    return expression;
+}
+
+
+// END:AST_EXPRESSIONS
+
+static Expression expression_parser(Parser *parser, Precedence pre) {
+    Expression expression = evaluation_expression(parser);
+
     // Validar expresion.
     if (expression._type == EXPR_FAILURE)
         return expression;
 
     // BEGIN:CallExpression
-
     if (is_call_expression(parser, &expression)) {
         expression = new_call_expression(parser, &expression);
         if (expression._type == EXPR_FAILURE) 
             return expression;
     }
-
-
     // END:CallExpression
 
     while (strcmp(parser->_peek_token._type, BEV_SEMICOLON) != 0 && pre < token_precedence(&parser->_peek_token)) {
