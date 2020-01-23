@@ -33,7 +33,7 @@ void start_repl(Repl *repl) {
             delete_data(&program, &lexer, &parser);
             continue;
         }
-
+        
         printf("%s\n", string_program(&program));
 
         free(line);

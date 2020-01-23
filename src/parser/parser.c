@@ -423,7 +423,9 @@ static Expression if_expression(Parser *parser) {
     expression._type = EXPR_IF;
     ((IfExpression *)expression._ptr)->__string = NULL;
     ((IfExpression *)expression._ptr)->_token = new_token(parser->_current_token._type, copy_string(parser->_current_token._literal));
-    
+    ((IfExpression *)expression._ptr)->_if_consequence = (BlockStatement){0};
+    ((IfExpression *)expression._ptr)->_else_consequence = (BlockStatement){0};
+
     if (!expect_token(parser, BEV_LPAREN)) {
         free_if_expression(((IfExpression *)expression._ptr));
         return (Expression) {._ptr=NULL, ._type=EXPR_FAILURE, .__string=NULL};
@@ -447,6 +449,10 @@ static Expression if_expression(Parser *parser) {
     }
 
     ((IfExpression *)expression._ptr)->_if_consequence = new_block_statement(parser);
+    if (((IfExpression *)expression._ptr)->_if_consequence.__error == 1) {
+        free_if_expression(((IfExpression *)expression._ptr));
+        return (Expression) {._ptr=NULL, ._type=EXPR_FAILURE, .__string=NULL};
+    }
 
     if (is_peek_token(parser, BEV_ELSE)) {
         next_token_parser(parser);
@@ -457,6 +463,10 @@ static Expression if_expression(Parser *parser) {
         }
 
         ((IfExpression *)expression._ptr)->_else_consequence = new_block_statement(parser);
+        if (((IfExpression *)expression._ptr)->_else_consequence.__error == 1) {
+            free_if_expression(((IfExpression *)expression._ptr));
+            return (Expression) {._ptr=NULL, ._type=EXPR_FAILURE, .__string=NULL};
+        }
     }
     else 
         ((IfExpression *)expression._ptr)->_else_consequence = (BlockStatement) {._statements=NULL, ._len=0, ._cap=0, .__string=NULL};
@@ -497,6 +507,10 @@ static Expression function_expression(Parser *parser) {
     }
 
     ((FunctionLiteral *)expression._ptr)->_block = new_block_statement(parser);
+    if (((FunctionLiteral *)expression._ptr)->_block.__error == 1) {
+        free_function_literal(((FunctionLiteral *)expression._ptr));
+        return (Expression) {._ptr=NULL, ._type=EXPR_FAILURE, .__string=NULL};
+    }
 
     return expression;
 }
@@ -531,8 +545,6 @@ static Expression evaluation_expression(Parser *parser) {
 
     return expression;
 }
-
-
 // END:AST_EXPRESSIONS
 
 static Expression expression_parser(Parser *parser, Precedence pre) {
@@ -631,15 +643,28 @@ static bool function_parameters(Parser *parser, Parameter *parameter) {
 }
 
 static BlockStatement new_block_statement(Parser *parser) {
-    BlockStatement block = (BlockStatement) {._statements=NULL, ._len=0, ._cap=0, .__string=NULL};
+    BlockStatement block = (BlockStatement) {._statements=NULL, ._len=0, ._cap=0, .__string=NULL, .__error=0};
     block._token = new_token(parser->_current_token._type, copy_string(parser->_current_token._literal));
-    next_token_parser(parser);
+   
+    if (is_peek_token(parser, BEV_EOF)) {
+        add_parsererror(&parser->error, "Error token '}' not found.\n");
+        free_block_statement(&block);
+        return (BlockStatement) {._statements=NULL, ._len=0, ._cap=0, .__string=NULL, .__error=1, ._token=(Token){._type=NULL, ._literal=NULL}};
+    }
+
+     next_token_parser(parser);
+
     while (!is_current_token(parser, BEV_RBRACE)) {
         Statement statement = stmt_parser(parser);
         if (statement._ptr != NULL) 
             add_element_block_statement(&block, statement);
         
         next_token_parser(parser);
+        if (is_current_token(parser, BEV_EOF)) {
+            add_parsererror(&parser->error, "Error token '}' not found.\n");
+            free_block_statement(&block);
+            return (BlockStatement) {._statements=NULL, ._len=0, ._cap=0, .__string=NULL, .__error=1, ._token=(Token){._type=NULL, ._literal=NULL}};
+        }
     }
 
     return block;

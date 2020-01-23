@@ -11,24 +11,26 @@ char *copy_string(const char *string) {
 }
 
 void add_string(char **destiny, const char *origin) {
-    if ((*destiny) == NULL) {
-        (*destiny) = (char *) malloc(sizeof(char) * (strlen(origin) + 1));
-        strcpy_s((*destiny), (strlen(origin) + 1), origin);
-    }
-    else {
-        size_t cap = strlen((*destiny)) + strlen(origin);
+    if (origin != NULL) {
+        if ((*destiny) == NULL) {
+            (*destiny) = (char *) malloc(sizeof(char) * (strlen(origin) + 1));
+            strcpy_s((*destiny), (strlen(origin) + 1), origin);
+        }
+        else {
+            size_t cap = strlen((*destiny)) + strlen(origin);
 
-        char *aux_destiny = (char *) malloc(sizeof(char) * (strlen((*destiny)) + 1));
-        strcpy_s(aux_destiny, (strlen((*destiny)) + 1), (*destiny));
-        
-        free((*destiny));
-        (*destiny) = NULL;
-        (*destiny) = (char *) malloc(sizeof(char) * (cap + 1));
-        strcpy_s((*destiny), (cap + 1), aux_destiny);
+            char *aux_destiny = (char *) malloc(sizeof(char) * (strlen((*destiny)) + 1));
+            strcpy_s(aux_destiny, (strlen((*destiny)) + 1), (*destiny));
+            
+            free((*destiny));
+            (*destiny) = NULL;
+            (*destiny) = (char *) malloc(sizeof(char) * (cap + 1));
+            strcpy_s((*destiny), (cap + 1), aux_destiny);
 
-        free(aux_destiny);
-        aux_destiny = NULL;
+            free(aux_destiny);
+            aux_destiny = NULL;
 
-        strcat_s((*destiny), (cap + 1), origin);
-    }
+            strcat_s((*destiny), (cap + 1), origin);
+        }
+    }    
 }

@@ -238,6 +238,7 @@ typedef struct BlockStatement {
     size_t _len;
     size_t _cap;
 
+    char __error;
     char *__string;
 
 } BlockStatement;
