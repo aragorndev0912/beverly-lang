@@ -4,6 +4,16 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+const char *MSG_BUG = " \n\
+                        -----------------------\n\
+                        |                      |\n\
+                        |    -YOU HAVE BUGS-   |\n\
+                        |                      |\n\
+                        -----------------------\n\
+                        (  _/)    | |             \n\
+                        ( -.-)    | |             \n\
+                +/      O('')('') | |//             ";
+
 static char *get_line(const char *prompt);
 
 static void print_errors(const ParserError *errors);
@@ -33,7 +43,7 @@ void start_repl(Repl *repl) {
             delete_data(&program, &lexer, &parser);
             continue;
         }
-        
+
         printf("%s\n", string_program(&program));
 
         free(line);
@@ -44,6 +54,8 @@ void start_repl(Repl *repl) {
 }
 
 static void print_errors(const ParserError *errors) {
+    printf(MSG_BUG);
+    printf("\n");
     for (size_t k=0; k < errors->_len; k++) 
         printf("\t%s\n", errors->_errors[k]);
 }
