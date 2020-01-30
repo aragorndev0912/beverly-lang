@@ -130,7 +130,7 @@ static bool __test_FunctionLiteralParams(void) {
         FunctionLiteral *function = ((FunctionLiteral *)aux_exprStmt->_expression._ptr);
 
         if (function->_parameters._len != k) {
-            printf("Error params len '%d', got='%d'\n", k, function->_parameters._len);
+            printf("Error params len '%ld', got='%ld'\n", k, function->_parameters._len);
             delete_data(&program, &lexer, &parser);
             return false;
         }
@@ -159,7 +159,7 @@ static bool __test_FunctionLiteral(void) {
     }
 
     if (program._len != 1) {
-        printf("Error, program._len has been 1 statements. got=%d.\n", program._len);
+        printf("Error, program._len has been 1 statements. got=%ld.\n", program._len);
         delete_data(&program, &lexer, &parser);
         return false;
     }
@@ -174,7 +174,7 @@ static bool __test_FunctionLiteral(void) {
     FunctionLiteral *function = ((FunctionLiteral *)aux_exprStmt->_expression._ptr);
 
     if (function->_parameters._len != 2) {
-        printf("Error, params wrong want='2'. got=%d.\n", function->_parameters._len);
+        printf("Error, params wrong want='2'. got=%ld.\n", function->_parameters._len);
         delete_data(&program, &lexer, &parser);
         return false;
     }
@@ -189,7 +189,7 @@ static bool __test_FunctionLiteral(void) {
     }
 
     if (block._len != 1) {
-        printf("Error, block must be '%d' instrucction(s), got='%d'.\n", 1, block._len);
+        printf("Error, block must be '%d' instrucction(s), got='%ld'.\n", 1, block._len);
         delete_data(&program, &lexer, &parser);
         return false;
     }
@@ -254,7 +254,7 @@ static bool __test_IfExpression(void) {
     }
 
     if (program._len != 1) {
-        printf("Error, program._len has been 1 statements. got=%d.\n", program._len);
+        printf("Error, program._len has been 1 statements. got=%ld.\n", program._len);
         delete_data(&program, &lexer, &parser);
         return false;
     }
@@ -289,7 +289,7 @@ static bool __test_IfExpression(void) {
     // BEGIN:CONSECUENCE
     BlockStatement consecuence = if_expresion->_if_consequence;
     if (consecuence._len != 1) {
-        printf("Error, consecuence._len has been 1 statements. got=%d.\n", consecuence._len);
+        printf("Error, consecuence._len has been 1 statements. got=%ld.\n", consecuence._len);
         delete_data(&program, &lexer, &parser);
         return false;
     }
@@ -306,7 +306,7 @@ static bool __test_IfExpression(void) {
     // BEGIN:ALTERNATIVE
     BlockStatement alternative = if_expresion->_else_consequence;
     if (alternative._statements != NULL && alternative._len == 0) {
-        printf("Error, alternative must be NULL. got=%d.\n", alternative._len);
+        printf("Error, alternative must be NULL. got=%ld.\n", alternative._len);
         delete_data(&program, &lexer, &parser);
         return false;
     }
@@ -423,7 +423,7 @@ static bool __test_infixExpression(void) {
         }
 
         if (program._len != 1) {
-            printf("Error, program._len has been 1 statements. got=%d.\n", program._len);
+            printf("Error, program._len has been 1 statements. got=%ld.\n", program._len);
             delete_data(&program, &lexer, &parser);
             return false;
         }
@@ -513,7 +513,7 @@ static bool __test_prefixExpression(void) {
         }
 
         if (program._len != 1) {
-            printf("Error, program._len has been 1 statements. got=%d.\n", program._len);
+            printf("Error, program._len has been 1 statements. got=%ld.\n", program._len);
             delete_data(&program, &lexer, &parser);
             return false;
         }
@@ -564,8 +564,8 @@ static bool __test_integerLiteral(const Expression *expression, int value) {
     }
 
     char buffer[sizeof(value) * 8 + 1];
-    // ltoa(value, buffer, 10);
-    itoa(value, buffer, 10);
+    sprintf(buffer, "%d", value);
+
     if (strcmp(aux_iLiteral->_token._literal, buffer) != 0) {
         printf("Error, _literal not %s. got=%s\n", buffer, aux_iLiteral->_token._literal);
         return false;
@@ -593,7 +593,7 @@ static bool __test_identifier(void) {
     }
 
     if (program._len != 1) {
-        printf("Error, program._len has been 1 statements. got=%d.\n", program._len);
+        printf("Error, program._len has been 1 statements. got=%ld.\n", program._len);
         delete_data(&program, &lexer, &parser);
         return false;
     }
@@ -633,7 +633,7 @@ static bool __test_returnStatement(void) {
     }
 
     if (program._len != 3) {
-        printf("Error, program._len has been 3 statements. got=%d.\n", program._len);
+        printf("Error, program._len has been 3 statements. got=%ld.\n", program._len);
         delete_data(&program, &lexer, &parser);
         return false;
     }
@@ -679,7 +679,7 @@ static bool __test_letStatement(void) {
     }
 
     if (program._len != 3) {
-        printf("Error, program._len has been 3 statements. got=%d.\n", program._len);
+        printf("Error, program._len has been 3 statements. got=%ld.\n", program._len);
         delete_data(&program, &lexer, &parser);
         return false;
     }
@@ -735,9 +735,9 @@ static bool checkParserErrors(const Parser *const parser) {
     if (parser->error._errors == NULL) 
         return false;
 
-    printf("parser has %d errors.\n", parser->error._len);
+    printf("parser has %ld errors.\n", parser->error._len);
     for (int k=0; k < parser->error._len; k++) 
-        printf(parser->error._errors[k]);
+        printf("%s", parser->error._errors[k]);
 
     return true;   
 }

@@ -34,6 +34,7 @@ void start_repl(Repl *repl) {
     Program program = (Program){0};
 
     while (true) {
+        printf("HELLO\n");
         line = get_line(repl->_prompt);
         lexer = new_lexer(line);
         parser = new_parser(&lexer);
@@ -54,8 +55,7 @@ void start_repl(Repl *repl) {
 }
 
 static void print_errors(const ParserError *errors) {
-    printf(MSG_BUG);
-    printf("\n");
+    printf("%s\n", MSG_BUG);
     for (size_t k=0; k < errors->_len; k++) 
         printf("\t%s\n", errors->_errors[k]);
 }

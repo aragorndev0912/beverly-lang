@@ -506,7 +506,7 @@ void free_block_statement(BlockStatement *block_statement) {
                     break;
 
                 default:
-                    printf("(free block)Error to delete --> ... %d, k=%d\n", block_statement->_statements[k]._type, k); // Falta implementar.
+                    printf("(free block)Error to delete --> ... %d, k=%ld\n", block_statement->_statements[k]._type, k); // Falta implementar.
             }
         }
 

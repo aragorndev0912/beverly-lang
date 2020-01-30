@@ -1,6 +1,6 @@
 NAME := beverly
 C := gcc
-CCFLAGS := -Wall -pedantic -std=c99
+CCFLAGS := -Wall -pedantic -std=c11
 LEXER_TEST := lexer_test
 PARSER_TEST := parser_test
 AST_TEST := ast_test
@@ -13,7 +13,7 @@ else
 endif
 
 main: dist obj obj/main.o obj/repl.o obj/token.o obj/lexer.o obj/lib.o obj/parser.o obj/ast.o
-	$(C) -o dist/$(NAME).exe obj/main.o obj/repl.o obj/token.o obj/lexer.o obj/lib.o obj/parser.o obj/ast.o $(CCFLAGS)
+	$(C) -o dist/$(NAME) obj/main.o obj/repl.o obj/token.o obj/lexer.o obj/lib.o obj/parser.o obj/ast.o $(CCFLAGS)
 
 obj/main.o: main.c src/repl/repl.h
 	$(C) -c main.c -o obj/main.o $(CCFLAGS)
@@ -49,7 +49,7 @@ obj:
 # Test Lexer.
 #------------------------------------------------------------------------
 lexer_test: obj obj/lexer_test.o obj/token.o obj/lexer.o obj/lib.o
-	$(C) -o $(LEXER_TEST).exe obj/lexer_test.o obj/token.o obj/lexer.o obj/lib.o $(CCFLAGS)
+	$(C) -o $(LEXER_TEST) obj/lexer_test.o obj/token.o obj/lexer.o obj/lib.o $(CCFLAGS)
 
 obj/lexer_test.o: src/lexer/lexer_test.c
 	$(C) -c src/lexer/lexer_test.c -o obj/lexer_test.o $(CCFLAGS)
@@ -58,7 +58,7 @@ obj/lexer_test.o: src/lexer/lexer_test.c
 # Test Parser.
 #------------------------------------------------------------------------
 parser_test: obj obj/parser_test.o obj/parser.o obj/lexer.o obj/ast.o obj/token.o obj/lib.o
-	$(C) -o $(PARSER_TEST).exe obj/parser_test.o obj/parser.o obj/lexer.o obj/ast.o obj/token.o obj/lib.o $(CCFLAGS)
+	$(C) -o $(PARSER_TEST) obj/parser_test.o obj/parser.o obj/lexer.o obj/ast.o obj/token.o obj/lib.o $(CCFLAGS)
 
 obj/parser_test.o: src/parser/parser_test.c 
 	$(C) -c src/parser/parser_test.c -o obj/parser_test.o $(CCFLAGS)
@@ -67,7 +67,7 @@ obj/parser_test.o: src/parser/parser_test.c
 # Test AST.
 #------------------------------------------------------------------------
 ast_test: obj obj/ast_test.o obj/parser.o obj/lexer.o obj/ast.o obj/token.o obj/lib.o
-	$(C) -o $(AST_TEST).exe obj/ast_test.o obj/parser.o obj/lexer.o obj/ast.o obj/token.o obj/lib.o $(CCFLAGS)
+	$(C) -o $(AST_TEST) obj/ast_test.o obj/parser.o obj/lexer.o obj/ast.o obj/token.o obj/lib.o $(CCFLAGS)
 
 obj/ast_test.o: src/ast/ast_test.c
 	$(C) -c src/ast/ast_test.c -o obj/ast_test.o $(CCFLAGS)
@@ -77,11 +77,14 @@ obj/ast_test.o: src/ast/ast_test.c
 #------------------------------------------------------------------------
 .PHONY:clean cleanall
 clean:
-	del /s *.o
+	rm -r *.o
+
 cleanall:
-	del /s *.o
-	del *.exe
-	del *.ilk
-	del *.pdb
-	rmdir /s obj
-	rmdir /s dist
+	rm -r obj
+	rm -r dist
+	rm -r *.o
+	rm lexer_test
+	rm parser_test
+	rm ast_test
+	rm *.ilk
+	rm *.pdb
