@@ -496,6 +496,7 @@ static Expression function_expression(Parser *parser) {
         return (Expression) {._ptr=NULL, ._type=EXPR_FAILURE, .__string=NULL};
     }
 
+
     if (!function_parameters(parser, &((FunctionLiteral *)expression._ptr)->_parameters)) {
         free_function_literal(((FunctionLiteral *)expression._ptr));
         return (Expression) {._ptr=NULL, ._type=EXPR_FAILURE, .__string=NULL};
@@ -620,6 +621,11 @@ static bool function_parameters(Parser *parser, Parameter *parameter) {
     if (is_peek_token(parser, BEV_RPAREN)) {
         next_token_parser(parser);
         return true;
+    }
+
+    if (is_peek_token(parser, BEV_EOF)) {
+        add_parsererror(&parser->error, "expected next token to be ), got 'EOF' instead\n");
+        return false;
     }
 
     next_token_parser(parser);
