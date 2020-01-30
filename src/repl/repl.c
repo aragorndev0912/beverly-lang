@@ -34,7 +34,6 @@ void start_repl(Repl *repl) {
     Program program = (Program){0};
 
     while (true) {
-        printf("HELLO\n");
         line = get_line(repl->_prompt);
         lexer = new_lexer(line);
         parser = new_parser(&lexer);
