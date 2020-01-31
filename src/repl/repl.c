@@ -4,15 +4,20 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-const char *MSG_BUG = " \n\
-                        -----------------------\n\
-                        |                      |\n\
-                        |    -YOU HAVE BUGS-   |\n\
-                        |                      |\n\
-                        -----------------------\n\
-                        (  _/)    | |             \n\
-                        ( -.-)    | |             \n\
-                +/      O('')('') | |//             ";
+const char *MSG_BUG = "         \n\
+        ----------------------  \n\
+       |                      | \n\
+       |    -YOU HAVE BUGS-   | \n\
+       |                      | \n\
+        ----------------------  \n\
+        (  _/)    | |           \n\
+        ( -.-)    | |           \n\
++/      O('')('') | |//         ";
+
+
+
+const char *WELCOME = "\n\
+Beverly 1.0.0 alpha\n";
 
 static char *get_line(const char *prompt);
 
@@ -28,6 +33,7 @@ Repl new_repl(const char *prompt) {
 }
 
 void start_repl(Repl *repl) {
+    printf("%s", WELCOME);
     char *line = NULL;
     Lexer lexer = (Lexer){0};
     Parser parser = (Parser){0};
