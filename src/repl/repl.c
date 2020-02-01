@@ -1,6 +1,7 @@
 #include "repl.h"
 #include "../lib/bool.h"
 #include "../parser/parser.h"
+#include "../evaluator/evaluator.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -17,13 +18,13 @@ const char *MSG_BUG = "         \n\
 
 
 const char *WELCOME = "\n\
-Beverly 1.0.0 alpha\n";
+Hello humans this is Beverly 1.0.0 alpha\n";
 
 static char *get_line(const char *prompt);
 
 static void print_errors(const ParserError *errors);
 
-static void delete_data(Program *program, Lexer *lexer, Parser *parser);
+static void delete_data(Program *program, Lexer *lexer, Parser *parser, Object *object);
 
 Repl new_repl(const char *prompt) {
     Repl repl = {0};
@@ -38,6 +39,7 @@ void start_repl(Repl *repl) {
     Lexer lexer = (Lexer){0};
     Parser parser = (Parser){0};
     Program program = (Program){0};
+    Object object = (Object){0};
 
     while (true) {
         line = get_line(repl->_prompt);
@@ -46,15 +48,19 @@ void start_repl(Repl *repl) {
         program = program_parser(&parser);
         if (parser.error._errors != NULL) {
             print_errors(&parser.error);
-            delete_data(&program, &lexer, &parser);
+            delete_data(&program, &lexer, &parser, &object);
             continue;
         }
+        object = evaluation(&program);
+        if (object._obj != NULL) {
+            printf("%s\n", inspect_object(&object));
+        }
 
-        printf("%s\n", string_program(&program));
+        // printf("%s\n", string_program(&program));
 
         free(line);
         line = NULL;
-        delete_data(&program, &lexer, &parser);
+        delete_data(&program, &lexer, &parser, &object);
     }
     
 }
@@ -65,10 +71,11 @@ static void print_errors(const ParserError *errors) {
         printf("\t%s\n", errors->_errors[k]);
 }
 
-static void delete_data(Program *program, Lexer *lexer, Parser *parser) {
+static void delete_data(Program *program, Lexer *lexer, Parser *parser, Object *object) {
     free_program(program);
     free_lexer(lexer);
     free_parser(parser);
+    free_object(object);
 }
 
 void free_repl(Repl *repl) {

@@ -18,10 +18,15 @@ typedef struct Object {
     void *_obj;
     TypeObject _type;
 
+    char *__string;
+
 } Object;
+
+Object new_object(void);
 
 void free_object(Object * object);
 
+const char *inspect_object(Object *object);
 
 //----------------------------------------------------------------------------------
 // struct OInteger.
@@ -29,10 +34,13 @@ void free_object(Object * object);
 typedef struct OInteger {
     int _value; // entero de 4 bytes.
 
+    char *__string;
+
 } OInteger;
 
 const char *inspect_ointeger(OInteger *integer);
 
+void free_ointger(OInteger *integer);
 
 //----------------------------------------------------------------------------------
 // struct OBoolean.

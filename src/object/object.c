@@ -5,10 +5,19 @@
 //----------------------------------------------------------------------------------
 // struct Object.
 //----------------------------------------------------------------------------------
+Object new_object(void) {
+    return (Object) {
+        ._obj=NULL,
+        ._type=OBJ_UNDEFINED,
+        .__string=NULL,
+    };
+}
+
 void free_object(Object * object) {
     if (object->_obj != NULL) {
         switch (object->_type) {
             case OBJ_INTEGER:
+                free_ointger((OInteger *)object->_obj);
                 break;
             
             default:
@@ -21,15 +30,34 @@ void free_object(Object * object) {
     }
 }
 
+const char *inspect_object(Object *object) {
+    switch (object->_type)
+    {
+        case OBJ_INTEGER:
+            return inspect_ointeger((OInteger *)object->_obj);
+            break;
+        
+        default:
+            return " ";
+            break;
+    }
+}
 
 //----------------------------------------------------------------------------------
 // struct OInteger.
 //----------------------------------------------------------------------------------
-const char *insinspect_ointegerpect(OInteger *integer) {
-    char buffer[sizeof(integer->_value) * 8 + 1];
-    sprintf(buffer, "%d", integer->_value);
+const char *inspect_ointeger(OInteger *integer) {
+    integer->__string = (char *) malloc(sizeof(integer->_value) * 8 + 1);
+    sprintf(integer->__string, "%d", integer->_value);
 
-    return "buffer"; //OJO
+    return integer->__string; 
+}
+
+void free_ointger(OInteger *integer) {
+    if (integer->__string != NULL) {
+        free(integer->__string);
+        integer->__string = NULL;
+    }
 }
 
 
