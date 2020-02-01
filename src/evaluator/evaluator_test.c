@@ -176,10 +176,10 @@ static bool __test_bangPrefixObject(void) {
     _TestBoolean tests[] = {
         {.input="not true", .expected=false},
         {.input="not false", .expected=true},
-        // {.input="not 6", .expected=false},
+        {.input="not 6", .expected=false},
         {.input="not not true", .expected=true},
         {.input="not not false", .expected=false},
-        // {.input="not not 6", .expected=true},
+        {.input="not not 6", .expected=true},
     };
 
     size_t size = sizeof(tests) / sizeof(_TestBoolean);
