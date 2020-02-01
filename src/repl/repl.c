@@ -18,7 +18,7 @@ const char *MSG_BUG = "         \n\
 
 
 const char *WELCOME = "\n\
-Hello humans this is Beverly 1.0.0 alpha\n";
+Hello hobbits this is Beverly 1.0.0 alpha language.\nFeel free to write here.\n";
 
 static char *get_line(const char *prompt);
 
