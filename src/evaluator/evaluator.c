@@ -46,8 +46,7 @@ static Object _eval_statement(Statement *statement) {
 
 static Object _eval_expression(Expression *expression) {
     Object result = new_object();
-    switch (expression->_type)
-    {
+    switch (expression->_type) {
         case EXPR_INTEGER:
             return _eval_integer((IntegerLiteral *)expression->_ptr);
             break;

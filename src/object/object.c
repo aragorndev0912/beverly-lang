@@ -31,8 +31,7 @@ void free_object(Object * object) {
 }
 
 const char *inspect_object(Object *object) {
-    switch (object->_type)
-    {
+    switch (object->_type) {
         case OBJ_INTEGER:
             return inspect_ointeger((OInteger *)object->_obj);
             break;
