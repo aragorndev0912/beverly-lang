@@ -26,6 +26,8 @@ static bool __test_booleanExpression(void);
 
 static bool __test_evalBooleanObject(Object *obj, bool expected);
 
+static bool __test_bangPrefixObject(void);
+
 //----------------------------------------------------------------------------------
 // Funcion principal.
 //----------------------------------------------------------------------------------
@@ -36,6 +38,9 @@ int main(void) {
 
     assert(__test_booleanExpression());
     printf("__test_booleanExpression (COMPLETED).\n");
+
+    assert(__test_bangPrefixObject());
+    printf("__test_bangPrefixObject (COMPLETED).\n");
 
     return 0;
 }
@@ -134,7 +139,7 @@ static bool __test_booleanExpression(void) {
         {.input="false", .expected=false},
     };
 
-    size_t size = sizeof(tests) / sizeof(_TestInteger);
+    size_t size = sizeof(tests) / sizeof(_TestBoolean);
     for (size_t k=0; k < size; k++) {
         Object evaluate = __eval_frontEnd(tests[k].input);
         if (evaluate._obj == NULL) {
@@ -165,4 +170,32 @@ static bool __test_evalBooleanObject(Object *obj, bool expected) {
     }
 
     return true; 
+}
+
+static bool __test_bangPrefixObject(void) {
+    _TestBoolean tests[] = {
+        {.input="not true", .expected=false},
+        {.input="not false", .expected=true},
+        // {.input="not 6", .expected=false},
+        {.input="not not true", .expected=true},
+        {.input="not not false", .expected=false},
+        // {.input="not not 6", .expected=true},
+    };
+
+    size_t size = sizeof(tests) / sizeof(_TestBoolean);
+    for (size_t k=0; k < size; k++) {
+        Object evaluate = __eval_frontEnd(tests[k].input);
+        if (evaluate._obj == NULL) {
+            printf("Object value is NULL\n");
+            return false;
+        }
+        if(!__test_evalBooleanObject(&evaluate, tests[k].expected)) {
+            free_object(&evaluate);
+            return false;
+        }
+
+        free_object(&evaluate);
+    }
+
+    return true;
 }

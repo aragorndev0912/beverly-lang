@@ -1,6 +1,7 @@
 #include "./evaluator.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 //----------------------------------------------------------------------------------
 // Firmas de funciones estaticas.
@@ -12,6 +13,10 @@ static Object _eval_expression(Expression *expression);
 static Object _eval_integer(IntegerLiteral *integer_literal);
 
 static Object _eval_boolean(Boolean *boolean);
+
+static void _eval_prefixExpression(const char *operator, Object *right);
+
+static void _eval_notOperator(Object *right);
 
 //----------------------------------------------------------------------------------
 // Implementacion de funciones.
@@ -54,6 +59,14 @@ static Object _eval_expression(Expression *expression) {
         case EXPR_BOOLEAN:
             return _eval_boolean((Boolean *)expression->_ptr);
             break;
+        
+        case EXPR_PREFIX:
+            ; // permite la declaracion de una statement despues de una etiqueta.
+            PrefixExpression *prefix = (PrefixExpression *)expression->_ptr;
+            Object right = _eval_expression(&prefix->_right);
+            _eval_prefixExpression(prefix->_operator, &right);
+            return right;
+            break;
 
         default:
             //pass
@@ -82,4 +95,28 @@ static Object _eval_boolean(Boolean *boolean) {
     ((OBoolean *)object._obj)->_value = boolean->_value;
     
     return object;
+}
+
+static void _eval_prefixExpression(const char *operator, Object *right) {
+    // operator 'not'
+    if (strcmp(operator, BEV_NOT) == 0) 
+        _eval_notOperator(right);
+}
+
+static void _eval_notOperator(Object *right) {
+    switch (right->_type) {
+        case OBJ_BOOLEAN:
+            ((OBoolean *)right->_obj)->_value = !((OBoolean *)right->_obj)->_value;
+            break;
+        
+        case OBJ_INTEGER:
+            free(right->_obj);
+            right->_obj = (OBoolean *) malloc(sizeof(OBoolean));
+            right->_type = OBJ_BOOLEAN;
+            ((OBoolean *)right->_obj)->_value = false;
+            break;
+
+        default:
+            break;
+    }
 }
