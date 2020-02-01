@@ -5,12 +5,13 @@
 //----------------------------------------------------------------------------------
 // Firmas de funciones estaticas.
 //----------------------------------------------------------------------------------
-Object _eval_statement(Statement *statement);
+static Object _eval_statement(Statement *statement);
 
-Object _eval_expression(Expression *expression);
+static Object _eval_expression(Expression *expression);
 
-Object _eval_integer(IntegerLiteral *integer_literal);
+static Object _eval_integer(IntegerLiteral *integer_literal);
 
+static Object _eval_boolean(Boolean *boolean);
 
 //----------------------------------------------------------------------------------
 // Implementacion de funciones.
@@ -28,7 +29,7 @@ Object evaluation(Program *program) {
 //----------------------------------------------------------------------------------
 // Implementacion de funciones estaticas.
 //----------------------------------------------------------------------------------
-Object _eval_statement(Statement *statement) {
+static Object _eval_statement(Statement *statement) {
     Object result = new_object();    
     switch (statement->_type) {
         case TYPE_EXPR_STMT:
@@ -43,14 +44,18 @@ Object _eval_statement(Statement *statement) {
     return result;
 }
 
-Object _eval_expression(Expression *expression) {
+static Object _eval_expression(Expression *expression) {
     Object result = new_object();
     switch (expression->_type)
     {
         case EXPR_INTEGER:
-            return _eval_integer(((IntegerLiteral *)expression->_ptr));
+            return _eval_integer((IntegerLiteral *)expression->_ptr);
             break;
         
+        case EXPR_BOOLEAN:
+            return _eval_boolean((Boolean *)expression->_ptr);
+            break;
+
         default:
             //pass
             break;
@@ -59,13 +64,23 @@ Object _eval_expression(Expression *expression) {
     return result;
 }
 
-Object _eval_integer(IntegerLiteral *integer_literal) {
+static Object _eval_integer(IntegerLiteral *integer_literal) {
     Object object = new_object();
     object._type = OBJ_INTEGER;
     object._obj = (OInteger *) malloc(sizeof(OInteger));
     
     ((OInteger *)object._obj)->_value = integer_literal->_value;
     ((OInteger *)object._obj)->__string = NULL;
+    
+    return object;
+}
+
+static Object _eval_boolean(Boolean *boolean) {
+    Object object = new_object();
+    object._type = OBJ_BOOLEAN;
+    object._obj = (OBoolean *) malloc(sizeof(OBoolean));
+    
+    ((OBoolean *)object._obj)->_value = boolean->_value;
     
     return object;
 }
