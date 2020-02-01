@@ -10,6 +10,10 @@ void free_object(Object * object) {
         switch (object->_type) {
             case OBJ_INTEGER:
                 break;
+            
+            default:
+                //pass
+                break;
         }
     
         free(object->_obj);
@@ -25,7 +29,7 @@ const char *insinspect_ointegerpect(OInteger *integer) {
     char buffer[sizeof(integer->_value) * 8 + 1];
     sprintf(buffer, "%d", integer->_value);
 
-    return buffer;
+    return "buffer"; //OJO
 }
 
 

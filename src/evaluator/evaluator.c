@@ -32,7 +32,11 @@ Object _eval_statement(Statement *statement) {
     Object result = (Object){._obj=NULL, ._type=OBJ_UNDEFINED};    
     switch (statement->_type) {
         case TYPE_EXPR_STMT:
-            result = _eval_expression((Expression *)statement->_ptr);
+            result = _eval_expression(&((ExpressionStatement *)statement->_ptr)->_expression);
+            break;
+
+        default:
+            //pas
             break;
     }
 
@@ -46,6 +50,10 @@ Object _eval_expression(Expression *expression) {
         case EXPR_INTEGER:
             return _eval_integer(((IntegerLiteral *)expression->_ptr));
             break;
+        
+        default:
+            //pass
+            break;
     }
 
     return result;
@@ -57,6 +65,5 @@ Object _eval_integer(IntegerLiteral *integer_literal) {
     obj_integer._obj = (OInteger *)malloc(sizeof(OInteger));
     
     ((OInteger *)obj_integer._obj)->_value = integer_literal->_value;
-
     return obj_integer;
 }
