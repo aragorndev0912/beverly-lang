@@ -16,7 +16,9 @@ static Object _eval_boolean(Boolean *boolean);
 
 static void _eval_prefixExpression(const char *operator, Object *right);
 
-static void _eval_notOperator(Object *right);
+static void _eval_notOperatorPrefix(Object *right);
+
+static void _eval_minusOperatorPrefix(Object *right);
 
 //----------------------------------------------------------------------------------
 // Implementacion de funciones.
@@ -100,10 +102,24 @@ static Object _eval_boolean(Boolean *boolean) {
 static void _eval_prefixExpression(const char *operator, Object *right) {
     // operator 'not'
     if (strcmp(operator, BEV_NOT) == 0) 
-        _eval_notOperator(right);
+        _eval_notOperatorPrefix(right);
+    
+    else if (strcmp(operator, BEV_MINUS) == 0)
+        _eval_minusOperatorPrefix(right);
 }
 
-static void _eval_notOperator(Object *right) {
+static void _eval_minusOperatorPrefix(Object *right) {
+    if (right->_type != OBJ_INTEGER) {
+        free(right->_obj);
+        right->_type = OBJ_NULL;
+        right->_obj = NULL;
+        return;
+    }
+
+    ((OInteger *)right->_obj)->_value *= -1;
+}
+
+static void _eval_notOperatorPrefix(Object *right) {
     switch (right->_type) {
         case OBJ_BOOLEAN:
             ((OBoolean *)right->_obj)->_value = !((OBoolean *)right->_obj)->_value;
@@ -117,6 +133,9 @@ static void _eval_notOperator(Object *right) {
             break;
 
         default:
+            free(right->_obj);
+            right->_obj = NULL;
+            right->_type = OBJ_NULL;
             break;
     }
 }

@@ -56,8 +56,10 @@ typedef struct _TestInteger {
 
 static bool __test_evalIntegerExpression(void) {
     _TestInteger tests[] = {
-        {.input="5", .expected=5},
         {.input="10", .expected=10},
+        {.input="25", .expected=25},
+        {.input="-10", .expected=-10},
+        {.input="-25", .expected=-25},
     }; 
 
     size_t size = sizeof(tests) / sizeof(_TestInteger);

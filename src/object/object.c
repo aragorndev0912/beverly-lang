@@ -39,6 +39,9 @@ const char *inspect_object(Object *object) {
         case OBJ_BOOLEAN:
             return inspect_oboolean((OBoolean *)object->_obj);
 
+        case OBJ_NULL:
+            return inspect_onull((ONull *)object->_obj);
+
         default:
             return " ";
             break;
