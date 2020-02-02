@@ -56,10 +56,21 @@ typedef struct _TestInteger {
 
 static bool __test_evalIntegerExpression(void) {
     _TestInteger tests[] = {
-        {.input="10", .expected=10},
-        {.input="25", .expected=25},
-        {.input="-10", .expected=-10},
-        {.input="-25", .expected=-25},
+        (_TestInteger){.input="10", .expected=10},
+        (_TestInteger){.input="25", .expected=25},
+        (_TestInteger){.input="-10", .expected=-10},
+        (_TestInteger){.input="-25", .expected=-25},
+        (_TestInteger){.input="5 + 5 + 5 + 5 + 10", .expected=30},
+        (_TestInteger){.input="2 * 2 * 2 * 2 * 2", .expected=32},
+        (_TestInteger){.input="-50 + 100 + -50", .expected=0},
+        (_TestInteger){.input="5 * 2 + 10", .expected=20},
+        (_TestInteger){.input="5 + 2 * 10", .expected=25},
+        (_TestInteger){.input="20 + 2 * -10", .expected=0},
+        (_TestInteger){.input="50 / 2 * 2 + 10", .expected=60},
+        (_TestInteger){.input="2 * (5 + 10)", .expected=30},
+        (_TestInteger){.input="3 * 3 * 3 + 10", .expected=37},
+        (_TestInteger){.input="3 * (3 * 3) + 10", .expected=37},
+        (_TestInteger){.input="(5 + 10 * 2 + 15 / 3) * 2 + -10", .expected=50},
     }; 
 
     size_t size = sizeof(tests) / sizeof(_TestInteger);
