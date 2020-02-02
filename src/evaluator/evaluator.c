@@ -112,7 +112,7 @@ static void _eval_minusOperatorPrefix(Object *right) {
     if (right->_type != OBJ_INTEGER) {
         free(right->_obj);
         right->_type = OBJ_NULL;
-        right->_obj = NULL;
+        right->_obj = (ONull*) malloc(sizeof(ONull));
         return;
     }
 
@@ -134,7 +134,7 @@ static void _eval_notOperatorPrefix(Object *right) {
 
         default:
             free(right->_obj);
-            right->_obj = NULL;
+            right->_obj = (ONull *) malloc(sizeof(ONull));
             right->_type = OBJ_NULL;
             break;
     }
