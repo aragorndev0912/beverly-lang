@@ -30,6 +30,8 @@ static Object eval_integer_operator(Object *left, const char *operator, Object *
 
 static Object eval_boolean_operator(Object *left, const char *operator, Object *right);
 
+static Object _eval_ifElseExpression(IfExpression *_if);
+
 //----------------------------------------------------------------------------------
 // Implementacion de funciones.
 //----------------------------------------------------------------------------------
@@ -66,11 +68,9 @@ static Object _eval_expression(Expression *expression) {
     switch (expression->_type) {
         case EXPR_INTEGER:
             return _eval_integer((IntegerLiteral *)expression->_ptr);
-            break;
         
         case EXPR_BOOLEAN:
             return _eval_boolean((Boolean *)expression->_ptr);
-            break;
         
         case EXPR_PREFIX:
             ; // permite la declaracion de una statement despues de una etiqueta.
@@ -90,6 +90,9 @@ static Object _eval_expression(Expression *expression) {
             free_object(&i_right);
 
             return result;
+
+        case EXPR_IF:
+            return _eval_ifElseExpression((IfExpression *)expression->_ptr);
 
         default:
             //pass
@@ -178,7 +181,6 @@ static Object _eval_infixExpression(Object *left, const char *operator, Object *
     return result;
 }
 
-
 static bool is_aritmetic_operator(const char *operator) {
     bool result = (strcmp(operator, BEV_PLUS) == 0 || strcmp(operator, BEV_MINUS) == 0 ||
                 strcmp(operator, BEV_MULT) == 0 || strcmp(operator, BEV_DIV) == 0);
@@ -243,5 +245,29 @@ static Object eval_boolean_operator(Object *left, const char *operator, Object *
 
     ((OBoolean *)result._obj)->_value = value;
 
+    return result;
+}
+
+static Object _eval_ifElseExpression(IfExpression *_if) {
+    Object result = new_object();
+    result._obj = (ONull *) malloc(sizeof(ONull));
+    result._type = OBJ_NULL;
+
+    Object condition = _eval_expression(&_if->_condition);
+    if (condition._type != OBJ_BOOLEAN) {
+        free_object(&condition);
+        return result;
+    }
+
+    if (((OBoolean *)condition._obj)->_value && _if->_if_consequence._statements != NULL) {
+        free_object(&result);
+        return _eval_statement(_if->_if_consequence._statements);
+    }
+    else if (_if->_else_consequence._statements != NULL) {
+        free_object(&result);
+        return _eval_statement(_if->_else_consequence._statements);
+    } 
+    
+    free_object(&condition);
     return result;
 }
