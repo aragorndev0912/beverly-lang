@@ -150,6 +150,14 @@ static bool __test_booleanExpression(void) {
     _TestBoolean tests[] = {
         {.input="true", .expected=true},
         {.input="false", .expected=false},
+        {.input="1 < 2", .expected=true},
+        {.input="1 > 2", .expected=false},
+        {.input="1 < 1", .expected=false},
+        {.input="1 > 1", .expected=false},
+        {.input="1 == 1",.expected=true},
+        {.input="1 != 1",.expected=false},
+        {.input="1 == 2",.expected=false},
+        {.input="1 != 2",.expected=true},
     };
 
     size_t size = sizeof(tests) / sizeof(_TestBoolean);
