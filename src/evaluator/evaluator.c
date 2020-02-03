@@ -26,6 +26,10 @@ static bool is_aritmetic_operator(const char *operator);
 
 static bool is_boolean_operator(const char *operator);
 
+static Object eval_integer_operator(Object *left, const char *operator, Object *right);
+
+static Object eval_boolean_operator(Object *left, const char *operator, Object *right);
+
 //----------------------------------------------------------------------------------
 // Implementacion de funciones.
 //----------------------------------------------------------------------------------
@@ -160,47 +164,12 @@ static void _eval_notOperatorPrefix(Object *right) {
 static Object _eval_infixExpression(Object *left, const char *operator, Object *right) {
     Object result = new_object();
 
-    if (left->_type == OBJ_INTEGER && right->_type == OBJ_INTEGER && is_aritmetic_operator(operator)) {
-        result._obj = (OInteger *) malloc(sizeof(OInteger));
-        result._type = OBJ_INTEGER;
-        ((OInteger *)result._obj)->_value = 0;
-        ((OInteger *)result._obj)->__string = NULL;
+    if (left->_type == OBJ_INTEGER && right->_type == OBJ_INTEGER && is_aritmetic_operator(operator)) 
+        return eval_integer_operator(left, operator, right);
 
-        int total = 0;
-        if (strcmp(operator, BEV_PLUS) == 0)
-            total = ((OInteger *)left->_obj)->_value + ((OInteger *)right->_obj)->_value; 
-        
-        else if (strcmp(operator, BEV_MINUS) == 0)
-            total = ((OInteger *)left->_obj)->_value - ((OInteger *)right->_obj)->_value; 
-        
-        else if (strcmp(operator, BEV_MULT) == 0)
-            total = ((OInteger *)left->_obj)->_value * ((OInteger *)right->_obj)->_value; 
+    else if (is_boolean_operator(operator))
+        return eval_boolean_operator(left, operator, right);
 
-        else if (strcmp(operator, BEV_DIV) == 0)
-            total = ((OInteger *)left->_obj)->_value / ((OInteger *)right->_obj)->_value; 
-
-        ((OInteger *)result._obj)->_value = total;
-    }
-    else if (is_boolean_operator(operator)) {
-        result._obj = (OBoolean *) malloc(sizeof(OBoolean));
-        result._type = OBJ_BOOLEAN;
-        ((OBoolean *)result._obj)->_value = false;
-
-        bool value = false;
-        if (strcmp(operator, BEV_LT) == 0)
-            value = ((OBoolean *)left->_obj)->_value < ((OBoolean *)right->_obj)->_value;  
-
-        else if (strcmp(operator, BEV_GT) == 0)
-            value = ((OBoolean *)left->_obj)->_value > ((OBoolean *)right->_obj)->_value;  
-
-        else if (strcmp(operator, BEV_EQUAL) == 0)
-            value = ((OBoolean *)left->_obj)->_value == ((OBoolean *)right->_obj)->_value;  
-
-        else if (strcmp(operator, BEV_NOT_EQUAL) == 0)
-            value = ((OBoolean *)left->_obj)->_value != ((OBoolean *)right->_obj)->_value;  
-
-        ((OBoolean *)result._obj)->_value = value;
-    }
     else {
         result._obj = (ONull *) malloc(sizeof(ONull));
         result._type = OBJ_NULL;
@@ -220,4 +189,59 @@ static bool is_aritmetic_operator(const char *operator) {
 static bool is_boolean_operator(const char *operator) {
     return (strcmp(operator, BEV_EQUAL) == 0 || strcmp(operator, BEV_NOT_EQUAL) == 0 ||
             strcmp(operator, BEV_LT) == 0 ||strcmp(operator, BEV_GT) == 0);
+}
+
+static Object eval_integer_operator(Object *left, const char *operator, Object *right) {
+    Object result = new_object();
+    result._obj = (OInteger *) malloc(sizeof(OInteger));
+    result._type = OBJ_INTEGER;
+    ((OInteger *)result._obj)->_value = 0;
+    ((OInteger *)result._obj)->__string = NULL;
+
+    int total = 0;
+    if (strcmp(operator, BEV_PLUS) == 0)
+        total = ((OInteger *)left->_obj)->_value + ((OInteger *)right->_obj)->_value; 
+    
+    else if (strcmp(operator, BEV_MINUS) == 0)
+        total = ((OInteger *)left->_obj)->_value - ((OInteger *)right->_obj)->_value; 
+    
+    else if (strcmp(operator, BEV_MULT) == 0)
+        total = ((OInteger *)left->_obj)->_value * ((OInteger *)right->_obj)->_value; 
+
+    else if (strcmp(operator, BEV_DIV) == 0)
+        total = ((OInteger *)left->_obj)->_value / ((OInteger *)right->_obj)->_value; 
+
+    ((OInteger *)result._obj)->_value = total;
+
+    return result;
+}
+
+static Object eval_boolean_operator(Object *left, const char *operator, Object *right) {
+    Object result = new_object();
+    result._obj = (OBoolean *) malloc(sizeof(OBoolean));
+    result._type = OBJ_BOOLEAN;
+    ((OBoolean *)result._obj)->_value = false;
+
+    // La primera validacion se hace de acuerdo a los tipos
+    // de datos.
+    if (left->_type != right->_type)
+        return result;
+
+
+    bool value = false;
+    if (strcmp(operator, BEV_LT) == 0)
+        value = ((OBoolean *)left->_obj)->_value < ((OBoolean *)right->_obj)->_value;  
+
+    else if (strcmp(operator, BEV_GT) == 0)
+        value = ((OBoolean *)left->_obj)->_value > ((OBoolean *)right->_obj)->_value;  
+
+    else if (strcmp(operator, BEV_EQUAL) == 0)
+        value = ((OBoolean *)left->_obj)->_value == ((OBoolean *)right->_obj)->_value;  
+
+    else if (strcmp(operator, BEV_NOT_EQUAL) == 0)
+        value = ((OBoolean *)left->_obj)->_value != ((OBoolean *)right->_obj)->_value;  
+
+    ((OBoolean *)result._obj)->_value = value;
+
+    return result;
 }
