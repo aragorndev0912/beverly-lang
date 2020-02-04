@@ -246,7 +246,7 @@ static bool __test_ifElseObject(void) {
     _IfTest tests[] = {
         (_IfTest){.input="if (true) { 10 }", .type=OBJ_INTEGER, .value=10},
         (_IfTest){.input="if (false) { 10 }", .type=OBJ_NULL, .value=0},
-        (_IfTest){.input="if (1) { 10 }", .type=OBJ_INTEGER, .value=10},
+        (_IfTest){.input="if (true) { 10 }", .type=OBJ_INTEGER, .value=10},
         (_IfTest){.input="if (1 < 2) { 10 }", .type=OBJ_INTEGER, .value=10},
         (_IfTest){.input="if (1 > 2) { 10 }", .type=OBJ_NULL, .value=0},
         (_IfTest){.input="if (1 > 2) { 10 } else { 20 }", .type=OBJ_INTEGER, .value=20},
@@ -260,7 +260,7 @@ static bool __test_ifElseObject(void) {
             printf("Object value is NULL\n");
             return false;
         }
-        printf("k:%ld\n", k);
+        
         if (evaluate._type != tests[k].type) {
             printf("Data type is not equal.\n");
             free_object(&evaluate);
