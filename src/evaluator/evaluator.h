@@ -6,4 +6,6 @@
 
 Object evaluation(Program *program);
 
+void new_oerror(OError *oerror, const char *msg);
+
 #endif //_EVALUATOR_H

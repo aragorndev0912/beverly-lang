@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include "../lib/lib.h"
 
 //----------------------------------------------------------------------------------
 // Firmas de funciones estaticas.
@@ -34,6 +35,9 @@ static Object _eval_ifElseExpression(IfExpression *_if);
 
 static Object _eval_returnStatement(ReturnStatement *return_statement);
 
+static const char *_get_object_type(const Object *object);
+
+
 //----------------------------------------------------------------------------------
 // Implementacion de funciones.
 //----------------------------------------------------------------------------------
@@ -45,9 +49,19 @@ Object evaluation(Program *program) {
 
         if (result._type == OBJ_RETURN) 
             return ((OReturn *)result._obj)->_value;
+        
+        else if (result._type == OBJ_ERROR)
+            return result;
     }
 
     return result;
+}
+
+
+void new_oerror(OError *oerror, const char *msg) {
+    oerror->_value = (char *) malloc(sizeof(char) * strlen(msg) + 1);
+    // memcpy(oerror->_value, msg, strlen(msg));
+    strcpy(oerror->_value, msg);
 }
 
 
@@ -148,13 +162,36 @@ static void _eval_prefixExpression(const char *operator, Object *right) {
     
     else if (strcmp(operator, BEV_MINUS) == 0)
         _eval_minusOperatorPrefix(right);
+    
+    else {
+        const char *_type = _get_object_type(right);
+        free_object(right);
+        right->_type = OBJ_ERROR;
+        right->_obj = (OError *) malloc(sizeof(OError));
+
+        char *msg = (char *) malloc(sizeof(char) * 50);
+        sprintf(msg, "unknown operator: %s %s", operator, _type);
+
+        new_oerror((OError *)right->_obj, msg);
+        free(msg);
+        msg = NULL;
+    }
 }
 
 static void _eval_minusOperatorPrefix(Object *right) {
     if (right->_type != OBJ_INTEGER) {
+        const char * _type = _get_object_type(right);
         free(right->_obj);
-        right->_type = OBJ_NULL;
-        right->_obj = (ONull*) malloc(sizeof(ONull));
+
+        right->_type = OBJ_ERROR;
+        right->_obj = (OError *) malloc(sizeof(OError));
+        char *msg = (char *) malloc(sizeof(char) * 100);
+        sprintf(msg, "unknown operator: -%s", _type);
+        new_oerror((OError *)right->_obj, msg);
+        
+        free(msg);
+        msg = NULL;
+
         return;
     }
 
@@ -191,9 +228,27 @@ static Object _eval_infixExpression(Object *left, const char *operator, Object *
     else if (is_boolean_operator(operator))
         return eval_boolean_operator(left, operator, right);
 
+    else if (left->_type != right->_type) {
+        result._type = OBJ_ERROR;
+        result._obj = (OError *) malloc(sizeof(OError));
+
+        char *msg = (char *)malloc(sizeof(char) * 100);
+        sprintf(msg, "type mismatch: %s %s %s", _get_object_type(left), operator, _get_object_type(right));
+        new_oerror((OError *)result._obj, msg);
+        free(msg);
+        msg = NULL;
+    }
     else {
-        result._obj = (ONull *) malloc(sizeof(ONull));
-        result._type = OBJ_NULL;
+        // result._obj = (ONull *) malloc(sizeof(ONull));
+        // result._type = OBJ_NULL;
+        result._type = OBJ_ERROR;
+        result._obj = (OError *) malloc(sizeof(OError));
+
+        char *msg = (char *)malloc(sizeof(char) * 100);
+        sprintf(msg, "unknown operator: %s %s %s", _get_object_type(left), operator, _get_object_type(right));
+        new_oerror((OError *)result._obj, msg);
+        free(msg);
+        msg = NULL;
     }
 
     return result;
@@ -288,4 +343,27 @@ static Object _eval_ifElseExpression(IfExpression *_if) {
     
     free_object(&condition);
     return result;
+}
+
+static const char *_get_object_type(const Object *object) {
+    switch (object->_type)
+    {
+    case OBJ_INTEGER:
+        return "INTEGER";
+
+    case OBJ_BOOLEAN:
+        return "BOOLEAN";
+
+    case OBJ_NULL:
+        return "NULL";
+    
+    case OBJ_RETURN:
+        return "RETURN";
+
+    case OBJ_ERROR:
+        return "ERROR";
+
+    default:
+        return "UNDEFINED";
+    }
 }

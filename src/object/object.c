@@ -22,6 +22,9 @@ void free_object(Object * object) {
             
             case OBJ_RETURN:
                 free_oreturn((OReturn *)object->_obj);
+            
+            case OBJ_ERROR:
+                free_oerror((OError *)object->_obj);
 
             default:
                 //pass
@@ -44,6 +47,9 @@ const char *inspect_object(Object *object) {
 
         case OBJ_NULL:
             return inspect_onull((ONull *)object->_obj);
+        
+        case OBJ_ERROR:
+            return inspect_oerror((OError *)object->_obj);
 
         default:
             return " ";
@@ -93,4 +99,18 @@ const char *inspect_oreturn(OReturn *oreturn) {
 
 void free_oreturn(OReturn *oreturn) {
     // falta implementar.   
+}
+
+//----------------------------------------------------------------------------------
+// struct OError.
+//----------------------------------------------------------------------------------
+const char *inspect_oerror(OError *oerror) {
+    return oerror->_value;
+}
+
+void free_oerror(OError *oerror) {
+    if (oerror->_value != NULL) {
+        free(oerror->_value);
+        oerror->_value = NULL;
+    }
 }

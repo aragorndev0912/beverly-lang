@@ -32,6 +32,8 @@ static bool __test_ifElseObject(void);
 
 static bool __test_returnStatement(void);
 
+static bool __test_errorHandling(void);
+
 //----------------------------------------------------------------------------------
 // Funcion principal.
 //----------------------------------------------------------------------------------
@@ -52,6 +54,9 @@ int main(void) {
     assert(__test_returnStatement());
     printf("__test_returnStatement (COMPLETED).\n");
     
+    assert(__test_errorHandling());
+    printf("__test_errorHandling (COMPLETED).\n");
+
     return 0;
 }
 
@@ -312,6 +317,73 @@ static bool __test_returnStatement(void) {
         free_object(&evaluate);
     }
     return true;
+}
+
+typedef struct _TestError {
+    const char *input;
+    const char *expected;
+
+} _TestError; 
+
+static bool __test_errorHandling(void) {
+    _TestError tests[] = {
+        (_TestError){
+            "5 + true;",
+            "type mismatch: INTEGER + BOOLEAN",
+        },
+        (_TestError){
+            "5 + true; 5;",
+            "type mismatch: INTEGER + BOOLEAN",
+        },
+        (_TestError){
+            "-true",
+            "unknown operator: -BOOLEAN",
+        },
+        (_TestError){
+            "true + false;",
+            "unknown operator: BOOLEAN + BOOLEAN",
+        },
+        (_TestError){
+            "5; true + false; 5",
+            "unknown operator: BOOLEAN + BOOLEAN",
+        },
+        (_TestError){
+            "if (10 > 1) { true + false; }",
+            "unknown operator: BOOLEAN + BOOLEAN",
+        },
+        (_TestError){
+            "if (10 > 1) { \n\
+                if (10 > 1) { \n\
+                    return true + false;\n\
+                }\n\
+                return 1;\n\
+            }",
+            "unknown operator: BOOLEAN + BOOLEAN"
+        },
+    };
+
+    size_t size = sizeof(tests) / sizeof(_TestError);
+    for (size_t k=0; k < size; k++) {
+        Object evaluate = __eval_frontEnd(tests[k].input);
+        if (evaluate._obj == NULL) {
+            printf("Object value is NULL\n");
+            return false;
+        }
+
+        if (evaluate._type != OBJ_ERROR) {
+            printf("Object value is not OERROR\n");
+            return false;
+        }
+
+        OError *_oerror = (OError *)evaluate._obj;
+
+        if (strcmp(_oerror->_value, tests[k].expected) != 0) {
+            printf("Value is not '%s'. got='%s'.\n", tests[k].expected, _oerror->_value);
+            return false;
+        }        
+
+        free_object(&evaluate);
+    }
 
     return true;
 }
