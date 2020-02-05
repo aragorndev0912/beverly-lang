@@ -30,6 +30,8 @@ static bool __test_bangPrefixObject(void);
 
 static bool __test_ifElseObject(void);
 
+static bool __test_returnStatement(void);
+
 //----------------------------------------------------------------------------------
 // Funcion principal.
 //----------------------------------------------------------------------------------
@@ -47,6 +49,9 @@ int main(void) {
     assert(__test_ifElseObject());
     printf("__test_ifElseObject (COMPLETED).\n");
 
+    assert(__test_returnStatement());
+    printf("__test_returnStatement (COMPLETED).\n");
+    
     return 0;
 }
 
@@ -277,3 +282,34 @@ static bool __test_ifElseObject(void) {
     }
     return true;
 }
+
+static bool __test_returnStatement(void) {
+    _TestInteger tests[] = {
+        (_TestInteger){.input="return 10;", .expected=10},
+        (_TestInteger){.input="return 10; 9;", .expected=10},
+        (_TestInteger){.input="return 3 * 5; 9;", .expected=15},
+        (_TestInteger){.input="9; return 2 * 5; 9;", .expected=10},
+    };
+
+    size_t size = sizeof(tests) / sizeof(_TestInteger);
+    for (size_t k=0; k < size; k++) {
+        Object evaluate = __eval_frontEnd(tests[k].input);
+        if (evaluate._obj == NULL) {
+            printf("Object value is NULL\n");
+            return false;
+        }
+
+        OInteger *integer = (OInteger *)evaluate._obj;
+
+        if (integer->_value != tests[k].expected) {
+            printf("Value is not '%d'. got='%d'.\n", tests[k].expected, integer->_value);
+            return false;
+        }        
+
+        free_object(&evaluate);
+    }
+    return true;
+
+    return true;
+}
+

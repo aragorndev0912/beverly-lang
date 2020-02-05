@@ -20,6 +20,9 @@ void free_object(Object * object) {
                 free_ointger((OInteger *)object->_obj);
                 break;
             
+            case OBJ_RETURN:
+                free_oreturn((OReturn *)object->_obj);
+
             default:
                 //pass
                 break;
@@ -78,4 +81,16 @@ const char *inspect_oboolean(OBoolean *boolean) {
 //----------------------------------------------------------------------------------
 const char *inspect_onull(ONull *null) {
     return "null";
+}
+
+
+//----------------------------------------------------------------------------------
+// struct OReturn.
+//----------------------------------------------------------------------------------
+const char *inspect_oreturn(OReturn *oreturn) {
+    return inspect_object(&oreturn->_value);
+}
+
+void free_oreturn(OReturn *oreturn) {
+    // falta implementar.   
 }

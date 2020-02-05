@@ -32,14 +32,20 @@ static Object eval_boolean_operator(Object *left, const char *operator, Object *
 
 static Object _eval_ifElseExpression(IfExpression *_if);
 
+static Object _eval_returnStatement(ReturnStatement *return_statement);
+
 //----------------------------------------------------------------------------------
 // Implementacion de funciones.
 //----------------------------------------------------------------------------------
 Object evaluation(Program *program) {
     Object result = new_object();
 
-    for (size_t k=0; k < program->_len; k++)
+    for (size_t k=0; k < program->_len; k++) {
         result = _eval_statement(&program->_statements[k]);
+
+        if (result._type == OBJ_RETURN) 
+            return ((OReturn *)result._obj)->_value;
+    }
 
     return result;
 }
@@ -55,6 +61,10 @@ static Object _eval_statement(Statement *statement) {
             result = _eval_expression(&((ExpressionStatement *)statement->_ptr)->_expression);
             break;
 
+        case TYPE_RETURN:
+            result = _eval_returnStatement((ReturnStatement *)statement->_ptr);
+            break;
+
         default:
             //pas
             break;
@@ -62,6 +72,16 @@ static Object _eval_statement(Statement *statement) {
 
     return result;
 }
+
+static Object _eval_returnStatement(ReturnStatement *return_statement) {
+    Object result = new_object();
+    result._type = OBJ_RETURN;
+    result._obj = (OReturn *) malloc(sizeof(OReturn));
+    ((OReturn *)result._obj)->_value = _eval_expression(&return_statement->_value);
+
+    return result;
+}
+
 
 static Object _eval_expression(Expression *expression) {
     Object result = new_object();

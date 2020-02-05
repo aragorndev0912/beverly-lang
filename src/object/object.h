@@ -11,6 +11,7 @@ typedef enum TypeObject {
     OBJ_NULL,
     OBJ_INTEGER,
     OBJ_BOOLEAN,
+    OBJ_RETURN,
 
 } TypeObject;
 
@@ -63,5 +64,18 @@ typedef struct ONull {
 } ONull;
 
 const char *inspect_onull(ONull *null);
+
+
+//----------------------------------------------------------------------------------
+// struct OReturn.
+//----------------------------------------------------------------------------------
+typedef struct OReturn {
+    Object _value;
+
+} OReturn;
+
+const char *inspect_oreturn(OReturn *oreturn);
+
+void free_oreturn(OReturn *oreturn);
 
 #endif //_OBJECT_H
