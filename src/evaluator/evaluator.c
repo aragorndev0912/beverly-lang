@@ -58,12 +58,10 @@ static Object _eval_statement(Statement *statement) {
     Object result = new_object();    
     switch (statement->_type) {
         case TYPE_EXPR_STMT:
-            result = _eval_expression(&((ExpressionStatement *)statement->_ptr)->_expression);
-            break;
+            return _eval_expression(&((ExpressionStatement *)statement->_ptr)->_expression);
 
         case TYPE_RETURN:
-            result = _eval_returnStatement((ReturnStatement *)statement->_ptr);
-            break;
+            return _eval_returnStatement((ReturnStatement *)statement->_ptr);
 
         default:
             //pas
