@@ -21,6 +21,7 @@ typedef struct Object {
     TypeObject _type;
 
     char *__string;
+    bool __in_table;
 
 } Object;
 

@@ -8,11 +8,12 @@
 #include "../lib/bool.h"
 #include "../object/object.h"
 #include "../evaluator/evaluator.h"
+#include "../env/env.h"
 
 //----------------------------------------------------------------------------------
 // Firmas de funciones estaticas.
 //----------------------------------------------------------------------------------
-static void delete_data(Program *program, Lexer *lexer, Parser *parser);
+static void delete_data(Program *program, Lexer *lexer, Parser *parser, Enviroment *enviroment);
 
 static bool __test_evalIntegerExpression(void);
 
@@ -41,23 +42,26 @@ static bool __test_letStatement(void);
 //----------------------------------------------------------------------------------
 
 int main(void) {
-    assert(__test_evalIntegerExpression());
-    printf("__test_evalIntegerExpression (COMPLETED).\n");
+    // assert(__test_evalIntegerExpression());
+    // printf("__test_evalIntegerExpression (COMPLETED).\n");
 
-    assert(__test_booleanExpression());
-    printf("__test_booleanExpression (COMPLETED).\n");
+    // assert(__test_booleanExpression());
+    // printf("__test_booleanExpression (COMPLETED).\n");
 
-    assert(__test_bangPrefixObject());
-    printf("__test_bangPrefixObject (COMPLETED).\n");
+    // assert(__test_bangPrefixObject());
+    // printf("__test_bangPrefixObject (COMPLETED).\n");
 
-    assert(__test_ifElseObject());
-    printf("__test_ifElseObject (COMPLETED).\n");
+    // assert(__test_ifElseObject());
+    // printf("__test_ifElseObject (COMPLETED).\n");
 
-    assert(__test_returnStatement());
-    printf("__test_returnStatement (COMPLETED).\n");
+    // assert(__test_returnStatement());
+    // printf("__test_returnStatement (COMPLETED).\n");
     
-    assert(__test_errorHandling());
-    printf("__test_errorHandling (COMPLETED).\n");
+    // assert(__test_errorHandling());
+    // printf("__test_errorHandling (COMPLETED).\n");
+
+    assert(__test_letStatement());
+    printf("__test_letStatement (COMPLETED).\n");
 
     return 0;
 }
@@ -114,14 +118,15 @@ static Object __eval_frontEnd(const char *input) {
     Lexer lexer = new_lexer(input);
     Parser parser = new_parser(&lexer);
     Program program = program_parser(&parser);
+    Enviroment enviroment = new_enviroment();
     if (checkParserErrors(&parser)) {
-        delete_data(&program, &lexer, &parser);
+        delete_data(&program, &lexer, &parser, &enviroment);
         return result;
     }
 
-    result = evaluation(&program);
+    result = evaluation(&program, &enviroment);
 
-    delete_data(&program, &lexer, &parser);
+    delete_data(&program, &lexer, &parser, &enviroment);
     return result;
 }
 
@@ -140,10 +145,11 @@ bool __test_evalIntegerObject(Object *obj, int expected) {
     return true;
 }
 
-static void delete_data(Program *program, Lexer *lexer, Parser *parser) {
+static void delete_data(Program *program, Lexer *lexer, Parser *parser, Enviroment *enviroment) {
     free_program(program);
     free_lexer(lexer);
     free_parser(parser);
+    // free_enviroment(enviroment);
 }
 
 static bool checkParserErrors(const Parser *const parser) {
@@ -362,6 +368,10 @@ static bool __test_errorHandling(void) {
             }",
             "unknown operator: BOOLEAN + BOOLEAN"
         },
+        (_TestError){
+            "foobar",
+            "identifier not found: foobar",
+        },
     };
 
     size_t size = sizeof(tests) / sizeof(_TestError);
@@ -398,7 +408,28 @@ static bool __test_letStatement(void) {
         (_TestInteger){"let a = 5; let b = a; let c = a + b + 5; c;", 15},
     };
 
+    size_t size = sizeof(tests) / sizeof(_TestError);
+    for (size_t k=0; k < size; k++) {
+        Object evaluate = __eval_frontEnd(tests[k].input);
+        if (evaluate._obj == NULL) {
+            printf("Object value is NULL\n");
+            return false;
+        }
 
+        printf("---->\n");
+        // if (evaluate._type != OBJ_ERROR) {
+        //     printf("Object value is not OERROR\n");
+        //     return false;
+        // }
+        // OError *_oerror = (OError *)evaluate._obj;
+        // if (strcmp(_oerror->_value, tests[k].expected) != 0) {
+        //     printf("Value is not '%s'. got='%s'.\n", tests[k].expected, _oerror->_value);
+        //     return false;
+        // }        
+
+        // if (!evaluate.__in_table)
+        free_object(&evaluate);
+    }
 
 
     return true;

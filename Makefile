@@ -85,8 +85,8 @@ obj/ast_test.o: src/ast/ast_test.c
 #------------------------------------------------------------------------
 # Test EVALUATOR.
 #------------------------------------------------------------------------
-evaluator_test: obj obj/evaluator_test.o obj/evaluator.o obj/object.o obj/parser.o obj/lexer.o obj/ast.o obj/lib.o obj/token.o
-	$(C) -o $(EVALUATOR_TEST) obj/evaluator_test.o obj/evaluator.o obj/object.o obj/parser.o obj/lexer.o obj/ast.o obj/lib.o obj/token.o $(CCFLAGS)
+evaluator_test: obj obj/evaluator_test.o obj/evaluator.o obj/object.o obj/parser.o obj/lexer.o obj/ast.o obj/lib.o obj/token.o obj/env.o
+	$(C) -o $(EVALUATOR_TEST) obj/evaluator_test.o obj/evaluator.o obj/object.o obj/parser.o obj/lexer.o obj/ast.o obj/lib.o obj/token.o obj/env.o $(CCFLAGS)
 
 obj/evaluator_test.o: src/evaluator/evaluator.c
 	$(C) -c src/evaluator/evaluator_test.c -o obj/evaluator_test.o $(CCFLAGS)

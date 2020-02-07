@@ -10,6 +10,7 @@ Object new_object(void) {
         ._obj=NULL,
         ._type=OBJ_UNDEFINED,
         .__string=NULL,
+        .__in_table=false,
     };
 }
 
@@ -17,6 +18,7 @@ void free_object(Object * object) {
     if (object->_obj != NULL) {
         switch (object->_type) {
             case OBJ_INTEGER:
+                printf("value: %d\n", ((OInteger *)object->_obj)->_value);
                 free_ointger((OInteger *)object->_obj);
                 break;
             
