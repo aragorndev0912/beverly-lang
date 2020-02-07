@@ -7,9 +7,9 @@
 //----------------------------------------------------------------------------------
 // Firmas de funciones estaticas.
 //----------------------------------------------------------------------------------
-static Object _eval_statement(Statement *statement);
+static Object _eval_statement(Statement *statement, Enviroment *enviroment);
 
-static Object _eval_expression(Expression *expression);
+static Object _eval_expression(Expression *expression, Enviroment *enviroment);
 
 static Object _eval_integer(IntegerLiteral *integer_literal);
 
@@ -31,21 +31,24 @@ static Object eval_integer_operator(Object *left, const char *operator, Object *
 
 static Object eval_boolean_operator(Object *left, const char *operator, Object *right);
 
-static Object _eval_ifElseExpression(IfExpression *_if);
+static Object _eval_ifElseExpression(IfExpression *_if, Enviroment *enviroment);
 
-static Object _eval_returnStatement(ReturnStatement *return_statement);
+static Object _eval_returnStatement(ReturnStatement *return_statement, Enviroment *enviroment);
 
 static const char *_get_object_type(const Object *object);
 
+static Object _eval_letStatement(LetStatement *let_statement, Enviroment *enviroment);
+
+static Object _eval_identifier(Identifier *identifier, Enviroment *enviroment);
 
 //----------------------------------------------------------------------------------
 // Implementacion de funciones.
 //----------------------------------------------------------------------------------
-Object evaluation(Program *program) {
+Object evaluation(Program *program, Enviroment *enviroment) {
     Object result = new_object();
 
     for (size_t k=0; k < program->_len; k++) {
-        result = _eval_statement(&program->_statements[k]);
+        result = _eval_statement(&program->_statements[k], enviroment);
 
         if (result._type == OBJ_RETURN) 
             return ((OReturn *)result._obj)->_value;
@@ -57,7 +60,6 @@ Object evaluation(Program *program) {
     return result;
 }
 
-
 void new_oerror(OError *oerror, const char *msg) {
     oerror->_value = (char *) malloc(sizeof(char) * strlen(msg) + 1);
     // memcpy(oerror->_value, msg, strlen(msg));
@@ -68,14 +70,18 @@ void new_oerror(OError *oerror, const char *msg) {
 //----------------------------------------------------------------------------------
 // Implementacion de funciones estaticas.
 //----------------------------------------------------------------------------------
-static Object _eval_statement(Statement *statement) {
+static Object _eval_statement(Statement *statement, Enviroment *enviroment) {
     Object result = new_object();    
     switch (statement->_type) {
         case TYPE_EXPR_STMT:
-            return _eval_expression(&((ExpressionStatement *)statement->_ptr)->_expression);
+            return _eval_expression(&((ExpressionStatement *)statement->_ptr)->_expression, enviroment);
 
         case TYPE_RETURN:
-            return _eval_returnStatement((ReturnStatement *)statement->_ptr);
+            return _eval_returnStatement((ReturnStatement *)statement->_ptr, enviroment);
+
+
+        case TYPE_LET:
+            return _eval_letStatement((LetStatement *)statement->_ptr, enviroment);
 
         default:
             //pas
@@ -85,19 +91,21 @@ static Object _eval_statement(Statement *statement) {
     return result;
 }
 
-static Object _eval_returnStatement(ReturnStatement *return_statement) {
+static Object _eval_returnStatement(ReturnStatement *return_statement, Enviroment *enviroment) {
     Object result = new_object();
     result._type = OBJ_RETURN;
     result._obj = (OReturn *) malloc(sizeof(OReturn));
-    ((OReturn *)result._obj)->_value = _eval_expression(&return_statement->_value);
+    ((OReturn *)result._obj)->_value = _eval_expression(&return_statement->_value, enviroment);
 
     return result;
 }
 
-
-static Object _eval_expression(Expression *expression) {
+static Object _eval_expression(Expression *expression, Enviroment *enviroment) {
     Object result = new_object();
     switch (expression->_type) {
+        case EXPR_IDENTIFIER:
+            return _eval_identifier((Identifier *)expression->_ptr, enviroment);
+
         case EXPR_INTEGER:
             return _eval_integer((IntegerLiteral *)expression->_ptr);
         
@@ -107,15 +115,15 @@ static Object _eval_expression(Expression *expression) {
         case EXPR_PREFIX:
             ; // permite la declaracion de una statement despues de una etiqueta.
             PrefixExpression *prefix = (PrefixExpression *)expression->_ptr;
-            Object p_right = _eval_expression(&prefix->_right);
+            Object p_right = _eval_expression(&prefix->_right, enviroment);
             _eval_prefixExpression(prefix->_operator, &p_right);
             return p_right;
 
         case EXPR_INFIX:
             ;
             InfixExpression *infix = (InfixExpression *)expression->_ptr;
-            Object left = _eval_expression(&infix->_left);
-            Object i_right = _eval_expression(&infix->_right);
+            Object left = _eval_expression(&infix->_left, enviroment);
+            Object i_right = _eval_expression(&infix->_right, enviroment);
             const char *operator = infix->_operator;
             result = _eval_infixExpression(&left, operator, &i_right);
             free_object(&left);
@@ -124,7 +132,7 @@ static Object _eval_expression(Expression *expression) {
             return result;
 
         case EXPR_IF:
-            return _eval_ifElseExpression((IfExpression *)expression->_ptr);
+            return _eval_ifElseExpression((IfExpression *)expression->_ptr, enviroment);
 
         default:
             //pass
@@ -321,12 +329,12 @@ static Object eval_boolean_operator(Object *left, const char *operator, Object *
     return result;
 }
 
-static Object _eval_ifElseExpression(IfExpression *_if) {
+static Object _eval_ifElseExpression(IfExpression *_if, Enviroment *enviroment) {
     Object result = new_object();
     result._obj = (ONull *) malloc(sizeof(ONull));
     result._type = OBJ_NULL;
 
-    Object condition = _eval_expression(&_if->_condition);
+    Object condition = _eval_expression(&_if->_condition, enviroment);
     if (condition._type != OBJ_BOOLEAN) {
         free_object(&condition);
         return result;
@@ -334,11 +342,11 @@ static Object _eval_ifElseExpression(IfExpression *_if) {
 
     if (((OBoolean *)condition._obj)->_value && _if->_if_consequence._statements != NULL) {
         free_object(&result);
-        return _eval_statement(_if->_if_consequence._statements);
+        return _eval_statement(_if->_if_consequence._statements, enviroment);
     }
     else if (_if->_else_consequence._statements != NULL) {
         free_object(&result);
-        return _eval_statement(_if->_else_consequence._statements);
+        return _eval_statement(_if->_else_consequence._statements, enviroment);
     } 
     
     free_object(&condition);
@@ -366,4 +374,26 @@ static const char *_get_object_type(const Object *object) {
     default:
         return "UNDEFINED";
     }
+}
+
+static Object _eval_letStatement(LetStatement *let_statement, Enviroment *enviroment) {
+    Object result = _eval_expression(&let_statement->_value, enviroment);
+    if (result._type == OBJ_NULL)
+        return result;
+    
+    set_object_enviroment(enviroment, let_statement->_name._value, &result);
+    return result;
+}
+
+static Object _eval_identifier(Identifier *identifier, Enviroment *enviroment) {
+    const Object *result = get_object_enviroment(enviroment, identifier->_value);
+    if (result == NULL) {
+        Object _result = new_object();
+        _result._type = OBJ_NULL;
+        _result._obj = (ONull *) malloc(sizeof(ONull));
+
+        return _result;
+    }
+
+    return *result;
 }

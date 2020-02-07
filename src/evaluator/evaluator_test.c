@@ -34,6 +34,8 @@ static bool __test_returnStatement(void);
 
 static bool __test_errorHandling(void);
 
+static bool __test_letStatement(void);
+
 //----------------------------------------------------------------------------------
 // Funcion principal.
 //----------------------------------------------------------------------------------
@@ -388,3 +390,16 @@ static bool __test_errorHandling(void) {
     return true;
 }
 
+static bool __test_letStatement(void) {
+    _TestInteger tests[] = {
+        (_TestInteger){"let a = 5; a;", 5},
+        (_TestInteger){"let a = 5 * 5; a;", 25},
+        (_TestInteger){"let a = 5; let b = a; b;", 5},
+        (_TestInteger){"let a = 5; let b = a; let c = a + b + 5; c;", 15},
+    };
+
+
+
+
+    return true;
+}

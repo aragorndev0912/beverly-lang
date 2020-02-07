@@ -13,8 +13,8 @@ else
 	CCFLAGS += -O2
 endif
 
-main: dist obj obj/main.o obj/repl.o obj/token.o obj/lexer.o obj/lib.o obj/parser.o obj/ast.o obj/evaluator.o obj/object.o
-	$(C) -o dist/$(NAME) obj/main.o obj/repl.o obj/token.o obj/lexer.o obj/lib.o obj/parser.o obj/ast.o obj/evaluator.o obj/object.o $(CCFLAGS)
+main: dist obj obj/main.o obj/repl.o obj/token.o obj/lexer.o obj/lib.o obj/parser.o obj/ast.o obj/evaluator.o obj/object.o obj/env.o
+	$(C) -o dist/$(NAME) obj/main.o obj/repl.o obj/token.o obj/lexer.o obj/lib.o obj/parser.o obj/ast.o obj/evaluator.o obj/object.o obj/env.o $(CCFLAGS)
 
 obj/main.o: main.c src/repl/repl.h
 	$(C) -c main.c -o obj/main.o $(CCFLAGS)
@@ -37,11 +37,14 @@ obj/parser.o: src/parser/parser.c src/parser/parser.h src/lexer/lexer.h src/toke
 obj/lib.o: src/lib/lib.c src/lib/lib.h
 	$(C) -c src/lib/lib.c -o obj/lib.o $(CCFLAGS)
 
-obj/evaluator.o: src/evaluator/evaluator.c src/evaluator/evaluator.h src/object/object.h src/ast/ast.h src/token/token.h
+obj/evaluator.o: src/evaluator/evaluator.c src/evaluator/evaluator.h src/object/object.h src/ast/ast.h src/token/token.h src/env/env.h
 	$(C) -c src/evaluator/evaluator.c -o obj/evaluator.o $(CCFLAGS)
 
 obj/object.o: src/object/object.c src/object/object.h src/lib/bool.h
 	$(C) -c src/object/object.c -o obj/object.o $(CCFLAGS)
+
+obj/env.o: src/env/env.c src/env/env.h src/object/object.h
+	$(C) -c src/env/env.c -o obj/env.o $(CCFLAGS)
 
 #------------------------------------------------------------------------
 # Create folder dist and obj.

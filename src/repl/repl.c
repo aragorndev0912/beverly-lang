@@ -2,6 +2,7 @@
 #include "../lib/bool.h"
 #include "../parser/parser.h"
 #include "../evaluator/evaluator.h"
+#include "../env/env.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -24,7 +25,7 @@ static char *get_line(const char *prompt);
 
 static void print_errors(const ParserError *errors);
 
-static void delete_data(Program *program, Lexer *lexer, Parser *parser, Object *object);
+static void delete_data(Program *program, Lexer *lexer, Parser *parser, Object *object, Enviroment *enviroment);
 
 Repl new_repl(const char *prompt) {
     Repl repl = {0};
@@ -40,18 +41,20 @@ void start_repl(Repl *repl) {
     Parser parser = (Parser){0};
     Program program = (Program){0};
     Object object = (Object){0};
+    Enviroment enviroment = (Enviroment){0};
 
     while (true) {
         line = get_line(repl->_prompt);
         lexer = new_lexer(line);
         parser = new_parser(&lexer);
         program = program_parser(&parser);
+        enviroment = new_enviroment();
         if (parser.error._errors != NULL) {
             print_errors(&parser.error);
-            delete_data(&program, &lexer, &parser, &object);
+            delete_data(&program, &lexer, &parser, &object, &enviroment);
             continue;
         }
-        object = evaluation(&program);
+        object = evaluation(&program, &enviroment);
         if (object._obj != NULL) {
             printf("%s\n", inspect_object(&object));
         }
@@ -60,7 +63,7 @@ void start_repl(Repl *repl) {
 
         free(line);
         line = NULL;
-        delete_data(&program, &lexer, &parser, &object);
+        delete_data(&program, &lexer, &parser, &object, &enviroment);
     }
     
 }
@@ -71,11 +74,12 @@ static void print_errors(const ParserError *errors) {
         printf("\t%s\n", errors->_errors[k]);
 }
 
-static void delete_data(Program *program, Lexer *lexer, Parser *parser, Object *object) {
+static void delete_data(Program *program, Lexer *lexer, Parser *parser, Object *object, Enviroment *enviroment) {
     free_program(program);
     free_lexer(lexer);
     free_parser(parser);
     free_object(object);
+    free_enviroment(enviroment);
 }
 
 void free_repl(Repl *repl) {
