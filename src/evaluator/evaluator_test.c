@@ -42,23 +42,23 @@ static bool __test_letStatement(void);
 //----------------------------------------------------------------------------------
 
 int main(void) {
-    // assert(__test_evalIntegerExpression());
-    // printf("__test_evalIntegerExpression (COMPLETED).\n");
+    assert(__test_evalIntegerExpression());
+    printf("__test_evalIntegerExpression (COMPLETED).\n");
 
-    // assert(__test_booleanExpression());
-    // printf("__test_booleanExpression (COMPLETED).\n");
+    assert(__test_booleanExpression());
+    printf("__test_booleanExpression (COMPLETED).\n");
 
-    // assert(__test_bangPrefixObject());
-    // printf("__test_bangPrefixObject (COMPLETED).\n");
+    assert(__test_bangPrefixObject());
+    printf("__test_bangPrefixObject (COMPLETED).\n");
 
-    // assert(__test_ifElseObject());
-    // printf("__test_ifElseObject (COMPLETED).\n");
+    assert(__test_ifElseObject());
+    printf("__test_ifElseObject (COMPLETED).\n");
 
-    // assert(__test_returnStatement());
-    // printf("__test_returnStatement (COMPLETED).\n");
+    assert(__test_returnStatement());
+    printf("__test_returnStatement (COMPLETED).\n");
     
-    // assert(__test_errorHandling());
-    // printf("__test_errorHandling (COMPLETED).\n");
+    assert(__test_errorHandling());
+    printf("__test_errorHandling (COMPLETED).\n");
 
     assert(__test_letStatement());
     printf("__test_letStatement (COMPLETED).\n");

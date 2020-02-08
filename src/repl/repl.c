@@ -25,7 +25,7 @@ static char *get_line(const char *prompt);
 
 static void print_errors(const ParserError *errors);
 
-static void delete_data(Program *program, Lexer *lexer, Parser *parser, Object *object, Enviroment *enviroment);
+static void delete_data(Program *program, Lexer *lexer, Parser *parser, Object *object);
 
 Repl new_repl(const char *prompt) {
     Repl repl = {0};
@@ -41,17 +41,16 @@ void start_repl(Repl *repl) {
     Parser parser = (Parser){0};
     Program program = (Program){0};
     Object object = (Object){0};
-    Enviroment enviroment = (Enviroment){0};
-
+    
+    Enviroment enviroment = new_enviroment();
     while (true) {
         line = get_line(repl->_prompt);
         lexer = new_lexer(line);
         parser = new_parser(&lexer);
         program = program_parser(&parser);
-        enviroment = new_enviroment();
         if (parser.error._errors != NULL) {
             print_errors(&parser.error);
-            delete_data(&program, &lexer, &parser, &object, &enviroment);
+            delete_data(&program, &lexer, &parser, &object);
             continue;
         }
         object = evaluation(&program, &enviroment);
@@ -63,9 +62,9 @@ void start_repl(Repl *repl) {
 
         free(line);
         line = NULL;
-        delete_data(&program, &lexer, &parser, &object, &enviroment);
+        delete_data(&program, &lexer, &parser, &object);
     }
-    
+    free_enviroment(&enviroment);
 }
 
 static void print_errors(const ParserError *errors) {
@@ -74,12 +73,11 @@ static void print_errors(const ParserError *errors) {
         printf("\t%s\n", errors->_errors[k]);
 }
 
-static void delete_data(Program *program, Lexer *lexer, Parser *parser, Object *object, Enviroment *enviroment) {
+static void delete_data(Program *program, Lexer *lexer, Parser *parser, Object *object) {
     free_program(program);
     free_lexer(lexer);
     free_parser(parser);
-    free_object(object);
-    free_enviroment(enviroment);
+    if(!object->__in_table)free_object(object);
 }
 
 void free_repl(Repl *repl) {
