@@ -89,6 +89,12 @@ static Object copy_object(const Object *object) {
         ((OInteger *)result._obj)->__string = ((OInteger *)object->_obj)->__string;
         break;
     
+    case OBJ_BOOLEAN:
+        result._type = OBJ_BOOLEAN;
+        result._obj = (OBoolean *) malloc(sizeof(OBoolean));
+        ((OBoolean *)result._obj)->_value = ((OBoolean *)object->_obj)->_value;
+        break;
+    
     default:
         result._type = OBJ_NULL;
         result._obj = (ONull *) malloc(sizeof(ONull));
