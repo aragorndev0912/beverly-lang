@@ -49,15 +49,12 @@ void set_object_enviroment(Enviroment *enviroment, const char *key, Object *valu
 
 void free_enviroment(Enviroment *enviroment) {
     if (enviroment->_table != NULL) {
-        printf("ELIMINANDO\n");
         for (size_t k=0; k < enviroment->_len; k++) {
                 free_object(enviroment->_table[k].value);
                 enviroment->_table[k].value = NULL; 
         }    
         
-        printf("(0)ELIMINADO\n");
         free(enviroment->_table);
-        printf("(1)ELIMINADO\n");
         enviroment->_table = NULL;
     }
 }

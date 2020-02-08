@@ -13,11 +13,11 @@
 //----------------------------------------------------------------------------------
 // Firmas de funciones estaticas.
 //----------------------------------------------------------------------------------
-static void delete_data(Program *program, Lexer *lexer, Parser *parser, Enviroment *enviroment);
+static void delete_data(Program *program, Lexer *lexer, Parser *parser);
 
 static bool __test_evalIntegerExpression(void);
 
-static Object __eval_frontEnd(const char *input);
+static Object __eval_frontEnd(const char *input, Enviroment *enviroment);
 
 static bool __test_evalIntegerObject(Object *obj, int expected);
 
@@ -42,26 +42,26 @@ static bool __test_letStatement(void);
 //----------------------------------------------------------------------------------
 
 int main(void) {
-    // assert(__test_evalIntegerExpression());
-    // printf("__test_evalIntegerExpression (COMPLETED).\n");
+    assert(__test_evalIntegerExpression());
+    printf("__test_evalIntegerExpression (COMPLETED).\n");
 
-    // assert(__test_booleanExpression());
-    // printf("__test_booleanExpression (COMPLETED).\n");
+    assert(__test_booleanExpression());
+    printf("__test_booleanExpression (COMPLETED).\n");
 
-    // assert(__test_bangPrefixObject());
-    // printf("__test_bangPrefixObject (COMPLETED).\n");
+    assert(__test_bangPrefixObject());
+    printf("__test_bangPrefixObject (COMPLETED).\n");
 
-    // assert(__test_ifElseObject());
-    // printf("__test_ifElseObject (COMPLETED).\n");
+    assert(__test_ifElseObject());
+    printf("__test_ifElseObject (COMPLETED).\n");
 
-    // assert(__test_returnStatement());
-    // printf("__test_returnStatement (COMPLETED).\n");
+    assert(__test_returnStatement());
+    printf("__test_returnStatement (COMPLETED).\n");
     
-    // assert(__test_errorHandling());
-    // printf("__test_errorHandling (COMPLETED).\n");
+    assert(__test_errorHandling());
+    printf("__test_errorHandling (COMPLETED).\n");
 
-    assert(__test_letStatement());
-    printf("__test_letStatement (COMPLETED).\n");
+    // assert(__test_letStatement());
+    // printf("__test_letStatement (COMPLETED).\n");
 
     return 0;
 }
@@ -94,9 +94,10 @@ static bool __test_evalIntegerExpression(void) {
         (_TestInteger){.input="(5 + 10 * 2 + 15 / 3) * 2 + -10", .expected=50},
     }; 
 
+    Enviroment enviroment = new_enviroment();
     size_t size = sizeof(tests) / sizeof(_TestInteger);
     for (size_t k=0; k < size; k++) {
-        Object evaluate = __eval_frontEnd(tests[k].input);
+        Object evaluate = __eval_frontEnd(tests[k].input, &enviroment);
         if (evaluate._obj == NULL) {
             printf("Object value is NULL\n");
             return false;
@@ -108,25 +109,25 @@ static bool __test_evalIntegerExpression(void) {
 
         free_object(&evaluate);
     }
+    free_enviroment(&enviroment);
 
     return true;
 }
 
-static Object __eval_frontEnd(const char *input) {
+static Object __eval_frontEnd(const char *input, Enviroment *enviroment) {
     Object result = (Object){._obj=NULL, ._type=OBJ_UNDEFINED};
 
     Lexer lexer = new_lexer(input);
     Parser parser = new_parser(&lexer);
     Program program = program_parser(&parser);
-    Enviroment enviroment = new_enviroment();
     if (checkParserErrors(&parser)) {
-        delete_data(&program, &lexer, &parser, &enviroment);
+        delete_data(&program, &lexer, &parser);
         return result;
     }
 
-    result = evaluation(&program, &enviroment);
+    result = evaluation(&program, enviroment);
 
-    delete_data(&program, &lexer, &parser, &enviroment);
+    delete_data(&program, &lexer, &parser);
     return result;
 }
 
@@ -145,11 +146,10 @@ bool __test_evalIntegerObject(Object *obj, int expected) {
     return true;
 }
 
-static void delete_data(Program *program, Lexer *lexer, Parser *parser, Enviroment *enviroment) {
+static void delete_data(Program *program, Lexer *lexer, Parser *parser) {
     free_program(program);
     free_lexer(lexer);
     free_parser(parser);
-    // free_enviroment(enviroment);
 }
 
 static bool checkParserErrors(const Parser *const parser) {
@@ -192,9 +192,10 @@ static bool __test_booleanExpression(void) {
         (_TestBoolean){.input="(1 > 2) == false", .expected=true},
     };
 
+    Enviroment enviroment = new_enviroment();
     size_t size = sizeof(tests) / sizeof(_TestBoolean);
     for (size_t k=0; k < size; k++) {
-        Object evaluate = __eval_frontEnd(tests[k].input);
+        Object evaluate = __eval_frontEnd(tests[k].input, &enviroment);
         if (evaluate._obj == NULL) {
             printf("Object value is NULL\n");
             return false;
@@ -206,6 +207,7 @@ static bool __test_booleanExpression(void) {
 
         free_object(&evaluate);
     }
+    free_enviroment(&enviroment);
 
     return true;
 }
@@ -235,9 +237,10 @@ static bool __test_bangPrefixObject(void) {
         (_TestBoolean){.input="not not 6", .expected=true},
     };
 
+    Enviroment enviroment = new_enviroment();
     size_t size = sizeof(tests) / sizeof(_TestBoolean);
     for (size_t k=0; k < size; k++) {
-        Object evaluate = __eval_frontEnd(tests[k].input);
+        Object evaluate = __eval_frontEnd(tests[k].input, &enviroment);
         if (evaluate._obj == NULL) {
             printf("Object value is NULL\n");
             return false;
@@ -249,6 +252,7 @@ static bool __test_bangPrefixObject(void) {
 
         free_object(&evaluate);
     }
+    free_enviroment(&enviroment);
 
     return true;
 }
@@ -271,9 +275,10 @@ static bool __test_ifElseObject(void) {
         (_IfTest){.input="if (1 < 2) { 10 } else { 20 }", .type=OBJ_INTEGER, .value=10},
     };
 
+    Enviroment enviroment = new_enviroment();
     size_t size = sizeof(tests) / sizeof(_IfTest);
     for (size_t k=0; k < size; k++) {
-        Object evaluate = __eval_frontEnd(tests[k].input);
+        Object evaluate = __eval_frontEnd(tests[k].input, &enviroment);
         if (evaluate._obj == NULL) {
             printf("Object value is NULL\n");
             return false;
@@ -293,6 +298,8 @@ static bool __test_ifElseObject(void) {
 
         free_object(&evaluate);
     }
+    free_enviroment(&enviroment);
+
     return true;
 }
 
@@ -307,9 +314,10 @@ static bool __test_returnStatement(void) {
 
     };
 
+    Enviroment enviroment = new_enviroment();
     size_t size = sizeof(tests) / sizeof(_TestInteger);
     for (size_t k=0; k < size; k++) {
-        Object evaluate = __eval_frontEnd(tests[k].input);
+        Object evaluate = __eval_frontEnd(tests[k].input, &enviroment);
         if (evaluate._obj == NULL) {
             printf("Object value is NULL\n");
             return false;
@@ -324,6 +332,8 @@ static bool __test_returnStatement(void) {
 
         free_object(&evaluate);
     }
+    free_enviroment(&enviroment);
+
     return true;
 }
 
@@ -368,15 +378,16 @@ static bool __test_errorHandling(void) {
             }",
             "unknown operator: BOOLEAN + BOOLEAN"
         },
-        (_TestError){
-            "foobar",
-            "identifier not found: foobar",
-        },
+        // (_TestError){
+        //     "foobar",
+        //     "identifier not found: foobar",
+        // },
     };
 
+    Enviroment enviroment = new_enviroment();
     size_t size = sizeof(tests) / sizeof(_TestError);
     for (size_t k=0; k < size; k++) {
-        Object evaluate = __eval_frontEnd(tests[k].input);
+        Object evaluate = __eval_frontEnd(tests[k].input, &enviroment);
         if (evaluate._obj == NULL) {
             printf("Object value is NULL\n");
             return false;
@@ -396,6 +407,7 @@ static bool __test_errorHandling(void) {
 
         free_object(&evaluate);
     }
+    free_enviroment(&enviroment);
 
     return true;
 }
@@ -408,9 +420,10 @@ static bool __test_letStatement(void) {
         (_TestInteger){"let a = 5; let b = a; let c = a + b + 5; c;", 15},
     };
 
+    Enviroment enviroment = new_enviroment();
     size_t size = sizeof(tests) / sizeof(_TestError);
     for (size_t k=0; k < size; k++) {
-        Object evaluate = __eval_frontEnd(tests[k].input);
+        Object evaluate = __eval_frontEnd(tests[k].input, &enviroment);
         if (evaluate._obj == NULL) {
             printf("Object value is NULL\n");
             return false;
@@ -430,7 +443,7 @@ static bool __test_letStatement(void) {
         // if (!evaluate.__in_table)
         free_object(&evaluate);
     }
-
+    free_enviroment(&enviroment);
 
     return true;
 }

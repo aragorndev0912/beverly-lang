@@ -56,7 +56,6 @@ Object evaluation(Program *program, Enviroment *enviroment) {
         else if (result._type == OBJ_ERROR)
             return result;
     }
-    printf("AQUI\n");
     return result;
 }
 
@@ -377,14 +376,12 @@ static const char *_get_object_type(const Object *object) {
 }
 
 static Object _eval_letStatement(LetStatement *let_statement, Enviroment *enviroment) {
-    printf("ONE\n");
     Object result = _eval_expression(&let_statement->_value, enviroment);
     if (result._type == OBJ_NULL)
         return result;
     
     result.__in_table = true;
     set_object_enviroment(enviroment, let_statement->_name._value, &result);
-    printf("TWO\n");
     return result;
 }
 
