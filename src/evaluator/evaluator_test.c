@@ -42,26 +42,26 @@ static bool __test_letStatement(void);
 //----------------------------------------------------------------------------------
 
 int main(void) {
-    assert(__test_evalIntegerExpression());
-    printf("__test_evalIntegerExpression (COMPLETED).\n");
+    // assert(__test_evalIntegerExpression());
+    // printf("__test_evalIntegerExpression (COMPLETED).\n");
 
-    assert(__test_booleanExpression());
-    printf("__test_booleanExpression (COMPLETED).\n");
+    // assert(__test_booleanExpression());
+    // printf("__test_booleanExpression (COMPLETED).\n");
 
-    assert(__test_bangPrefixObject());
-    printf("__test_bangPrefixObject (COMPLETED).\n");
+    // assert(__test_bangPrefixObject());
+    // printf("__test_bangPrefixObject (COMPLETED).\n");
 
-    assert(__test_ifElseObject());
-    printf("__test_ifElseObject (COMPLETED).\n");
+    // assert(__test_ifElseObject());
+    // printf("__test_ifElseObject (COMPLETED).\n");
 
-    assert(__test_returnStatement());
-    printf("__test_returnStatement (COMPLETED).\n");
+    // assert(__test_returnStatement());
+    // printf("__test_returnStatement (COMPLETED).\n");
     
-    assert(__test_errorHandling());
-    printf("__test_errorHandling (COMPLETED).\n");
+    // assert(__test_errorHandling());
+    // printf("__test_errorHandling (COMPLETED).\n");
 
-    // assert(__test_letStatement());
-    // printf("__test_letStatement (COMPLETED).\n");
+    assert(__test_letStatement());
+    printf("__test_letStatement (COMPLETED).\n");
 
     return 0;
 }
@@ -378,10 +378,10 @@ static bool __test_errorHandling(void) {
             }",
             "unknown operator: BOOLEAN + BOOLEAN"
         },
-        // (_TestError){
-        //     "foobar",
-        //     "identifier not found: foobar",
-        // },
+        (_TestError){
+            "foobar",
+            "identifier not found: foobar",
+        },
     };
 
     Enviroment enviroment = new_enviroment();
@@ -416,33 +416,40 @@ static bool __test_letStatement(void) {
     _TestInteger tests[] = {
         (_TestInteger){"let a = 5; a;", 5},
         (_TestInteger){"let a = 5 * 5; a;", 25},
-        (_TestInteger){"let a = 5; let b = a; b;", 5},
-        (_TestInteger){"let a = 5; let b = a; let c = a + b + 5; c;", 15},
+        // (_TestInteger){"let a = 5; let b = a; b;", 5},
+        // (_TestInteger){"let a = 5; let b = a; let c = a + b + 5; c;", 15},
     };
 
     Enviroment enviroment = new_enviroment();
-    size_t size = sizeof(tests) / sizeof(_TestError);
+    size_t size = sizeof(tests) / sizeof(_TestInteger);
     for (size_t k=0; k < size; k++) {
+        printf("INI\n");
         Object evaluate = __eval_frontEnd(tests[k].input, &enviroment);
         if (evaluate._obj == NULL) {
             printf("Object value is NULL\n");
             return false;
         }
 
-        printf("---->\n");
-        // if (evaluate._type != OBJ_ERROR) {
-        //     printf("Object value is not OERROR\n");
-        //     return false;
-        // }
-        // OError *_oerror = (OError *)evaluate._obj;
-        // if (strcmp(_oerror->_value, tests[k].expected) != 0) {
-        //     printf("Value is not '%s'. got='%s'.\n", tests[k].expected, _oerror->_value);
-        //     return false;
-        // }        
+        if (evaluate._type != OBJ_INTEGER) {
+            printf("Object value is not OInteger\n");
+            free_enviroment(&enviroment);
+            return false;
+        }     
+
+        OInteger * integer = (OInteger *)evaluate._obj;
+        printf("value: %d\n", integer->_value);
+
+        if (integer->_value != tests[k].expected) {
+            printf("value is not '%d'. got='%d'.\n", tests[k].expected, integer->_value);
+            free_enviroment(&enviroment);
+            return false;
+        }
 
         // if (!evaluate.__in_table)
-        free_object(&evaluate);
+            // free_object(&evaluate);
     }
+
+    printf("ELIMINANDO.....\n");
     free_enviroment(&enviroment);
 
     return true;

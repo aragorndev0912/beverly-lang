@@ -48,15 +48,18 @@ void set_object_enviroment(Enviroment *enviroment, const char *key, Object *valu
 }
 
 void free_enviroment(Enviroment *enviroment) {
+    printf("BEGIN: FREE_ENVIROMENT\n");
     if (enviroment->_table != NULL) {
         for (size_t k=0; k < enviroment->_len; k++) {
-                free_object(enviroment->_table[k].value);
-                enviroment->_table[k].value = NULL; 
+            free_object(enviroment->_table[k].value);
+            enviroment->_table[k].value = NULL; 
         }    
         
         free(enviroment->_table);
         enviroment->_table = NULL;
     }
+    printf("END: FREE_ENVIROMENT\n");
+
 }
 
 static Symbol new_symbol(const char *key, Object *value) {
