@@ -416,14 +416,13 @@ static bool __test_letStatement(void) {
     _TestInteger tests[] = {
         (_TestInteger){"let a = 5; a;", 5},
         (_TestInteger){"let a = 5 * 5; a;", 25},
-        // (_TestInteger){"let a = 5; let b = a; b;", 5},
-        // (_TestInteger){"let a = 5; let b = a; let c = a + b + 5; c;", 15},
+        (_TestInteger){"let a = 6; let b = a + 5; b;", 11},
+        (_TestInteger){"let a = 5; let b = a; let c = a + b + 5; c;", 15},
     };
 
-    Enviroment enviroment = new_enviroment();
     size_t size = sizeof(tests) / sizeof(_TestInteger);
     for (size_t k=0; k < size; k++) {
-        printf("INI\n");
+        Enviroment enviroment = new_enviroment();
         Object evaluate = __eval_frontEnd(tests[k].input, &enviroment);
         if (evaluate._obj == NULL) {
             printf("Object value is NULL\n");
@@ -437,7 +436,7 @@ static bool __test_letStatement(void) {
         }     
 
         OInteger * integer = (OInteger *)evaluate._obj;
-        printf("value: %d\n", integer->_value);
+        // printf("value: %d\n", integer->_value);
 
         if (integer->_value != tests[k].expected) {
             printf("value is not '%d'. got='%d'.\n", tests[k].expected, integer->_value);
@@ -445,12 +444,9 @@ static bool __test_letStatement(void) {
             return false;
         }
 
-        // if (!evaluate.__in_table)
-            // free_object(&evaluate);
+        if(!evaluate.__in_table) free_object(&evaluate);
+        free_enviroment(&enviroment);
     }
-
-    printf("ELIMINANDO.....\n");
-    free_enviroment(&enviroment);
 
     return true;
 }

@@ -8,8 +8,8 @@
 // StructEnviroment.
 //----------------------------------------------------------------------------------
 typedef struct Symbol {
-    const char *key;
-    Object *value;
+    char *key;
+    Object value;
 
 } Symbol;
 
@@ -22,7 +22,7 @@ typedef struct Enviroment {
 
 Enviroment new_enviroment(void);
 
-const Object *get_object_enviroment(const Enviroment *enviroment, const char *key);
+const Object get_object_enviroment(const Enviroment *enviroment, const char *key);
 
 void set_object_enviroment(Enviroment *enviroment, const char *key, Object *value);
 

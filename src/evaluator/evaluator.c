@@ -125,8 +125,8 @@ static Object _eval_expression(Expression *expression, Enviroment *enviroment) {
             Object i_right = _eval_expression(&infix->_right, enviroment);
             const char *operator = infix->_operator;
             result = _eval_infixExpression(&left, operator, &i_right);
-            free_object(&left);
-            free_object(&i_right);
+            if (!left.__in_table) free_object(&left);
+            if (!i_right.__in_table) free_object(&i_right);
 
             return result;
 
@@ -172,7 +172,7 @@ static void _eval_prefixExpression(const char *operator, Object *right) {
     
     else {
         const char *_type = _get_object_type(right);
-        free_object(right);
+        if(!right->__in_table) free_object(right);
         right->_type = OBJ_ERROR;
         right->_obj = (OError *) malloc(sizeof(OError));
 
@@ -335,7 +335,7 @@ static Object _eval_ifElseExpression(IfExpression *_if, Enviroment *enviroment) 
 
     Object condition = _eval_expression(&_if->_condition, enviroment);
     if (condition._type != OBJ_BOOLEAN) {
-        free_object(&condition);
+        if(!condition.__in_table) free_object(&condition);
         return result;
     }
 
@@ -348,7 +348,7 @@ static Object _eval_ifElseExpression(IfExpression *_if, Enviroment *enviroment) 
         return _eval_statement(_if->_else_consequence._statements, enviroment);
     } 
     
-    free_object(&condition);
+    if(!condition.__in_table) free_object(&condition);
     return result;
 }
 
@@ -380,28 +380,25 @@ static Object _eval_letStatement(LetStatement *let_statement, Enviroment *enviro
     if (result._type == OBJ_NULL)
         return result;
     
-    result.__in_table = true;
     set_object_enviroment(enviroment, let_statement->_name._value, &result);
     return result;
 }
 
 static Object _eval_identifier(Identifier *identifier, Enviroment *enviroment) {
-    const Object *result = get_object_enviroment(enviroment, identifier->_value);
-    if (result == NULL) {
-        Object _result = new_object();
-        _result._type = OBJ_ERROR;
-        _result._obj = (OError *) malloc(sizeof(OError));
+    Object result = get_object_enviroment(enviroment, identifier->_value); 
+    if (result._type == OBJ_NULL) {
+        free_object(&result);
 
+        result._type = OBJ_ERROR;
+        result._obj = (OError *) malloc(sizeof(OError));
 
         char *msg = (char *) malloc(sizeof(char) * 100);
         sprintf(msg, "identifier not found: %s", identifier->_value);
-        new_oerror((OError *)_result._obj, msg);
+        new_oerror((OError *)result._obj, msg);
         
         free(msg);
         msg = NULL;
-
-        return _result;
     }
 
-    return *result;
+    return result; 
 }

@@ -15,11 +15,10 @@ Object new_object(void) {
 }
 
 void free_object(Object * object) {
-    printf("BEGIN: DELETE_OBJECT\n");
+    // printf("BEGIN: DELETE_OBJECT\n");
     if (object->_obj != NULL) {
         switch (object->_type) {
             case OBJ_INTEGER:
-                printf("INDISE: DELETE_OBJECT\n");
                 // printf("value: %d\n", ((OInteger *)object->_obj)->_value);
                 free_ointger((OInteger *)object->_obj);
                 break;
@@ -38,7 +37,7 @@ void free_object(Object * object) {
         free(object->_obj);
         object->_obj = NULL;
     }
-    printf("END: DELETE_OBJECT\n");
+    // printf("END: DELETE_OBJECT\n");
 }
 
 const char *inspect_object(Object *object) {
